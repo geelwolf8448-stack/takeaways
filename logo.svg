@@ -1,33 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 460">
-<defs>
- <linearGradient id="sky" x2="0" y2="1"><stop stop-color="#07133f"/><stop offset=".42" stop-color="#a51c43"/><stop offset=".72" stop-color="#ff4a08"/><stop offset="1" stop-color="#ffb000"/></linearGradient>
- <linearGradient id="gold" x2="0" y2="1"><stop stop-color="#fff45b"/><stop offset=".5" stop-color="#ffb600"/><stop offset="1" stop-color="#ed4b00"/></linearGradient>
- <linearGradient id="white" x2="0" y2="1"><stop stop-color="#fff"/><stop offset="1" stop-color="#bfc8dc"/></linearGradient>
- <filter id="shadow"><feGaussianBlur stdDeviation="7"/></filter>
-</defs>
-<rect width="1200" height="460" rx="52" fill="#03040b"/>
-<rect x="10" y="10" width="1180" height="440" rx="45" fill="url(#sky)" stroke="#ffd52b" stroke-width="9"/>
-<circle cx="600" cy="190" r="172" fill="url(#gold)" stroke="#fff27a" stroke-width="8"/>
-<path d="M20 300 Q180 245 340 300T660 300T1180 292V445H20Z" fill="#06112b"/>
-<path d="M20 345 Q190 320 350 345T690 345T1180 337" fill="none" stroke="#ffbd21" stroke-width="7"/>
-<g fill="#050611" stroke="#050611" stroke-width="8" stroke-linejoin="round">
- <path d="M90 285Q130 170 70 80Q145 142 155 208Q180 120 255 75Q198 158 180 226Q250 180 300 190Q230 225 180 270Z"/>
- <path d="M1010 290Q1065 175 1015 70Q1080 145 1090 210Q1125 130 1180 100Q1135 180 1110 245Q1160 215 1190 225L1190 290Z"/>
-</g>
-<g transform="translate(365 65)" stroke="#050611" stroke-width="17" stroke-linecap="round" stroke-linejoin="round">
- <path d="M80 235L160 145L260 165L340 235L285 252L205 225L145 270Z" fill="#101526"/>
- <circle cx="130" cy="270" r="53" fill="#090b15" stroke="#ffb800" stroke-width="13"/>
- <circle cx="340" cy="270" r="53" fill="#090b15" stroke="#ffb800" stroke-width="13"/>
- <path d="M145 220L215 150L295 170L340 230L260 225L205 205Z" fill="#fa4a08" stroke="#ffb800" stroke-width="9"/>
- <path d="M175 140L150 70L210 38L268 65L250 150Z" fill="#080b17"/>
- <path d="M205 75L225 25L272 10L305 42L282 83L250 100Z" fill="#080b17" stroke="#ffcb16" stroke-width="8"/>
- <path d="M300 170L365 120L405 132" fill="none"/>
- <path d="M160 150L105 118L75 135" fill="none"/>
-</g>
-<g transform="translate(70 55)" fill="#fff" stroke="#080a12" stroke-width="9" stroke-linejoin="round">
- <path d="M40 160Q-5 150 5 112Q15 82 48 88Q55 48 100 52Q135 52 146 87Q182 82 195 112Q205 150 168 163Z"/>
- <path d="M58 158L155 158L165 202L50 202Z"/>
-</g>
-<text x="600" y="330" text-anchor="middle" font-family="Arial Black,Arial,sans-serif" font-size="112" font-weight="1000" font-style="italic" fill="url(#white)" stroke="#05050a" stroke-width="18" paint-order="stroke">TAKEAWAYS</text>
-<text x="600" y="422" text-anchor="middle" font-family="Arial Black,Arial,sans-serif" font-size="100" font-weight="1000" font-style="italic" fill="url(#gold)" stroke="#09070b" stroke-width="18" paint-order="stroke">TONIGHT?</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 300">
+<defs><linearGradient id="g" x2="0" y2="1"><stop stop-color="#fff45c"/><stop offset=".48" stop-color="#ffbd00"/><stop offset="1" stop-color="#f45b00"/></linearGradient><linearGradient id="w" x2="0" y2="1"><stop stop-color="#fff"/><stop offset="1" stop-color="#c9d3e7"/></linearGradient></defs>
+<rect x="5" y="5" width="1090" height="290" rx="35" fill="#050713" stroke="#ffd52b" stroke-width="10"/>
+<circle cx="150" cy="145" r="125" fill="#07143a" stroke="url(#g)" stroke-width="9"/><circle cx="150" cy="145" r="92" fill="url(#g)"/>
+<g fill="#050713"><path d="M35 170Q70 95 45 30Q100 85 103 130Q130 65 185 50Q145 110 130 160Q175 125 220 135Q170 160 130 195Z"/></g>
+<g transform="translate(70 70)" stroke="#050713" stroke-width="10" stroke-linejoin="round"><circle cx="42" cy="112" r="24" fill="#080b17" stroke="#ffd21a"/><circle cx="130" cy="112" r="24" fill="#080b17" stroke="#ffd21a"/><path d="M38 96L75 52L115 60L136 96L95 100L68 83Z" fill="#f34b09" stroke="#ffbd00"/><path d="M70 55L66 15L95 0L125 16L116 57Z" fill="#080b17"/><path d="M94 15L110 -2L133 5L140 24L118 38Z" fill="#080b17" stroke="#ffd21a" stroke-width="5"/></g>
+<text x="300" y="132" font-family="Arial Black,Arial,sans-serif" font-size="105" font-weight="1000" font-style="italic" fill="url(#w)" stroke="#05050a" stroke-width="15" paint-order="stroke">TAKEAWAYS</text>
+<text x="315" y="245" font-family="Arial Black,Arial,sans-serif" font-size="110" font-weight="1000" font-style="italic" fill="url(#g)" stroke="#05050a" stroke-width="16" paint-order="stroke">TONIGHT?</text>
 </svg>
