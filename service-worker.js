@@ -1,4 +1,4 @@
-const CACHE_NAME = "takeaways-tonight-v5";
+const CACHE_NAME = "takeaways-tonight-v6";
 const APP_FILES = ["./", "./index.html", "./privacy.html", "./terms.html", "./manifest.webmanifest", "./icon.svg", "./config.js"];
 
 self.addEventListener("install", event => {
