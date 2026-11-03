@@ -1,12 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-<defs><linearGradient id="bg" x2="0" y2="1"><stop stop-color="#20102d"/><stop offset=".55" stop-color="#e53c19"/><stop offset="1" stop-color="#ff9b00"/></linearGradient><linearGradient id="sun" x2="0" y2="1"><stop stop-color="#fff45a"/><stop offset="1" stop-color="#ff7900"/></linearGradient></defs>
-<rect width="512" height="512" rx="112" fill="#111018"/><rect x="18" y="18" width="476" height="476" rx="96" fill="url(#bg)" stroke="#ffd400" stroke-width="12"/>
-<circle cx="256" cy="225" r="126" fill="url(#sun)" stroke="#fff3a0" stroke-width="8"/>
-<path d="M40 340Q140 300 230 340T472 330V460H40Z" fill="#111018"/>
-<path d="M86 360l-25-155m25 58-44-37m43 12 35-45m-34 79 47-20m-47-3-43 6" stroke="#111018" stroke-width="15" stroke-linecap="round" fill="none"/>
-<path d="M292 305h102l-17 42h-91z" fill="#fff8e9" stroke="#111018" stroke-width="12" stroke-linejoin="round"/>
-<path d="M316 305q27-62 54 0" fill="none" stroke="#111018" stroke-width="13" stroke-linecap="round"/>
-<circle cx="310" cy="365" r="24" fill="#ffd400" stroke="#111018" stroke-width="12"/><circle cx="390" cy="365" r="24" fill="#ffd400" stroke="#111018" stroke-width="12"/>
-<path d="M280 275h145" stroke="#fff8e9" stroke-width="13" stroke-linecap="round"/>
-<text x="256" y="438" text-anchor="middle" font-family="Arial,sans-serif" font-size="76" font-weight="900" fill="#fff" stroke="#111018" stroke-width="9" paint-order="stroke">TT?</text>
+<defs><linearGradient id="s" x2="0" y2="1"><stop stop-color="#13275f"/><stop offset=".52" stop-color="#ec4050"/><stop offset="1" stop-color="#ffb500"/></linearGradient><linearGradient id="g" x2="0" y2="1"><stop stop-color="#fff47a"/><stop offset="1" stop-color="#ff9b00"/></linearGradient></defs>
+<rect width="512" height="512" rx="105" fill="#05091d"/><rect x="14" y="14" width="484" height="484" rx="92" fill="url(#s)" stroke="#ffd21a" stroke-width="12"/>
+<circle cx="256" cy="205" r="135" fill="url(#g)"/><path d="M20 290q110-42 230 0t242-3v211H20z" fill="#05091d"/>
+<g stroke="#05091d" stroke-width="15" stroke-linecap="round" fill="none"><path d="M95 300V91m0 98Q30 95 30 67q57 14 75 93m-9-56q48-68 90-52-16 56-85 88"/><path d="M410 300V84m0 115q-56-85-99-76 18 58 105 98m-8-52q51-76 91-61-16 59-88 98"/></g>
+<path d="M190 135q-34-9-25-41 8-26 39-24 11-42 54-34 35 6 39 40 37-2 40 32 2 25-27 34z" fill="#fff" stroke="#07102f" stroke-width="10"/><path d="M202 132h128l-13 43H215z" fill="#fff" stroke="#07102f" stroke-width="10"/>
+<text x="256" y="345" text-anchor="middle" font-family="Trebuchet MS,Arial,sans-serif" font-size="76" font-weight="1000" font-style="italic" fill="#fff" stroke="#05091d" stroke-width="12" paint-order="stroke">TAKE</text>
+<text x="256" y="423" text-anchor="middle" font-family="Trebuchet MS,Arial,sans-serif" font-size="94" font-weight="1000" font-style="italic" fill="#ffd21a" stroke="#05091d" stroke-width="13" paint-order="stroke">TONIGHT?</text>
 </svg>
