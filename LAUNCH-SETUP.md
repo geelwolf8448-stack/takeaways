@@ -1,37 +1,43 @@
-# Takeaways Tonight? — launch setup
+# Takeaways Tonight? — simple launch plan
 
-The live site is a static GitHub Pages website. It can display the directory, but GitHub Pages alone cannot securely receive shared submissions or provide owner accounts. The SQL in `supabase/schema.sql` prepares a Supabase database with private partner applications and a separate public directory.
+**Live preview:** https://geelwolf8448-stack.github.io/TAKEAWAYS-TONIGHT-/
 
-## Current state
-- Website preview: https://geelwolf8448-stack.github.io/TAKEAWAYS-TONIGHT-/
-- The three sample restaurants are demos, not real businesses.
-- Partner applications are currently downloadable drafts; they are not sent to the team or published.
-- No payment gateway, delivery dispatch, customer accounts, or restaurant logins are active.
+## Important: no Supabase setup is needed right now
 
-## Connect the shared database (free-tier starting point)
-1. Create a Supabase account and a new project at https://supabase.com/.
-2. In the project, open **SQL Editor**, create a query, paste the complete contents of `supabase/schema.sql`, and run it.
-3. Open **Project Settings → API**. Copy the Project URL and the **anon/public** key only.
-4. Keep the **service_role** key private. Never send it in chat, email, screenshots, or website code.
-5. In the GitHub repository, open `config.js`, choose Edit, paste your Project URL into `supabaseUrl` and your anon/public key into `supabaseAnonKey`, then commit the change. The website code is prepared to read published rows from `restaurants` and submit private applications to `partner_applications` when these values are configured.
-6. Never paste the `service_role` key into `config.js`. The anon/public key is designed for browser use; the database Row Level Security policies are essential.
-7. Test with a small test application first. Confirm it appears as `pending` in Supabase Table Editor and is not visible in the public directory. Then create a test restaurant row with `is_published = true` and confirm it appears. Remove test data before launch.
+We are changing the order of work to keep the launch simple and avoid unnecessary setup. The website preview can run on GitHub Pages without Supabase. Leave the Supabase dashboard alone for now. Do not create database tables or copy API keys at this stage.
 
-## Approving a restaurant
-Review the application, contact the owner, verify permission, WhatsApp number, menu and prices, then create/update its row in `restaurants` and set `is_published = true`. The public site should only display rows where `is_published` is true.
+## What works in the current preview
 
-## Before taking real orders
-- Confirm every restaurant's written permission and current menu/prices.
-- Test WhatsApp order messages with the owner.
-- Explain that WhatsApp orders are requests until the restaurant confirms stock, delivery/collection, final price and payment.
-- Add spam protection and an admin workflow before promoting the application form widely.
-- Add a privacy notice and terms before collecting customer or restaurant information at scale.
+- Mobile-friendly South Coast food directory preview.
+- Search and category filters.
+- Demonstration menus and basket.
+- WhatsApp order-request flow for a real restaurant only after its verified number and menu are added.
+- A restaurant application form that prepares a downloadable draft on the device.
 
-## Suggested growth roadmap
-1. Shared database and secure application intake.
-2. Admin review and published restaurant directory.
-3. Restaurant owner accounts and menu editing.
-4. Customer favourites, ratings/moderation and campaign submissions.
-5. Order status, delivery options and payment integration only after local restaurant partnerships are established.
+## What is not live yet
 
-This project is an independent directory, not a restaurant, payment processor, or delivery company. Database provider free-tier limits and terms may change.
+- The three visible restaurants are demo listings, not actual partners.
+- Partner applications are not submitted to the platform.
+- There are no restaurant logins, shared admin dashboard, online payments or delivery dispatch.
+- No restaurant should be shown as a partner until it has given permission and its details have been checked.
+
+## First real-world launch steps
+
+1. Approach restaurants in Margate, Shelly Beach, Uvongo and Port Shepstone.
+2. Ask permission to display their business name, current menu, prices and WhatsApp ordering number.
+3. Verify the WhatsApp number and test an order request with the owner.
+4. Add only confirmed restaurant details to the website.
+5. Start with collection and direct restaurant confirmation. Treat every WhatsApp message as an order request until the restaurant confirms it.
+6. After the first partners and real applications exist, connect Supabase for shared applications and an approved public directory.
+
+## Future database setup (not required today)
+
+The repository includes `supabase/schema.sql` and `config.js` as a later foundation. When we are ready, we can connect them. Never place a database password or Supabase `service_role` key in website code or share either in chat. Only a Supabase anon/public key is intended for browser use, with correct Row Level Security policies.
+
+## Before commercial launch
+
+- Confirm written permission from each restaurant.
+- Confirm menus, prices, opening hours and fulfilment arrangements.
+- Add accurate operator contact details to the privacy notice and terms.
+- Get appropriate legal/privacy review.
+- Do not collect or process customer payments until a compliant payment setup has been designed and tested.
