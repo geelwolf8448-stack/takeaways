@@ -1,12 +1,12 @@
 # Takeaways Tonight? — First restaurant outreach list
 
-Purpose: invite the first five potential restaurant partners for the pilot. These are **prospects only**. None is confirmed as a partner.
+Purpose: invite local restaurant partners for the launch. These are **prospects only** until each owner agrees and approves their listing.
 
 ## First five prospects
 
 | Area | Business | Publicly listed contact | Why approach |
 |---|---|---:|---|
-| Sunwich Port | Orca's Beach Bar & Grill | +27 74 377 9802 | Strong local beachside identity; a good northern launch anchor |
+| Sunwich Port (existing meeting; confirm service-area exception) | Orca's Beach Bar & Grill | +27 74 377 9802 | Existing owner meeting; confirm whether it is included in the Hibberdene–Port Edward launch area |
 | Hibberdene | Fifi's Fresh Fish and Take Away | +27 39 699 2235; mobile +27 76 396 4301 is listed by Visit KZN South Coast | Established seafood/takeaway offer |
 | Sea Park | Fisherman's Belly | +27 73 525 3233 | Dedicated fish-and-chips takeaway |
 | Umtentweni | Jaxx Restaurant | +27 39 201 0479 | Broad menu and established local presence |
@@ -16,7 +16,7 @@ Purpose: invite the first five potential restaurant partners for the pilot. Thes
 
 - These are publicly listed telephone numbers, not confirmed WhatsApp numbers. Call first or check the business's official contact channel before sending a WhatsApp.
 - Ask for the owner or manager responsible for marketing/menu listings.
-- Explain the launch simply: free early-stage pilot listing; no fee is being advertised yet; owner controls the menu and prices; no listing goes live without written approval.
+- Explain the launch simply: proposed Premium listing R1,000/month plus a once-off R250 setup fee, with a 7-day free introductory trial; owner controls the menu and prices; no listing goes live without written approval.
 - Ask permission to use the restaurant name, logo/photos, menu, prices, phone number and opening hours.
 - Confirm whether they accept takeaway orders and whether they want customers to contact them by WhatsApp or phone.
 - Do not promise a number of orders, customer reach, delivery service, online payment or guaranteed sales.
@@ -24,11 +24,11 @@ Purpose: invite the first five potential restaurant partners for the pilot. Thes
 
 ## Suggested first message
 
-Hi! I'm getting in touch about **Takeaways Tonight?**, a new local food-finder for the KZN South Coast, covering Sunwich Port to Port Edward.
+Hi! I'm getting in touch about **Takeaways Tonight?**, a new local food-finder for the KZN South Coast, covering Hibberdene to Port Edward.
 
 We're inviting our first five restaurants to help shape the launch. The idea is to help locals and visitors discover menus, specials and takeaway options, then contact the restaurant directly to place an order.
 
-There is no listing fee being advertised for this early pilot. You stay in control of your menu, prices and order confirmations, and nothing is published without your approval.
+Our proposed Premium listing is R1,000 per month, plus a once-off R250 setup fee, with a 7-day free introductory trial. You stay in control of your menu, prices and order confirmations, and nothing is published without your approval.
 
 Would the owner or manager be open to a quick chat about being one of our first featured restaurants?
 
