@@ -13,7 +13,7 @@
 <meta name="description" content="Discover takeaway menus, local food specials and restaurants from Hibberdene to Port Edward on the KwaZulu-Natal South Coast.">
 <meta property="og:title" content="Takeaways Tonight? | South Coast food finder">
 <meta property="og:description" content="Find local food, browse menus and connect with participating South Coast takeaways from Hibberdene to Port Edward.">
-<meta property="og:type" content="website">
+<meta property="og:type" content="website"><meta property="og:image" content="hero-art.svg">
 <title>Takeaways Tonight? | South Coast</title>
 <style>
 :root{--ink:#111018;--muted:#45424b;--cream:#fff8e9;--paper:#fff;--orange:#ff6a00;--green:#b92718;--line:#e8d8c6;--gold:#ffd400}
@@ -150,6 +150,97 @@ footer{line-height:1.6}
  .deals{grid-template-columns:1fr}
  .brand-logo{width:210px}
 }
+
+
+/* TAKEAWAYS TONIGHT? — unified sunset rider visual system */
+:root{--ink:#03040b;--muted:#d7d9e7;--cream:#050713;--paper:#0a1028;--orange:#ffc400;--green:#ffc400;--line:#c69a16;--gold:#ffdf24}
+html{background:#03040b;scroll-behavior:smooth}
+body{background:#03040b;color:#fff;font-family:Arial,Helvetica,sans-serif;font-weight:650}
+header{padding:18px clamp(14px,4vw,54px) 56px;min-height:600px;background:#050713 url('hero-art.svg') center 42%/cover no-repeat;position:relative;isolation:isolate;border:0;border-bottom:5px solid #ffd52b}
+header:before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,#03040bd9 0%,#03040b70 45%,#03040b50 100%),linear-gradient(0deg,#03040bf2 0%,transparent 60%)}
+header:after{display:none}
+nav,.wrap{max-width:1240px}
+nav{align-items:center;padding:4px 0 14px}
+.brand-logo{width:min(450px,65vw);max-height:120px;filter:drop-shadow(0 5px 10px #000)}
+.nav-actions button{border-radius:999px;padding:12px 18px;font-size:14px}
+.hero{max-width:1240px;margin:75px auto 0;padding:24px 0 20px}
+.eyebrow{color:#ffe52d;font-size:14px;letter-spacing:3px;text-shadow:0 2px 5px #000}
+.hero h1{font-size:clamp(46px,8vw,92px);line-height:.98;letter-spacing:-2px;font-weight:1000;text-transform:none;text-shadow:0 4px 0 #000,0 8px 22px #000}
+.hero h1 span{color:#ffdc16!important;text-shadow:0 3px 0 #8b2800,0 8px 20px #000}
+.hero p{font-size:clamp(17px,2vw,22px);max-width:630px;color:#fff;text-shadow:0 2px 6px #000;font-weight:750}
+.hero .tag{background:#03040bdc;border:1px solid #ffd52b;color:#fff;font-weight:850;padding:9px 15px}
+main{max-width:1240px;padding:0 clamp(14px,3vw,34px);margin:-26px auto 60px}
+#installAppCard{background:linear-gradient(110deg,#090d20,#19102a 65%,#481628)!important;border:2px solid #ffd52b!important;border-radius:22px!important;box-shadow:0 12px 34px #0009!important;padding:20px 24px!important;color:#fff}
+#installAppCard img{width:64px!important;height:64px!important;border-radius:14px!important;border:2px solid #ffd52b}
+#installAppCard b{color:#ffdf24;font-size:20px}
+#installHint{color:#f4e8d6!important}
+.searchbar{background:#080d21;border:2px solid #d9ad20;border-radius:18px;box-shadow:0 12px 28px #0008;padding:12px}
+.searchbar input{color:#fff;background:transparent;font-weight:700}
+.searchbar input::placeholder{color:#c7c9d5}
+button{border-radius:999px;background:linear-gradient(180deg,#fff45a 0%,#ffd000 48%,#ff8a00 100%);color:#080a12;border:2px solid #fff17a;box-shadow:0 4px 0 #9d3900,0 6px 16px #0007;font-weight:1000}
+button:hover{filter:brightness(1.08);transform:translateY(-1px)}
+button.secondary,button.dark{background:linear-gradient(180deg,#171b30,#050713);color:#ffe12b;border:2px solid #ffd52b;box-shadow:0 3px 0 #6c3e00}
+.section-head{margin:42px 0 16px}
+.section-head h2{font-size:clamp(23px,3vw,32px);color:#fff;text-shadow:0 2px 8px #000;font-weight:1000}
+.section-head p,.notice{color:#cbd1e7}
+.deals{gap:16px}
+.deal,.deal:nth-child(2),.deal:nth-child(3){border:2px solid #e9b921;border-radius:20px;box-shadow:0 12px 25px #0008;background:linear-gradient(135deg,#11162f,#461b36 55%,#a63219);min-height:170px}
+.deal:nth-child(2){background:linear-gradient(135deg,#39112b,#bb321c 60%,#ff9b00)}
+.deal:nth-child(3){background:linear-gradient(135deg,#071332,#123c69 55%,#4e1b42)}
+.deal small{color:#ffe54a}
+.deal h3{font-size:25px;text-shadow:0 2px 4px #000}
+.card{background:linear-gradient(145deg,#111831,#080d20);border:1px solid #b68e1c;border-radius:20px;box-shadow:0 10px 28px #0008}
+.food-art{height:170px;background:linear-gradient(135deg,#ffb23a,#c32c28 55%,#172d6a)!important;font-size:76px;border-bottom:2px solid #e9b921}
+.card-body{padding:18px}
+.card h3{color:#fff;font-size:21px}
+.card p,.card .meta small{color:#cbd1e7}
+.pill{background:#ffdc26;color:#15101a}
+.filters button{background:#111832;color:#fff;border:1px solid #d0a31a}
+.filters button.active{background:#ffda19;color:#080a12}
+.empty{background:#0b122b;color:#fff;border:1px dashed #d2a51a}
+section[style*="background:#eaf2eb"]{background:linear-gradient(135deg,#0a1028,#1d1838 60%,#571e30)!important;border:2px solid #d5a51c!important;color:#fff}
+section[style*="background:#eaf2eb"] p{color:#dce1f2!important}
+section[style*="background:#fff"]{background:linear-gradient(135deg,#0a1028,#17152e)!important;border-color:#d5a51c!important;color:#fff}
+section[style*="background:#fff"] p{color:#dce1f2!important}
+footer{background:#02040b;border-top:4px solid #ffd52b;color:#e7e8ef;padding:40px 18px}
+footer b{font-size:22px;color:#ffdf24}
+dialog{background:#080e24;color:#fff;border:2px solid #d4a81b;border-radius:22px}
+.modal-head{background:linear-gradient(110deg,#050713,#1d1741 60%,#8d2a28);border-bottom:2px solid #ffd52b}
+.modal-body{background:#080e24;color:#fff}
+.menu-item,.basket-item{border-color:#39415f}
+.menu-item small{color:#cbd1e7}
+.field label{color:#ffdf24}
+.field input,.field textarea,.field select{background:#050a1c;color:#fff;border:1px solid #c39b1c}
+.admin-note{background:#241d36;color:#fff0b0;border:1px solid #b88e16}
+@media(max-width:760px){
+ header{min-height:580px;background-position:54% center}
+ nav{flex-wrap:wrap}
+ .brand-logo{width:min(360px,78vw);max-height:95px}
+ .nav-actions{width:100%;justify-content:flex-start}
+ .hero{margin-top:55px}
+ .hero h1{font-size:clamp(44px,11vw,64px)}
+ .deals{grid-template-columns:1fr 1fr}
+ .grid{grid-template-columns:1fr 1fr}
+ .food-art{height:120px;font-size:56px}
+}
+@media(max-width:480px){
+ header{min-height:610px;padding:12px 14px 46px;background-position:53% center}
+ .brand-logo{width:min(300px,78vw);max-height:78px}
+ .nav-actions button{font-size:12px;padding:9px 12px}
+ .hero{margin-top:58px}
+ .hero h1{font-size:clamp(42px,11vw,55px);letter-spacing:-1.2px}
+ .hero p{font-size:16px}
+ .deals,.grid{grid-template-columns:1fr 1fr;gap:10px}
+ .deal{padding:14px;min-height:145px}
+ .deal h3{font-size:18px}
+ .food-art{height:100px;font-size:45px}
+ .card-body{padding:12px}
+ .card h3{font-size:16px}
+ .card p{font-size:12px}
+ .card-actions{gap:6px}
+ .card-actions button{font-size:11px;padding:8px 9px}
+}
+@media(max-width:360px){.deals,.grid{grid-template-columns:1fr}}
 
 </style>
 </head>
