@@ -1,0 +1,53 @@
+name: Build Takeaways Tonight Android
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "index.html"
+      - "logo.svg"
+      - "icon.svg"
+      - "package.json"
+      - "capacitor.config.json"
+      - "scripts/**"
+      - ".github/workflows/android-build.yml"
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install dependencies
+        run: npm install
+      - name: Prepare web app
+        run: npm run build:web
+      - name: Add Android platform
+        run: npx cap add android
+      - name: Sync Android project
+        run: npx cap sync android
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - name: Build debug APK and release bundle
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug bundleRelease
+      - name: Upload Android APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: takeaways-tonight-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 14
+      - name: Upload Android App Bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: takeaways-tonight-release-aab-unsigned
+          path: android/app/build/outputs/bundle/release/app-release.aab
+          retention-days: 14
