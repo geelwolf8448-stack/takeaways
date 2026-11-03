@@ -1,32 +1,18 @@
 {
   "name": "Takeaways Tonight? — South Coast Food Finder",
-  "short_name": "Takeaways Tonight?",
+  "short_name": "Takeaways",
   "description": "Discover local takeaways, menus, specials and South Coast experiences from Hibberdene to Port Edward.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#fff8e9",
-  "theme_color": "#171018",
+  "background_color": "#07102f",
+  "theme_color": "#07102f",
   "orientation": "portrait-primary",
   "icons": [
-    {
-      "src": "icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any"
-    },
-    {
-      "src": "icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "maskable"
-    }
+    {"src":"icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any"},
+    {"src":"icon.svg","sizes":"any","type":"image/svg+xml","purpose":"maskable"}
   ],
-  "id": "./",
-  "categories": [
-    "food",
-    "shopping",
-    "lifestyle"
-  ],
-  "prefer_related_applications": false
+  "id":"./",
+  "categories":["food","shopping","lifestyle"],
+  "prefer_related_applications":false
 }
