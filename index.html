@@ -35,6 +35,10 @@ dialog{border:0;border-radius:20px;padding:0;width:min(580px,calc(100% - 24px));
 <div class="hero"><div class="eyebrow">THE SOUTH COAST FOOD FINDER</div><h1>What's for<br><span style="color:#ffc857">dinner tonight?</span></h1><p>Discover local food and experiences from Hibberdene to Port Edward. In-app ordering and secure checkout are being built.</p><span class="tag">📍 Hibberdene to Port Edward</span><span class="tag">🍔 Local food, made easy</span></div>
 </header>
 <main>
+<section id="installAppCard" style="margin:0 0 18px;padding:16px 18px;border-radius:16px;background:#fff;border:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+<div style="display:flex;align-items:center;gap:12px"><img src="icon.svg" alt="" width="48" height="48" style="border-radius:12px"><div><b>Get Takeaways Tonight? on your phone</b><div id="installHint" class="notice" style="margin:2px 0 0">Install the app for a home-screen icon and quick access.</div></div></div>
+<button id="installAppButton" type="button" onclick="installTakeawaysApp()">📲 Install app</button>
+</section>
 <div class="searchbar"><input id="search" placeholder="Search restaurants, meals or areas…" oninput="render()"><button onclick="render()">Search</button></div>
 <div class="section-head"><div><h2>South Coast food campaigns 🔥</h2><p>Community promotions we plan to run with participating restaurants.</p></div></div>
 <div class="deals"><div class="deal"><small>Food challenge</small><h3>The R100<br>meal challenge</h3><p>Find a filling deal for a hundred rand.</p><b>R100</b></div><div class="deal"><small>Tonight's spotlight</small><h3>Give local<br>food a go</h3><p>Discover a new South Coast favourite.</p><b>★</b></div><div class="deal"><small>Community vote</small><h3>South Coast<br>Food Wars</h3><p>Help choose the people's favourite.</p><b>♥</b></div></div>
@@ -78,6 +82,16 @@ const baseRestaurants=[
 ];
 let restaurants=JSON.parse(localStorage.getItem("tt_restaurants")||"null")||baseRestaurants;
 let basket=[];let activeFilter="All";let currentRestaurant=null;
+let deferredInstallPrompt=null;
+window.addEventListener("beforeinstallprompt",event=>{event.preventDefault();deferredInstallPrompt=event;document.getElementById("installAppButton").textContent="📲 Install app";document.getElementById("installHint").textContent="Add the app to your phone's home screen in a few taps.";});
+window.addEventListener("appinstalled",()=>{deferredInstallPrompt=null;document.getElementById("installAppButton").textContent="App installed ✓";document.getElementById("installAppButton").disabled=true;document.getElementById("installHint").textContent="Takeaways Tonight? is now on your home screen.";});
+async function installTakeawaysApp(){
+ if(deferredInstallPrompt){deferredInstallPrompt.prompt();const choice=await deferredInstallPrompt.userChoice;deferredInstallPrompt=null;if(choice&&choice.outcome==="accepted"){document.getElementById("installHint").textContent="Thanks for installing Takeaways Tonight?!";}return;}
+ const ua=navigator.userAgent||"",isIOS=/iphone|ipad|ipod/i.test(ua),isAndroid=/android/i.test(ua);
+ if(isIOS){alert("To install on iPhone: tap the Share button in Safari, then choose 'Add to Home Screen', and tap Add.");}
+ else if(isAndroid){alert("To install on Android: open this page in Chrome, tap the three dots ⋮ menu, then choose 'Install app' or 'Add to Home screen'.");}
+ else{alert("Open this site in Chrome, Edge or Safari and use the browser menu's Install app or Add to Home Screen option.");}
+}
 const categories=["All","Burgers","Pizza","Fish & chips","Chicken","Seafood","Takeaways","Other"];
 function save(){localStorage.setItem("tt_restaurants",JSON.stringify(restaurants))}
 function money(n){return "R"+Number(n).toFixed(2).replace(".00","")}
