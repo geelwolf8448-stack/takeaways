@@ -4,6 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#101b17">
+<meta name="description" content="Discover takeaway menus, local food specials and restaurants from Margate to Port Shepstone on the South Coast of KwaZulu-Natal.">
+<meta property="og:title" content="Takeaways Tonight? | South Coast food finder">
+<meta property="og:description" content="Find local food, browse menus and connect with South Coast takeaways.">
+<meta property="og:type" content="website">
 <title>Takeaways Tonight? | South Coast</title>
 <style>
 :root{--ink:#14221c;--muted:#65736b;--cream:#fffaf0;--paper:#fff;--orange:#f47735;--green:#1c6a4b;--line:#e9e6dc;--gold:#ffc857}
@@ -27,9 +31,22 @@ dialog{border:0;border-radius:20px;padding:0;width:min(580px,calc(100% - 24px));
 </header>
 <main>
 <div class="searchbar"><input id="search" placeholder="Search restaurants, meals or areas…" oninput="render()"><button onclick="render()">Search</button></div>
-<div class="section-head"><div><h2>Tonight's big deals 🔥</h2><p>Promotions from participating local restaurants.</p></div></div>
+<div class="section-head"><div><h2>South Coast food campaigns 🔥</h2><p>Community promotions we plan to run with participating restaurants.</p></div></div>
 <div class="deals"><div class="deal"><small>Food challenge</small><h3>The R100<br>meal challenge</h3><p>Find a filling deal for a hundred rand.</p><b>R100</b></div><div class="deal"><small>Tonight's spotlight</small><h3>Give local<br>food a go</h3><p>Discover a new South Coast favourite.</p><b>★</b></div><div class="deal"><small>Community vote</small><h3>South Coast<br>Food Wars</h3><p>Help choose the people's favourite.</p><b>♥</b></div></div>
-<div class="section-head"><div><h2>Find your food</h2><p>Choose a category to narrow it down.</p></div></div>
+
+<section style="margin:30px 0;padding:22px;background:#fff;border:1px solid var(--line);border-radius:18px">
+<div class="section-head" style="margin:0 0 12px"><div><h2>How Takeaways Tonight? works</h2><p>A simple way to discover local food.</p></div></div>
+<div class="deals" style="grid-template-columns:repeat(3,1fr)">
+<div style="padding:12px"><div style="font-size:28px">🔎</div><b>1. Discover</b><p style="font-size:13px;color:var(--muted)">Search restaurants, areas and food categories.</p></div>
+<div style="padding:12px"><div style="font-size:28px">📋</div><b>2. Browse</b><p style="font-size:13px;color:var(--muted)">Check menus and prices supplied by participating restaurants.</p></div>
+<div style="padding:12px"><div style="font-size:28px">💬</div><b>3. Order direct</b><p style="font-size:13px;color:var(--muted)">Send an order request to the restaurant and confirm the details with them.</p></div>
+</div></section>
+<section style="margin:30px 0;padding:24px;border-radius:18px;background:#eaf2eb;border:1px solid #d6e5d8">
+<div class="eyebrow" style="color:var(--green)">RESTAURANT OWNERS</div><h2 style="margin:8px 0">Put your menu in front of hungry locals.</h2>
+<p style="max-width:650px;color:var(--muted)">We are building a South Coast food directory, starting around Margate, Shelly Beach, Uvongo and Port Shepstone. Apply to be considered for the directory, showcase specials and help shape a better local takeaway experience.</p>
+<button onclick="openAdmin()">Apply to join the directory</button>
+<p class="notice">Early-stage launch: applications are drafts on the device used. Listings are checked with owners before publication. No listing fee or partnership price is being advertised yet.</p>
+</section><div class="section-head"><div><h2>Find your food</h2><p>Choose a category to narrow it down.</p></div></div>
 <div class="filters" id="filters"></div>
 <div class="section-head"><div><h2>Local restaurants</h2><p id="resultCount">Browse the directory.</p></div></div>
 <div class="grid" id="restaurants"></div>
