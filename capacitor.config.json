@@ -1,0 +1,11 @@
+{
+  "appId": "za.co.takeawaystonight.app",
+  "appName": "Takeaways Tonight?",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "allowMixedContent": false
+  }
+}
