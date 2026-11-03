@@ -102,6 +102,55 @@ dialog{background:#0c1538;color:#fff;border:1px solid #ffd21a}
 .admin-note{background:#1b2852;color:#fff0b0;border:1px solid #b88e16}
 @media(max-width:500px){.brand-logo{width:min(285px,64vw);max-height:76px}}
 
+
+/* Final mobile-first brand and layout corrections */
+header{padding:14px 18px 42px;overflow:hidden}
+nav{align-items:center;flex-wrap:wrap;gap:10px}
+.brand-logo{width:min(290px,58vw);max-height:74px;object-fit:contain}
+.nav-actions{gap:7px;flex-wrap:wrap;justify-content:flex-end}
+.nav-actions button{font-size:13px;padding:8px 12px;min-height:40px}
+.hero{margin-top:26px}
+.hero h1{font-size:clamp(36px,8vw,64px);line-height:1.02;letter-spacing:-1.8px;text-shadow:0 2px 5px #0008}
+.hero p{font-size:clamp(15px,3.7vw,18px);line-height:1.55;max-width:620px}
+main{padding:0 16px;margin-top:-20px}
+.searchbar{border-radius:15px;gap:7px}
+.searchbar input{font-size:15px;min-width:0}
+.section-head{margin:28px 0 12px}
+.section-head h2{font-size:22px}
+.grid{gap:12px}
+.card{border-radius:15px}
+.food-art{height:112px;font-size:54px}
+.card-body{padding:13px}
+#installAppCard{padding:18px!important;border-radius:18px!important}
+#installAppCard button{min-height:48px}
+footer{line-height:1.6}
+@media(max-width:600px){
+ header{padding:12px 14px 38px}
+ nav{justify-content:space-between}
+ .brand-logo{width:min(245px,57vw);max-height:62px}
+ .nav-actions{flex:1;min-width:100%;justify-content:flex-start}
+ .nav-actions button{font-size:12px;padding:8px 10px}
+ .hero{margin-top:25px}
+ .hero h1{font-size:clamp(36px,9vw,52px);letter-spacing:-1.3px;line-height:1.04}
+ .hero p{font-size:16px}
+ .hero .tag{font-size:12px;margin-top:8px}
+ .deals{grid-template-columns:1fr 1fr;gap:9px}
+ .deal{min-height:132px;padding:14px}
+ .deal h3{font-size:18px}
+ .grid{grid-template-columns:1fr 1fr;gap:10px}
+ .food-art{height:96px;font-size:46px}
+ .card h3{font-size:16px}
+ .card p{font-size:12px}
+ .card-actions{flex-wrap:wrap}
+ .card-actions button{font-size:11px;padding:8px 9px}
+ .searchbar button{padding:9px 12px;font-size:13px}
+}
+@media(max-width:380px){
+ .grid{grid-template-columns:1fr}
+ .deals{grid-template-columns:1fr}
+ .brand-logo{width:210px}
+}
+
 </style>
 </head>
 <body>
@@ -163,9 +212,10 @@ window.addEventListener("appinstalled",()=>{deferredInstallPrompt=null;document.
 async function installTakeawaysApp(){
  if(deferredInstallPrompt){deferredInstallPrompt.prompt();const choice=await deferredInstallPrompt.userChoice;deferredInstallPrompt=null;if(choice&&choice.outcome==="accepted"){document.getElementById("installHint").textContent="Thanks for installing Takeaways Tonight?!";}return;}
  const ua=navigator.userAgent||"",isIOS=/iphone|ipad|ipod/i.test(ua),isAndroid=/android/i.test(ua);
- if(isIOS){alert("To install on iPhone: tap the Share button in Safari, then choose 'Add to Home Screen', and tap Add.");}
- else if(isAndroid){alert("To install on Android: open this page in Chrome, tap the three dots ⋮ menu, then choose 'Install app' or 'Add to Home screen'.");}
- else{alert("Open this site in Chrome, Edge or Safari and use the browser menu's Install app or Add to Home Screen option.");}
+ const hint=document.getElementById("installHint");
+ if(isIOS){hint.textContent="In Safari, tap Share, then Add to Home Screen.";}
+ else if(isAndroid){hint.textContent="In Chrome, open the ⋮ menu and choose Install app. If it is not listed, choose Add to Home screen.";}
+ else{hint.textContent="Use your browser menu to choose Install app or Add to Home Screen.";}
 }
 const categories=["All","Burgers","Pizza","Fish & chips","Chicken","Seafood","Takeaways","Other"];
 function save(){localStorage.setItem("tt_restaurants",JSON.stringify(restaurants))}
