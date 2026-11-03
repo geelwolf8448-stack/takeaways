@@ -23,7 +23,7 @@ We are changing the order of work to keep the launch simple and avoid unnecessar
 
 ## First real-world launch steps
 
-1. Approach restaurants in Margate, Shelly Beach, Uvongo and Port Shepstone.
+1. Approach restaurants across Hibberdene, Pumula, Umzumbe, Umtentweni, Port Shepstone, Shelly Beach, Uvongo, Margate, Ramsgate, Southbroom and Port Edward.
 2. Ask permission to display their business name, current menu, prices and WhatsApp ordering number.
 3. Verify the WhatsApp number and test an order request with the owner.
 4. Add only confirmed restaurant details to the website.
