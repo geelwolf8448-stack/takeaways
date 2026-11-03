@@ -5,14 +5,28 @@
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#07102f",
-  "theme_color": "#07102f",
+  "background_color": "#03040b",
+  "theme_color": "#050713",
   "orientation": "portrait-primary",
   "icons": [
-    {"src":"icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any"},
-    {"src":"icon.svg","sizes":"any","type":"image/svg+xml","purpose":"maskable"}
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
   ],
-  "id":"./",
-  "categories":["food","shopping","lifestyle"],
-  "prefer_related_applications":false
+  "id": "./",
+  "categories": [
+    "food",
+    "shopping",
+    "lifestyle"
+  ],
+  "prefer_related_applications": false
 }
