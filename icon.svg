@@ -1,9 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-<defs><linearGradient id="sky" x2="0" y2="1"><stop stop-color="#fff06a"/><stop offset=".5" stop-color="#ff8a19"/><stop offset="1" stop-color="#e8322b"/></linearGradient><linearGradient id="bun" x2="0" y2="1"><stop stop-color="#ffe18a"/><stop offset="1" stop-color="#df7925"/></linearGradient></defs>
-<rect width="512" height="512" rx="112" fill="#09102c"/><rect x="15" y="15" width="482" height="482" rx="100" fill="url(#sky)"/>
-<circle cx="256" cy="190" r="112" fill="#fff7c5" opacity=".9"/><path d="M15 256q120-35 241 0t241 0v241H15z" fill="#10152f"/><path d="M25 286q110-28 220 0t242 0" fill="none" stroke="#ffcb36" stroke-width="9"/>
-<g fill="#10152f"><path d="M73 285V112L34 67l9-8 47 38 36-51 10 7-27 59 53-20 5 10-68 36v147z"/><path d="M439 285V108l-39-45 9-8 47 39 36-49 9 7-25 59 30-9v20l-67 26z"/></g>
-<ellipse cx="256" cy="347" rx="166" ry="91" fill="#fff7dc" stroke="#fff" stroke-width="9"/><ellipse cx="256" cy="347" rx="128" ry="62" fill="#d88b28"/>
-<path d="M137 332q119-61 238 0v27q-119 58-238 0z" fill="#6a261e"/><path d="M145 326q111 32 222 0l-12 21q-99 28-198 0z" fill="#ffd34c"/><path d="M151 313q105-43 210 0l-10 16q-95-28-190 0z" fill="#54a34c"/><path d="M160 300q96-44 192 0l-10 15q-86-28-172 0z" fill="#e8492e"/><path d="M173 289q83-42 166 0" fill="none" stroke="url(#bun)" stroke-width="26" stroke-linecap="round"/>
-<path d="M208 220q-15-13-4-28 10-14 27-5 5-23 28-23 22 0 26 21 21-3 25 16 3 17-16 23z" fill="#fff" stroke="#10152f" stroke-width="8"/><path d="M215 224h82l-8 23h-66z" fill="#fff" stroke="#10152f" stroke-width="8"/>
-<text x="256" y="469" text-anchor="middle" font-family="Arial,sans-serif" font-size="32" font-weight="900" letter-spacing="2" fill="#fff">TT?</text></svg>
+<defs><linearGradient id="bg" x2="0" y2="1"><stop stop-color="#06113c"/><stop offset=".45" stop-color="#d32927"/><stop offset="1" stop-color="#ff9d00"/></linearGradient><linearGradient id="sun" x2="0" y2="1"><stop stop-color="#fff44d"/><stop offset="1" stop-color="#ff6500"/></linearGradient></defs>
+<rect width="512" height="512" rx="112" fill="#03040b"/><rect x="12" y="12" width="488" height="488" rx="100" fill="url(#bg)" stroke="#ffd52b" stroke-width="12"/>
+<circle cx="256" cy="218" r="172" fill="url(#sun)" stroke="#fff07a" stroke-width="7"/>
+<path d="M20 340Q130 300 250 340T492 335V490H20Z" fill="#071027"/>
+<g fill="#050611"><path d="M35 305Q80 195 42 92Q110 160 120 230Q150 150 218 120Q160 208 143 278Q205 235 245 252L155 310Z"/><path d="M370 315Q430 205 392 95Q455 165 463 238L500 200V315Z"/></g>
+<g transform="translate(105 85)" stroke="#050611" stroke-width="18" stroke-linejoin="round" stroke-linecap="round"><circle cx="75" cy="265" r="48" fill="#080b15" stroke="#ffbd00" stroke-width="12"/><circle cx="275" cy="265" r="48" fill="#080b15" stroke="#ffbd00" stroke-width="12"/><path d="M65 220L140 150L230 170L275 220L205 228L145 205Z" fill="#f34408" stroke="#ffbd00" stroke-width="10"/><path d="M135 148L125 75L185 35L238 60L220 152Z" fill="#080b16"/><path d="M180 65L205 18L250 25L275 62L240 95Z" fill="#080b16" stroke="#ffbd00" stroke-width="8"/></g>
+<path d="M80 385Q256 340 432 385" fill="none" stroke="#ffd21c" stroke-width="13"/>
+<text x="256" y="438" text-anchor="middle" font-family="Arial Black,Arial,sans-serif" font-size="56" font-weight="1000" fill="#fff" stroke="#05050a" stroke-width="10" paint-order="stroke">TT?</text>
+</svg>
