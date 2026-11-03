@@ -28,7 +28,9 @@ We are changing the order of work to keep the launch simple and avoid unnecessar
 3. Verify the WhatsApp number and test an order request with the owner.
 4. Add only confirmed restaurant details to the website.
 5. Start with collection and direct restaurant confirmation. Treat every WhatsApp message as an order request until the restaurant confirms it.
-6. After the first partners and real applications exist, connect Supabase for shared applications and an approved public directory.
+6. Keep the payment rule: customers pay the restaurant directly after it accepts the order. The platform must never collect or hold food-order funds and must not charge order commission.
+7. Keep restaurant subscription fees (if activated) separate from customer food payments, with a written agreement and clear cancellation/billing terms.
+8. After the first partners and real applications exist, connect Supabase for shared applications and an approved public directory.
 
 ## Future database setup (not required today)
 
