@@ -4,6 +4,10 @@ on:
   push:
     paths:
       - "index.html"
+      - "manifest.webmanifest"
+      - "hero-art.svg"
+      - "splash.svg"
+      - "service-worker.js"
       - "logo.svg"
       - "icon.svg"
       - "package.json"
