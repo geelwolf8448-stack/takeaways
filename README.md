@@ -1,12 +1,14 @@
 # Takeaways Tonight? 🍔
 
-A South Coast, KwaZulu-Natal food discovery directory concept, starting with Margate, Shelly Beach, Uvongo and Port Shepstone.
+A South Coast, KwaZulu-Natal food discovery directory covering Hibberdene to Port Edward.
 
 **Live preview:** https://geelwolf8448-stack.github.io/TAKEAWAYS-TONIGHT-/
 
 ## Current launch approach
 
-We are deliberately starting with a simple, low-cost directory and WhatsApp order-request model. **Supabase is optional for the first preview and is not required to view the website.** Do not spend time configuring a database until the basic directory and first restaurant partnerships are ready.
+We are deliberately starting with a simple, low-cost directory and WhatsApp order-request model. The service area is **Hibberdene to Port Edward**. **Supabase is optional for the first preview and is not required to view the website.** Do not spend time configuring a database until the basic directory and first restaurant partnerships are ready.
+
+The current proposed founding Premium listing is **R1,000 per month**, plus a **once-off R250 setup fee**, with a **7-day introductory trial**. Confirm the package and terms with each restaurant before onboarding; this is a proposed offer, not a guarantee of customer orders.
 
 ## What's in this repository
 
