@@ -16,7 +16,7 @@
 <meta property="og:type" content="website">
 <title>Takeaways Tonight? | South Coast</title>
 <style>
-:root{--ink:#14221c;--muted:#65736b;--cream:#fffaf0;--paper:#fff;--orange:#f47735;--green:#1c6a4b;--line:#e9e6dc;--gold:#ffc857}
+:root{--ink:#111018;--muted:#45424b;--cream:#fff8e9;--paper:#fff;--orange:#ff6a00;--green:#b92718;--line:#e8d8c6;--gold:#ffd400}
 *{box-sizing:border-box}body{margin:0;background:var(--cream);color:var(--ink);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer;border:0;border-radius:999px;padding:11px 17px;font-weight:750;background:var(--orange);color:#fff}button.secondary{background:#edf3ee;color:var(--green)}button.dark{background:var(--ink)}button:disabled{opacity:.45;cursor:not-allowed}
 header{background:var(--ink);color:white;padding:18px max(5vw,18px) 52px;position:relative;overflow:hidden}header:after{content:"";position:absolute;width:360px;height:360px;border-radius:50%;background:#f4773525;right:-100px;top:-180px}
 nav,.wrap{max-width:1120px;margin:auto}nav{display:flex;align-items:center;justify-content:space-between;gap:12px;position:relative;z-index:1}.brand{font-size:20px;font-weight:950;letter-spacing:-.7px}.brand span{color:var(--gold)}.nav-actions{display:flex;gap:8px;align-items:center}.nav-actions button{font-size:13px;padding:9px 13px}.hero{max-width:1120px;margin:38px auto 0;position:relative;z-index:1}.eyebrow{color:var(--gold);font-size:12px;letter-spacing:2px;font-weight:900;text-transform:uppercase}.hero h1{font-size:clamp(38px,7vw,72px);line-height:.98;letter-spacing:-3px;margin:12px 0}.hero p{color:#d4ded7;max-width:560px;font-size:18px}.hero .tag{display:inline-block;background:#ffffff16;border:1px solid #ffffff2c;border-radius:30px;padding:7px 12px;margin:12px 6px 0 0;font-size:13px}
@@ -28,11 +28,35 @@ footer{background:#101b17;color:#d7e0d9;padding:28px 18px;text-align:center;font
 dialog{border:0;border-radius:20px;padding:0;width:min(580px,calc(100% - 24px));max-height:88vh;box-shadow:0 20px 80px #0005}dialog::backdrop{background:#0a1712b8}.modal-head{padding:18px 20px;background:var(--ink);color:white;display:flex;justify-content:space-between;align-items:center}.modal-head h2{font-size:20px;margin:0}.modal-body{padding:20px;overflow:auto;max-height:68vh}.x{background:#ffffff20;padding:6px 11px}.menu-item,.basket-item{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}.menu-item p{margin:0;font-weight:750}.menu-item small{color:var(--muted)}.qty{display:flex;align-items:center;gap:8px}.qty button{padding:5px 10px}.total{font-size:20px;font-weight:900;text-align:right;padding:15px 0}.field{display:grid;gap:5px;margin:12px 0}.field[hidden]{display:none}.field label{font-size:13px;font-weight:800}.field input,.field textarea,.field select{width:100%;border:1px solid #d8ddd8;border-radius:10px;padding:11px;background:#fff}.admin-note{background:#fff5e5;border-radius:12px;padding:12px;font-size:13px;color:#77501b}
 @media(max-width:760px){.grid,.deals{grid-template-columns:1fr 1fr}.hero{margin-top:30px}.hero p{font-size:16px}}
 @media(max-width:500px){.grid,.deals{grid-template-columns:1fr}.nav-actions button{padding:8px 10px}.brand{font-size:17px}.section-head{align-items:start;flex-direction:column}.searchbar{padding:8px}.searchbar button{padding:10px 12px}}
+/* Bold sunset brand palette and readable typography */
+body{font-weight:600;color:#17141b}
+header{background:linear-gradient(120deg,#100d1d,#25102a 50%,#681d18);border-bottom:5px solid #ffd400}
+header:after{background:#ff6a0040}
+.brand-logo{display:block;width:min(330px,62vw);height:auto;max-height:78px;object-fit:contain}
+.hero h1{font-weight:1000;text-shadow:0 3px 0 #0008}
+.hero p{color:#fff;font-weight:700;text-shadow:0 1px 2px #000}
+.eyebrow{color:#ffe15a;font-weight:1000}
+button{background:linear-gradient(135deg,#ffe500,#ff9b00);color:#171018;font-weight:950;border:2px solid #171018;box-shadow:0 3px 0 #8c3000}
+button.secondary{background:#fff;color:#a51f17;border:2px solid #a51f17}
+button.dark{background:#171018;color:#fff;border:2px solid #ffd400}
+.filters button.active{background:#a51f17;color:#fff;border-color:#a51f17}
+.deal{background:linear-gradient(135deg,#a51f17,#21102a)}
+.deal:nth-child(2){background:linear-gradient(135deg,#ff8a00,#bd2417)}
+.deal:nth-child(3){background:linear-gradient(135deg,#30203e,#111018)}
+.pill{background:#fff0bd;color:#70200d;font-weight:950}
+.card h3,.section-head h2{font-weight:950;color:#171018}
+.card p,.section-head p,.notice{color:#45424b;font-weight:650}
+.field label{font-weight:900;color:#171018}
+.field input,.field textarea,.field select{color:#171018;font-weight:650;border:2px solid #8a7b70}
+footer{background:#111018;border-top:5px solid #ffd400;color:#fff}
+#installAppCard{border:2px solid #ff9b00!important;box-shadow:0 8px 24px #5b2a1718}
+#installAppCard b{font-weight:950;color:#171018}
+@media(max-width:500px){.brand-logo{width:min(245px,58vw);max-height:64px}.hero h1{letter-spacing:-1.5px}}
 </style>
 </head>
 <body>
 <header>
-<nav><div class="brand">TAKEAWAYS <span>TONIGHT?</span></div><div class="nav-actions"><button class="secondary" onclick="openBasket()">🛒 Basket <span id="basketCount">0</span></button><button class="dark" onclick="openAdmin()">Restaurant portal</button></div></nav>
+<nav><img class="brand-logo" src="logo.svg" alt="Takeaways Tonight?"><div class="nav-actions"><button class="secondary" onclick="openBasket()">🛒 Basket <span id="basketCount">0</span></button><button class="dark" onclick="openAdmin()">Restaurant portal</button></div></nav>
 <div class="hero"><div class="eyebrow">THE SOUTH COAST FOOD FINDER</div><h1>What's for<br><span style="color:#ffc857">dinner tonight?</span></h1><p>Discover local food and experiences from Hibberdene to Port Edward. In-app ordering and secure checkout are being built.</p><span class="tag">📍 Hibberdene to Port Edward</span><span class="tag">🍔 Local food, made easy</span></div>
 </header>
 <main>
