@@ -1,10 +1,33 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 360" role="img" aria-labelledby="title desc">
-<title id="title">Takeaways Tonight?</title><desc id="desc">Bold South Coast food logo with a tropical sunset, palm trees, chef hat and burger.</desc>
-<defs><linearGradient id="bg" x2="1" y2="1"><stop stop-color="#09102c"/><stop offset=".58" stop-color="#18245a"/><stop offset="1" stop-color="#521b3b"/></linearGradient><linearGradient id="sun" x2="0" y2="1"><stop stop-color="#fff36a"/><stop offset=".55" stop-color="#ff9b1b"/><stop offset="1" stop-color="#ed4429"/></linearGradient><linearGradient id="gold" x2="0" y2="1"><stop stop-color="#fff66a"/><stop offset=".55" stop-color="#ffc52b"/><stop offset="1" stop-color="#ff7418"/></linearGradient><filter id="shadow"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-<rect x="8" y="8" width="1184" height="344" rx="42" fill="url(#bg)" stroke="#ffca32" stroke-width="8"/>
-<circle cx="172" cy="178" r="120" fill="url(#sun)"/><path d="M18 226q77-30 154 0t154-1v119H18z" fill="#090d25"/><path d="M24 246q90-24 180 0t128 0" fill="none" stroke="#ffd34a" stroke-width="6"/>
-<g fill="none" stroke="#090d25" stroke-width="14" stroke-linecap="round"><path d="M94 255V91m0 94Q35 103 35 72q49 9 72 95m-10-58q43-62 82-53-15 53-74 84m-4 11q-46-39-79-20 25 39 83 48"/><path d="M270 255V82m0 90q-53-74-91-68 16 54 96 88m-7-47q46-70 86-58-14 53-82 89"/></g>
-<g transform="translate(410 32)"><circle cx="100" cy="132" r="78" fill="#fff0b0" opacity=".9"/><ellipse cx="100" cy="236" rx="100" ry="48" fill="#fff8e3" stroke="#ffca32" stroke-width="8"/><ellipse cx="100" cy="236" rx="76" ry="31" fill="#d88b28"/><path d="M34 231q66-34 132 0v14q-66 31-132 0z" fill="#6b261e"/><path d="M43 222q57 18 114 0l-7 12q-50 17-100 0z" fill="#ffd34c"/><path d="M49 212q51-24 102 0l-6 10q-45-16-90 0z" fill="#55a34c"/><path d="M70 94q-13-11-3-24 9-12 22-4 5-20 24-19 20 0 23 18 18-2 21 14 2 14-14 19z" fill="#fff" stroke="#10152f" stroke-width="6"/><path d="M80 97h70l-7 18H87z" fill="#fff" stroke="#10152f" stroke-width="6"/></g>
-<text x="850" y="154" text-anchor="middle" font-family="Arial,sans-serif" font-size="100" font-weight="1000" font-style="italic" fill="#fff" stroke="#090d25" stroke-width="12" paint-order="stroke" filter="url(#shadow)">TAKEAWAYS</text>
-<text x="850" y="260" text-anchor="middle" font-family="Arial,sans-serif" font-size="116" font-weight="1000" font-style="italic" fill="url(#gold)" stroke="#090d25" stroke-width="13" paint-order="stroke" filter="url(#shadow)">TONIGHT?</text>
-<path d="M470 291q370 30 650-4" fill="none" stroke="#ffca32" stroke-width="6" stroke-linecap="round"/><text x="850" y="326" text-anchor="middle" font-family="Arial,sans-serif" font-size="24" font-weight="900" letter-spacing="4" fill="#fff4ce">ORDER · ENJOY · REPEAT</text></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 460">
+<defs>
+ <linearGradient id="sky" x2="0" y2="1"><stop stop-color="#07133f"/><stop offset=".42" stop-color="#a51c43"/><stop offset=".72" stop-color="#ff4a08"/><stop offset="1" stop-color="#ffb000"/></linearGradient>
+ <linearGradient id="gold" x2="0" y2="1"><stop stop-color="#fff45b"/><stop offset=".5" stop-color="#ffb600"/><stop offset="1" stop-color="#ed4b00"/></linearGradient>
+ <linearGradient id="white" x2="0" y2="1"><stop stop-color="#fff"/><stop offset="1" stop-color="#bfc8dc"/></linearGradient>
+ <filter id="shadow"><feGaussianBlur stdDeviation="7"/></filter>
+</defs>
+<rect width="1200" height="460" rx="52" fill="#03040b"/>
+<rect x="10" y="10" width="1180" height="440" rx="45" fill="url(#sky)" stroke="#ffd52b" stroke-width="9"/>
+<circle cx="600" cy="190" r="172" fill="url(#gold)" stroke="#fff27a" stroke-width="8"/>
+<path d="M20 300 Q180 245 340 300T660 300T1180 292V445H20Z" fill="#06112b"/>
+<path d="M20 345 Q190 320 350 345T690 345T1180 337" fill="none" stroke="#ffbd21" stroke-width="7"/>
+<g fill="#050611" stroke="#050611" stroke-width="8" stroke-linejoin="round">
+ <path d="M90 285Q130 170 70 80Q145 142 155 208Q180 120 255 75Q198 158 180 226Q250 180 300 190Q230 225 180 270Z"/>
+ <path d="M1010 290Q1065 175 1015 70Q1080 145 1090 210Q1125 130 1180 100Q1135 180 1110 245Q1160 215 1190 225L1190 290Z"/>
+</g>
+<g transform="translate(365 65)" stroke="#050611" stroke-width="17" stroke-linecap="round" stroke-linejoin="round">
+ <path d="M80 235L160 145L260 165L340 235L285 252L205 225L145 270Z" fill="#101526"/>
+ <circle cx="130" cy="270" r="53" fill="#090b15" stroke="#ffb800" stroke-width="13"/>
+ <circle cx="340" cy="270" r="53" fill="#090b15" stroke="#ffb800" stroke-width="13"/>
+ <path d="M145 220L215 150L295 170L340 230L260 225L205 205Z" fill="#fa4a08" stroke="#ffb800" stroke-width="9"/>
+ <path d="M175 140L150 70L210 38L268 65L250 150Z" fill="#080b17"/>
+ <path d="M205 75L225 25L272 10L305 42L282 83L250 100Z" fill="#080b17" stroke="#ffcb16" stroke-width="8"/>
+ <path d="M300 170L365 120L405 132" fill="none"/>
+ <path d="M160 150L105 118L75 135" fill="none"/>
+</g>
+<g transform="translate(70 55)" fill="#fff" stroke="#080a12" stroke-width="9" stroke-linejoin="round">
+ <path d="M40 160Q-5 150 5 112Q15 82 48 88Q55 48 100 52Q135 52 146 87Q182 82 195 112Q205 150 168 163Z"/>
+ <path d="M58 158L155 158L165 202L50 202Z"/>
+</g>
+<text x="600" y="330" text-anchor="middle" font-family="Arial Black,Arial,sans-serif" font-size="112" font-weight="1000" font-style="italic" fill="url(#white)" stroke="#05050a" stroke-width="18" paint-order="stroke">TAKEAWAYS</text>
+<text x="600" y="422" text-anchor="middle" font-family="Arial Black,Arial,sans-serif" font-size="100" font-weight="1000" font-style="italic" fill="url(#gold)" stroke="#09070b" stroke-width="18" paint-order="stroke">TONIGHT?</text>
+</svg>
