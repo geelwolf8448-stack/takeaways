@@ -1,0 +1,19 @@
+{
+  "name": "Takeaways Tonight? — South Coast Food Finder",
+  "short_name": "Takeaways Tonight",
+  "description": "Discover South Coast takeaways, menus and local food.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#fffaf0",
+  "theme_color": "#101b17",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
