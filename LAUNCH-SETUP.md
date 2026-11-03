@@ -11,14 +11,14 @@ We are changing the order of work to keep the launch simple and avoid unnecessar
 - Mobile-friendly South Coast food directory preview.
 - Search and category filters.
 - Demonstration menus and basket.
-- WhatsApp order-request flow for a real restaurant only after its verified number and menu are added.
+- Demonstration menu and basket only; live ordering and in-app payments are not enabled.
 - A restaurant application form that prepares a downloadable draft on the device.
 
 ## What is not live yet
 
 - The three visible restaurants are demo listings, not actual partners.
 - Partner applications are not submitted to the platform.
-- There are no restaurant logins, shared admin dashboard, online payments or delivery dispatch.
+- There are no customer/restaurant logins, shared order dashboard, live online payments, refunds or delivery dispatch.
 - No restaurant should be shown as a partner until it has given permission and its details have been checked.
 
 ## First real-world launch steps
@@ -27,10 +27,10 @@ We are changing the order of work to keep the launch simple and avoid unnecessar
 2. Ask permission to display their business name, current menu, prices and WhatsApp ordering number.
 3. Verify the WhatsApp number and test an order request with the owner.
 4. Add only confirmed restaurant details to the website.
-5. Start with collection and direct restaurant confirmation. Treat every WhatsApp message as an order request until the restaurant confirms it.
-6. Keep the payment rule: customers pay the restaurant directly after it accepts the order. The platform must never collect or hold food-order funds and must not charge order commission.
-7. Keep restaurant subscription fees (if activated) separate from customer food payments, with a written agreement and clear cancellation/billing terms.
-8. After the first partners and real applications exist, connect Supabase for shared applications and an approved public directory.
+5. The selected future model is in-app ordering, customer payment, restaurant acceptance and order-status updates.
+6. The selected platform commission is 15% of the food subtotal on successfully completed orders, excluding delivery charges in the initial design. The commission is not active until the payment integration and signed partner terms are approved.
+7. Keep any restaurant listing subscription separate from order commission, with written terms and clear cancellation/billing conditions.
+8. Build and test shared authentication, order records, restaurant dashboards, payment-provider callbacks, refund handling and commission reconciliation before taking real orders.
 
 ## Future database setup (not required today)
 
@@ -43,3 +43,4 @@ The repository includes `supabase/schema.sql` and `config.js` as a later foundat
 - Add accurate operator contact details to the privacy notice and terms.
 - Get appropriate legal/privacy review.
 - Do not collect or process customer payments until a compliant payment setup has been designed and tested.
+\n\n## Marketplace ordering and payments (new build)\n\nSee `MARKETPLACE-PAYMENTS.md` and `supabase/marketplace-schema.sql`. The current website is still a preview; these files do not activate live checkout. Do not accept real customer payments until provider approval, backend functions, security testing, refunds, restaurant agreements and legal/accounting review are complete.\n
