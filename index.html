@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#101b17">
+<meta name="theme-color" content="#07102f">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon.svg">
@@ -52,6 +52,56 @@ footer{background:#111018;border-top:5px solid #ffd400;color:#fff}
 #installAppCard{border:2px solid #ff9b00!important;box-shadow:0 8px 24px #5b2a1718}
 #installAppCard b{font-weight:950;color:#171018}
 @media(max-width:500px){.brand-logo{width:min(245px,58vw);max-height:64px}.hero h1{letter-spacing:-1.5px}}
+
+/* Midnight-blue, sunset and gold brand system */
+:root{--ink:#05091d;--muted:#d5d9ed;--cream:#07102f;--paper:#0c1538;--orange:#ffc400;--green:#ffc400;--line:#d5a900;--gold:#ffe22b}
+body{background:#07102f;color:#fff;font-weight:650}
+header{background:radial-gradient(ellipse at 50% 100%,#ff8b00 0%,#9d2c4d 20%,#152b70 48%,#05091d 78%);border-bottom:3px solid #ffd21a;color:#fff}
+header:before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#02061750,#03091a30);pointer-events:none}
+header:after{background:radial-gradient(circle,#ffd21a35,transparent 68%)}
+.brand-logo{width:min(390px,68vw);max-height:92px;filter:drop-shadow(0 4px 8px #000b)}
+.hero h1{color:#fff;text-shadow:0 3px 0 #000,0 0 18px #ffc40055;font-weight:1000}
+.hero h1 span{color:#ffd21a!important}
+.hero p{color:#fff;font-weight:750}
+.eyebrow{color:#ffe22b}
+.hero .tag{background:#03091ac9;border:1px solid #ffd21a;color:#fff;font-weight:800}
+main{color:#fff}
+.searchbar,.card,.empty{background:#0d173b;color:#fff;border:1px solid #b88e16;box-shadow:0 8px 24px #0005}
+.searchbar input{background:transparent;color:#fff}
+.searchbar input::placeholder{color:#bfc7e3}
+button{background:linear-gradient(135deg,#fff04a,#ffb600 60%,#ff8a00);color:#080d24;border:2px solid #ffe56a;box-shadow:0 3px 0 #8c5800;font-weight:950}
+button.secondary{background:#111d49;color:#ffe02a;border:2px solid #e8bd25}
+button.dark{background:#05091d;color:#ffe02a;border:2px solid #e8bd25}
+.filters button{background:#101a42;color:#fff;border:1px solid #b88e16}
+.filters button.active{background:#ffd21a;color:#080d24;border-color:#fff0a0}
+.section-head h2,.card h3{color:#fff;font-weight:950}
+.section-head p,.card p,.card .meta small,.notice{color:#d2d9f1}
+.deals .deal,.deal{border:1px solid #ffd21a;box-shadow:0 8px 22px #0005;background:linear-gradient(135deg,#0a1642,#101b50 55%,#7c2a50)}
+.deal:nth-child(2){background:linear-gradient(135deg,#7e2145,#e05a20,#ffae00)}
+.deal:nth-child(3){background:linear-gradient(135deg,#07102f,#183b78)}
+.deal small{color:#ffe22b}
+.pill{background:#ffe22b;color:#10142b;font-weight:950}
+.food-art{background:linear-gradient(135deg,#ffb33a,#9b3152,#172d6a)!important}
+#installAppCard{background:linear-gradient(135deg,#0d173b,#14275b)!important;border:2px solid #ffd21a!important;color:#fff;box-shadow:0 8px 25px #0007}
+#installAppCard b{color:#ffe22b}
+#installHint{color:#e0e5f8}
+section[style*="background:#eaf2eb"]{background:linear-gradient(135deg,#0c173d,#14275b)!important;border:1px solid #d2a51a!important;color:#fff}
+section[style*="background:#eaf2eb"] p{color:#e0e5f8!important}
+section[style*="background:#fff"]{background:#0c1538!important;border-color:#bd951c!important;color:#fff}
+section[style*="background:#fff"] p{color:#d5d9ed!important}
+footer{background:#030719;border-top:3px solid #ffd21a;color:#e9edff}
+footer b{color:#ffe22b}
+dialog{background:#0c1538;color:#fff;border:1px solid #ffd21a}
+.modal-head{background:linear-gradient(110deg,#07102f,#182d6a 65%,#8b304b);border-bottom:2px solid #ffd21a}
+.modal-body{background:#0c1538;color:#fff}
+.menu-item,.basket-item{border-color:#35416d}
+.menu-item small{color:#cbd3ee}
+.field label{color:#ffe22b}
+.field input,.field textarea,.field select{background:#07102f;color:#fff;border:1px solid #b88e16}
+.field input::placeholder,.field textarea::placeholder{color:#aeb8dc}
+.admin-note{background:#1b2852;color:#fff0b0;border:1px solid #b88e16}
+@media(max-width:500px){.brand-logo{width:min(285px,64vw);max-height:76px}}
+
 </style>
 </head>
 <body>
