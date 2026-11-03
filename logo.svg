@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 230" role="img" aria-labelledby="title">
+<title id="title">Takeaways Tonight?</title>
+<defs><linearGradient id="sunset" x2="1" y2="1"><stop stop-color="#fff45a"/><stop offset=".5" stop-color="#ff9b00"/><stop offset="1" stop-color="#ed3b18"/></linearGradient></defs>
+<rect x="8" y="8" width="984" height="214" rx="42" fill="#111018" stroke="#ffd400" stroke-width="12"/>
+<circle cx="112" cy="112" r="78" fill="url(#sunset)" stroke="#fff4a8" stroke-width="7"/>
+<path d="M48 152q60-25 128 0M80 151V72m0 30-25-22m25 38 30-36" stroke="#171018" stroke-width="10" fill="none" stroke-linecap="round"/>
+<path d="M122 127h38l-7 17h-34zM132 127q9-24 18 0" fill="#fff8e9" stroke="#171018" stroke-width="5"/>
+<text x="220" y="111" font-family="Arial,sans-serif" font-size="82" font-weight="900" letter-spacing="-3" fill="#fff" stroke="#171018" stroke-width="5" paint-order="stroke">TAKEAWAYS</text>
+<text x="224" y="190" font-family="Arial,sans-serif" font-size="82" font-weight="900" letter-spacing="-2" fill="url(#sunset)" stroke="#171018" stroke-width="5" paint-order="stroke">TONIGHT?</text>
+</svg>
