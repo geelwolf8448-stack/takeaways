@@ -1,5 +1,5 @@
 const CACHE_NAME = "takeaways-tonight-v1";
-const APP_FILES = ["./", "./index.html", "./privacy.html", "./terms.html", "./manifest.webmanifest", "./icon.svg"];
+const APP_FILES = ["./", "./index.html", "./privacy.html", "./terms.html", "./manifest.webmanifest", "./icon.svg", "./config.js"];
 
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(APP_FILES)).then(() => self.skipWaiting()));
