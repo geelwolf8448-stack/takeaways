@@ -50,7 +50,13 @@ async function sendMagicLink(){
   const {error}=await supabaseClient.auth.signInWithOtp({email,options:{emailRedirectTo:redirect,shouldCreateUser:false}});
   if(error)throw error;
   el("resetStatus").textContent="Sign-in link requested. Open the newest Takeaways Tonight sign-in email and click its link in this same browser. It will sign you in without a password.";
- }catch(error){el("resetStatus").textContent=error.message||"Could not send the sign-in link."}
+  }catch(error){
+  const detail=error.message||"Could not send the sign-in link.";
+  const diagnostics=/Error sending magic link email/i.test(detail)
+   ?" Supabase could not deliver the email. Check Supabase Dashboard → Logs → Auth Logs for the SMTP response. Confirm the Brevo sender address is verified, the SMTP host is smtp-relay.brevo.com, port is 587, the username is the Brevo SMTP login (not an API key), the SMTP key is current, and the Auth email rate limit has not been reached."
+   :"";
+  el("resetStatus").textContent=detail+(error.status?" (HTTP "+error.status+")":"")+(error.code?" ["+error.code+"]":"")+diagnostics;
+ }
  finally{button.disabled=false;}
 }
 async function restoreExistingSession(){
