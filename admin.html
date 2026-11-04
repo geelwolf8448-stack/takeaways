@@ -23,6 +23,8 @@ button.reject{background:#251010;color:#ffd9d9;border:1px solid #a44}button:disa
 <label for="email">Email</label><input id="email" type="email" autocomplete="username">
 <label for="password">Password</label><input id="password" type="password" autocomplete="current-password">
 <button id="loginButton" onclick="signIn()">Sign in</button>
+<button class="reject" id="resetButton" onclick="sendPasswordReset()">Email me a password-reset link</button>
+<div class="status" id="resetStatus" aria-live="polite">Enter your account email above, then request a reset link.</div>
 </div>
 <section id="dashboard" class="hidden">
 <div class="panel"><div class="row"><div><h2>Pending applications</h2><div class="small" id="who"></div></div><button class="reject" onclick="signOut()">Sign out</button></div><button onclick="loadApplications()">Refresh list</button><div class="status" id="status">Signed in. Loading applications…</div></div>
@@ -37,6 +39,19 @@ const config=window.TT_CONFIG||{};
 const el=id=>document.getElementById(id);
 function say(message){el("status").textContent=message}
 function apiHeaders(){return {apikey:config.supabaseAnonKey,Authorization:"Bearer "+accessToken,"Content-Type":"application/json"}}
+async function sendPasswordReset(){
+ const email=el("email").value.trim();
+ if(!email){el("resetStatus").textContent="Enter your Supabase account email first.";el("email").focus();return;}
+ if(!config.supabaseUrl||!config.supabaseAnonKey){el("resetStatus").textContent="Supabase configuration is missing.";return;}
+ const button=el("resetButton");button.disabled=true;el("resetStatus").textContent="Requesting a password-reset email…";
+ const redirect="https://geelwolf8448-stack.github.io/TAKEAWAYS-TONIGHT-/reset-password.html";
+ try{
+  const response=await fetch(config.supabaseUrl+"/auth/v1/recover?redirect_to="+encodeURIComponent(redirect),{method:"POST",headers:{apikey:config.supabaseAnonKey,"Content-Type":"application/json"},body:JSON.stringify({email})});
+  if(!response.ok){let detail="";try{const data=await response.json();detail=data.msg||data.message||data.error_description||"";}catch{}throw new Error(detail||"Supabase did not accept the reset request. Check Auth logs.");}
+  el("resetStatus").textContent="Supabase accepted the request. Check Inbox, Spam, Promotions and All Mail for the newest message titled Reset your password. The message must contain a Reset password link. If it has no link, the Supabase Recovery email template needs correction.";
+ }catch(error){el("resetStatus").textContent=error.message;}
+ finally{button.disabled=false;}
+}
 async function signIn(){
  if(!config.supabaseUrl||!config.supabaseAnonKey){alert("Supabase configuration is missing.");return}
  const button=el("loginButton");button.disabled=true;
