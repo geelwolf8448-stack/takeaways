@@ -26,6 +26,8 @@ jobs:
           node-version: 22
       - name: Install dependencies
         run: npm install
+      - name: Run release validation checks
+        run: npm test
       - name: Prepare web app
         run: npm run build:web
       - name: Add Android platform
