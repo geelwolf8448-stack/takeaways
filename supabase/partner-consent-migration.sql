@@ -16,7 +16,7 @@ $$;
 
 drop trigger if exists partner_permission_confirmation_stamp on public.partner_applications;
 create trigger partner_permission_confirmation_stamp
-before insert or update of permission_confirmed on public.partner_applications
+before insert or update on public.partner_applications
 for each row execute function public.stamp_partner_permission_confirmation();
 
 drop policy if exists "Anyone can submit partner applications" on public.partner_applications;
