@@ -4,6 +4,10 @@ on:
   push:
     paths:
       - "index.html"
+      - "admin.html"
+      - "reset-password.html"
+      - "privacy.html"
+      - "terms.html"
       - "manifest.webmanifest"
       - "hero-art.svg"
       - "splash.svg"
