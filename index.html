@@ -53,11 +53,61 @@ header{background-position:center 45%;background-size:cover}
 .install-panel{background:linear-gradient(115deg,#080808,#241006 65%,#72200d)}
 footer{background:#020202}
 
+
+/* Rebuilt poster-style home screen: composition follows the supplied campaign artwork */
+header.poster-header{min-height:0;padding:14px clamp(12px,3vw,38px) 30px;background:#020202 url('hero-art.svg') center 38%/cover no-repeat;border:7px solid #ffc914;border-radius:38px;margin:8px;box-shadow:inset 0 0 0 3px #fff2a1,0 0 28px #ff920044}
+header.poster-header:before{background:linear-gradient(180deg,#02030a55 0%,#03030308 35%,#030303aa 100%)}
+.poster-nav{max-width:1200px;min-height:52px;display:flex;justify-content:space-between;align-items:center;gap:12px;position:relative;z-index:3}
+.nav-location{font-size:12px;font-weight:1000;letter-spacing:1.5px;color:#ffe36a;text-shadow:0 2px 5px #000}
+.poster-main{max-width:1120px;margin:10px auto 0;position:relative;z-index:2;text-align:center}
+.poster-logo-wrap{width:100%;max-width:980px;margin:0 auto;filter:drop-shadow(0 9px 15px #000)}
+.poster-logo{display:block;width:100%;height:auto;max-height:500px;object-fit:contain}
+.poster-tagline{display:inline-block;margin:0 auto 18px;padding:9px clamp(14px,3vw,36px);border-radius:50%;background:#050505ed;border-top:4px solid #ffcf18;border-bottom:4px solid #ffcf18;color:#fff;font-family:Georgia,serif;font-size:clamp(18px,3vw,34px);font-style:italic;font-weight:bold;text-shadow:0 3px 8px #000}
+.poster-categories{display:flex;align-items:center;justify-content:center;gap:clamp(8px,2vw,25px);padding:15px 10px;margin:0 auto 18px;max-width:1050px;background:#030303eF;border-top:2px solid #ffcf18;border-bottom:2px solid #ffcf18;border-radius:18px}
+.poster-categories span{display:flex;align-items:center;gap:9px;text-align:left;color:#ffd51b;font-size:clamp(23px,3vw,35px)}
+.poster-categories b{font:900 clamp(10px,1.35vw,16px)/1.15 Arial,sans-serif;color:#fff}
+.poster-categories i{height:42px;width:2px;background:#ffd51b;flex:none}
+.poster-download{display:block;max-width:760px;margin:0 auto;padding:14px 22px;border:4px solid #fff08a;border-radius:60px;background:linear-gradient(180deg,#fff52b,#ffbf00 55%,#ff7500);box-shadow:0 6px 0 #8d2b00,0 12px 25px #000b;color:#080808;text-decoration:none;font-size:clamp(22px,4vw,40px);font-weight:1000;letter-spacing:.4px;text-shadow:0 1px #fff8}
+.poster-region{margin:20px auto 0;color:#ffe36a;font-size:11px;font-weight:1000;letter-spacing:2px;text-shadow:0 2px 5px #000}
+main{margin:18px auto 60px}
+.feature-nav a{border-radius:14px;background:linear-gradient(180deg,#16100a,#030303);box-shadow:0 4px 0 #8c4c05,0 8px 16px #0009}
+.section-ribbon{background:linear-gradient(90deg,#050505,#351307,#050505);border-color:#ffcf18}
+.deal{background:linear-gradient(135deg,#080808 0%,#461608 55%,#f05a08 100%)}
+.deal:nth-child(2){background:linear-gradient(135deg,#090909,#78200f 65%,#ff9b00)}
+.deal:nth-child(3){background:linear-gradient(135deg,#090909,#38120b 60%,#a62b14)}
+.card{background:linear-gradient(145deg,#18100a,#030303);border-color:#e9b91a}
+.food-art{background:radial-gradient(circle at 50% 45%,#ffb33b,#b62c1b 65%,#080808)}
+.card:nth-child(3n+2) .food-art{background:radial-gradient(circle at 50% 45%,#f6c27c,#793b22 60%,#080808)}
+.card:nth-child(3n) .food-art{background:radial-gradient(circle at 50% 45%,#ffc65a,#a62922 60%,#080808)}
+.promo-panel,.install-panel{background:linear-gradient(125deg,#070707,#281006 60%,#79220e);border-color:#ffcf18}
+.modal-head{background:linear-gradient(110deg,#050505,#391408 65%,#8c2b10)}
+.modal-body{background:#080604}
+.admin-note{background:#211108;border-color:#bb8b16}
+button.secondary,button.dark{background:linear-gradient(180deg,#25180d,#050505);color:#ffdf25}
+@media(max-width:650px){
+ header.poster-header{padding:10px 9px 22px;border-width:5px;border-radius:25px}
+ .poster-nav{align-items:center}.nav-location{font-size:9px;letter-spacing:.8px}
+ .poster-logo{max-height:340px}
+ .poster-tagline{font-size:clamp(16px,4.3vw,23px);margin-bottom:12px}
+ .poster-categories{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:13px 9px}
+ .poster-categories i{display:none}
+ .poster-categories span{font-size:24px;justify-content:center}
+ .poster-categories b{font-size:10px}
+ .poster-download{font-size:clamp(19px,5vw,27px);padding:12px 8px}
+ .poster-region{font-size:8px;letter-spacing:1px;line-height:1.6}
+}
+
 </style>
 <body>
-<header>
-<nav><img class="brand-logo" src="logo.svg" alt="Takeaways Tonight?"><div class="nav-actions"><button class="secondary" onclick="openBasket()">🛒 Basket <span id="basketCount">0</span></button><button class="dark" onclick="openAdmin()">Restaurant portal</button></div></nav>
-<div class="hero"><div class="eyebrow">THE SOUTH COAST FOOD FINDER</div><h1>What's for<br><span>dinner tonight?</span></h1><p>Discover local food, takeaway menus and unforgettable experiences from Hibberdene to Port Edward. Discover local. Order direct. Support local.</p><span class="tag">📍 HIBBERDENE TO PORT EDWARD</span><span class="tag">🍔 LOCAL FOOD · GREAT VIBES</span></div>
+<header class="poster-header">
+<nav class="poster-nav"><span class="nav-location">📍 KZN SOUTH COAST</span><div class="nav-actions"><button class="secondary" onclick="openBasket()">🛒 Basket <span id="basketCount">0</span></button><button class="dark" onclick="openAdmin()">Restaurant portal</button></div></nav>
+<div class="poster-main">
+<div class="poster-logo-wrap"><img class="poster-logo" src="logo.svg" alt="Takeaways Tonight? — chef hat and delivery rider logo"></div>
+<div class="poster-tagline">Discover local. Order direct. Support local.</div>
+<div class="poster-categories"><span>🍴 <b>RESTAURANTS<br>& MENUS</b></span><i></i><span>🍱 <b>FOOD<br>DELIVERY</b></span><i></i><span>🍸 <b>BARS &<br>EXPERIENCES</b></span><i></i><span>⭐ <b>SPECIALS<br>& DEALS</b></span></div>
+<a class="poster-download" href="#restaurants">⬇ &nbsp; EXPLORE & ORDER NOW</a>
+<div class="poster-region">HIBBERDENE · PORT SHEPSTONE · MARGATE · PORT EDWARD</div>
+</div>
 </header>
 <main>
 <div class="feature-nav"><a href="#restaurants"><strong>🍴</strong> Restaurants & menus</a><a href="#restaurants"><strong>♨</strong> Food delivery</a><a href="#campaigns"><strong>🍸</strong> Bars & experiences</a><a href="#campaigns"><strong>★</strong> Specials & deals</a><a href="#owners"><strong>♥</strong> Support local</a></div>
