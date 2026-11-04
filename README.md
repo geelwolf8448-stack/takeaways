@@ -42,4 +42,4 @@ The project has moved beyond the original static preview. Use the code in `index
 - `supabase/schema.sql` — shared directory, application and approval schema.
 - `supabase/admin-setup.sql` — adds the owner Auth account to the admin allowlist.
 - `supabase/marketplace-schema.sql` and `MARKETPLACE-PAYMENTS.md` — future marketplace planning; not live.
-- `COMPLIANCE-CHECKLIST.md` — pre-launch operational and legal review checklist.\n- `scripts/validate-release.js` — static release checks, run with `npm test`.
+- `COMPLIANCE-CHECKLIST.md` — pre-launch operational and legal review checklist.\n- `scripts/validate-release.js` — static release checks, run with `npm test`.\n- `LAUNCH-KIT.md` — ready-to-adapt public launch copy, restaurant invitation, onboarding checklist, customer FAQ and Google Play listing draft.\n- `ANDROID-RELEASE.md` — secure upload-keystore instructions and signed release process.\n- `.github/workflows/android-release.yml` — manual signed APK/AAB workflow; requires four private GitHub Actions signing secrets.
