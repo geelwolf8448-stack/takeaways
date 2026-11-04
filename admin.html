@@ -34,7 +34,7 @@ button.reject{background:#251010;color:#ffd9d9;border:1px solid #a44}button:disa
 </main>
 <script src="config.js"></script>
 <script>
-let accessToken="",currentEmail="";
+let accessToken="",currentEmail="",currentUserId="";
 const config=window.TT_CONFIG||{};
 const el=id=>document.getElementById(id);
 function say(message){el("status").textContent=message}
@@ -59,14 +59,20 @@ async function signIn(){
   const response=await fetch(config.supabaseUrl+"/auth/v1/token?grant_type=password",{method:"POST",headers:{apikey:config.supabaseAnonKey,"Content-Type":"application/json"},body:JSON.stringify({email:el("email").value.trim(),password:el("password").value})});
   const data=await response.json();
   if(!response.ok)throw new Error(data.msg||data.message||"Sign-in failed.");
-  accessToken=data.access_token;currentEmail=data.user?.email||el("email").value;
+  accessToken=data.access_token;currentEmail=data.user?.email||el("email").value;currentUserId=data.user?.id||"";
   el("loginPanel").classList.add("hidden");el("dashboard").classList.remove("hidden");el("who").textContent="Signed in as "+currentEmail;
   await loadApplications();
  }catch(error){alert(error.message)}finally{button.disabled=false}
 }
 async function loadApplications(){
- say("Loading pending applications…");
+ say("Checking administrator access…");
  try{
+  if(!currentUserId)throw new Error("Your sign-in session has no user ID. Sign out and sign in again.");
+  const access=await fetch(config.supabaseUrl+"/rest/v1/admin_users?select=user_id&user_id=eq."+encodeURIComponent(currentUserId),{headers:apiHeaders()});
+  if(!access.ok)throw new Error("Could not verify administrator access ("+access.status+"). Check the admin_users table permissions.");
+  const admins=await access.json();
+  if(!admins.length)throw new Error("You are signed in, but this account is not on the administrator allowlist yet. The admin user must be added to public.admin_users in Supabase.");
+  say("Administrator verified. Loading pending applications…");
   const response=await fetch(config.supabaseUrl+"/rest/v1/partner_applications?select=id,restaurant_name,area,category,whatsapp,menu,created_at,status&status=eq.pending&order=created_at.asc",{headers:apiHeaders()});
   const data=await response.json();if(!response.ok)throw new Error(data.message||data.hint||"Could not load applications. Check that the SQL upgrade was run and this account is allowlisted.");
   el("applications").innerHTML=data.length?data.map(app=>card(app)).join(""):'<div class="panel">No pending applications. New submissions will appear here.</div>';
