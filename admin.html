@@ -23,6 +23,7 @@ button.reject{background:#251010;color:#ffd9d9;border:1px solid #a44}button:disa
 <label for="email">Email</label><input id="email" type="email" autocomplete="username">
 <label for="password">Password</label><input id="password" type="password" autocomplete="current-password">
 <button id="loginButton" onclick="signIn()">Sign in</button>
+<button id="magicButton" class="reject" onclick="sendMagicLink()">Email me a passwordless sign-in link</button>
 <button class="reject" id="resetButton" onclick="sendPasswordReset()">Email me a password-reset link</button>
 <div class="status" id="resetStatus" aria-live="polite">Enter your account email above, then request a reset link.</div>
 </div>
@@ -32,10 +33,12 @@ button.reject{background:#251010;color:#ffd9d9;border:1px solid #a44}button:disa
 </section>
 <div class="small">Security: the browser uses only the public Supabase publishable key. Review actions are checked again inside a database function; no secret key is stored here.</div>
 </main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
 <script>
 let accessToken="",currentEmail="",currentUserId="";
 const config=window.TT_CONFIG||{};
+const supabaseClient=(window.supabase&&config.supabaseUrl&&config.supabaseAnonKey)?window.supabase.createClient(config.supabaseUrl,config.supabaseAnonKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}}):null;
 const el=id=>document.getElementById(id);
 function say(message){el("status").textContent=message}
 function apiHeaders(){return {apikey:config.supabaseAnonKey,Authorization:"Bearer "+accessToken,"Content-Type":"application/json"}}
@@ -51,6 +54,26 @@ async function sendPasswordReset(){
   el("resetStatus").textContent="Supabase accepted the request. Check Inbox, Spam, Promotions and All Mail for the newest message titled Reset your password. The message must contain a Reset password link. If it has no link, the Supabase Recovery email template needs correction.";
  }catch(error){el("resetStatus").textContent=error.message;}
  finally{button.disabled=false;}
+}
+async function sendMagicLink(){
+ const email=el("email").value.trim();
+ if(!email){el("resetStatus").textContent="Enter your account email first.";el("email").focus();return;}
+ if(!supabaseClient){el("resetStatus").textContent="Supabase sign-in could not initialise. Refresh the page and try again.";return;}
+ const button=el("magicButton");button.disabled=true;el("resetStatus").textContent="Sending a one-time sign-in link…";
+ try{
+  const redirect="https://geelwolf8448-stack.github.io/TAKEAWAYS-TONIGHT-/reset-password.html";
+  const {error}=await supabaseClient.auth.signInWithOtp({email,options:{emailRedirectTo:redirect,shouldCreateUser:false}});
+  if(error)throw error;
+  el("resetStatus").textContent="Sign-in link requested. Open the newest Takeaways Tonight sign-in email and click its link in this same browser. It will sign you in without a password.";
+ }catch(error){el("resetStatus").textContent=error.message||"Could not send the sign-in link."}
+ finally{button.disabled=false;}
+}
+async function restoreExistingSession(){
+ if(!supabaseClient)return;
+ try{const {data,error}=await supabaseClient.auth.getSession();if(error||!data.session)return;
+  accessToken=data.session.access_token;currentEmail=data.session.user.email||"";currentUserId=data.session.user.id||"";
+  el("loginPanel").classList.add("hidden");el("dashboard").classList.remove("hidden");el("who").textContent="Signed in as "+currentEmail;await loadApplications();
+ }catch(e){el("resetStatus").textContent=e.message||"Could not restore your sign-in session."}
 }
 async function signIn(){
  if(!config.supabaseUrl||!config.supabaseAnonKey){alert("Supabase configuration is missing.");return}
