@@ -1,7 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const sharp = require("sharp");
-const files = ["index.html","config.js","manifest.webmanifest","logo.svg","icon.svg","hero-art.svg","splash.svg","privacy.html","terms.html"];
+const files = ["index.html","config.js","manifest.webmanifest","logo.svg","icon.svg","hero-art.svg","splash.svg","privacy.html","terms.html","service-worker.js"];
 fs.mkdirSync("www",{recursive:true});
 for (const file of files) {
   if (fs.existsSync(file)) fs.copyFileSync(file,path.join("www",file));
