@@ -3,5 +3,5 @@
 // NEVER place a service_role key or database password in this file.
 window.TT_CONFIG = {
   supabaseUrl: "https://xsrmtokfrqdyfbrqljsm.supabase.co",
-  supabaseAnonKey: ""
+  supabaseAnonKey: "sb_publishable_eWay4GS9RB_G2LwJq-NYNQ_DeBic1TB"
 };
