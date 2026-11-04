@@ -64,6 +64,8 @@ for (const file of ["manifest.webmanifest", "config.js", "logo.svg", "icon.svg",
   check(file + " exists", fs.existsSync(path.join(root, file)));
 }
 const config = read("config.js");
-const configuredKey = (config.match(/supabaseAnonKey:\\s*["']([^"']+)["']/) || [])[1] || "";\ncheck("browser config uses only a public Supabase publishable/anon key", /^(sb_publishable_|eyJ)/.test(configuredKey) && !/(service_role|sb_secret)/i.test(configuredKey));
+const configuredKey = (config.match(/supabaseAnonKey:\s*["']([^"']+)["']/) || [])[1] || "";
+check("browser config uses only a public Supabase publishable/anon key", /^(sb_publishable_|eyJ)/.test(configuredKey) && !/(service_role|sb_secret)/i.test(configuredKey));
+
 console.log("Takeaways Tonight? static release checks passed: " + checks.length);
 for (const item of checks) console.log("PASS " + item);
