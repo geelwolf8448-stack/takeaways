@@ -38,6 +38,7 @@ for (const id of requiredIds) {
   check("public page has #" + id, (publicPage.html.includes('id="'+id+'"') || publicPage.html.includes("id='"+id+"'")));
 }
 check("demo listings are not treated as order-enabled", /Demo only/.test(publicPage.html) && /r\.isDemo!==false/.test(publicPage.html));
+check("demo cards are not labelled as confirmed featured partners", !/Our featured restaurants/.test(publicPage.html));
 check("orders are restricted to approved non-demo records", /r\.isDemo!==false/.test(publicPage.html) && /is_published=eq\.true/.test(publicPage.html));
 check("WhatsApp order request is generated", /https:\/\/wa\.me\//.test(publicPage.html) && /No payment has been made/.test(publicPage.html));
 check("South African customer and restaurant phone numbers are validated", /\^27\\d\{9\}\$/.test(publicPage.html));
