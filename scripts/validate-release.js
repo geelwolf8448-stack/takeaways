@@ -41,6 +41,7 @@ check("demo listings are not treated as order-enabled", /Demo only/.test(publicP
 check("demo cards are not labelled as confirmed featured partners", !/Our featured restaurants/.test(publicPage.html));
 check("orders are restricted to approved non-demo records", /r\.isDemo!==false/.test(publicPage.html) && /is_published=eq\.true/.test(publicPage.html));
 check("WhatsApp order request is generated", /https:\/\/wa\.me\//.test(publicPage.html) && /No payment has been made/.test(publicPage.html));
+check("public page explains WhatsApp requests are not secure in-app checkout", /Send an order request directly to the restaurant on WhatsApp/.test(publicPage.html) && !/secure checkout are being prepared/.test(publicPage.html));
 check("South African customer and restaurant phone numbers are validated", /\^27\\d\{9\}\$/.test(publicPage.html));
 check("delivery address is required for delivery", /fulfilment==="Delivery"&&!address/.test(publicPage.html));
 check("partner application requires permission declaration", /rConsent/.test(publicPage.html) && /permission_confirmed:true/.test(publicPage.html));
@@ -86,7 +87,7 @@ check("Android signing configuration script compiles", true);
 const callbackSource = callback.html;
 check("magic-link callback verifies Supabase magiclink tokens as magiclink", /type:"magiclink"/.test(callbackSource));
 check("email OTP callback supports email token type", /type:"email"/.test(callbackSource));
-for (const file of ["LAUNCH-KIT.md", "ANDROID-RELEASE.md", ".github/workflows/android-release.yml"]) {
+for (const file of ["LAUNCH-KIT.md", "ANDROID-RELEASE.md", "RESTAURANT-AGREEMENT-TEMPLATE.md", ".github/workflows/android-release.yml"]) {
   check(file + " exists", fs.existsSync(path.join(root, file)));
 }
 
