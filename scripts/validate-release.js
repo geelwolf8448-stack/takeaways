@@ -46,6 +46,8 @@ check("partner application requires permission declaration", /rConsent/.test(pub
 check("partner applications remain pending until admin approval", /status:"pending"/.test(publicPage.html) && /will not appear in the public directory unless approved/.test(publicPage.html));
 check("public directory fetch filters published restaurants", /is_published=eq\.true/.test(publicPage.html));
 check("privacy and terms pages are linked", /privacy\.html/.test(publicPage.html) && /terms\.html/.test(publicPage.html));
+check("mobile navigation does not advertise unfinished favourites/orders/settings tabs", !/Favourites|>Orders<|>Settings</.test(publicPage.html));
+check("mobile navigation links to real sections", /href="#restaurants"/.test(publicPage.html) && /href="#campaigns"/.test(publicPage.html) && /href="#owners"/.test(publicPage.html));
 
 const admin = compileInlineScripts("admin.html");
 check("admin portal inline JavaScript compiles", admin.count > 0);
