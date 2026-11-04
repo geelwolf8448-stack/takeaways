@@ -38,8 +38,11 @@ order by tablename, policyname;
 select
   to_regprocedure('public.review_partner_application(uuid,text)') is not null
     as review_function_exists,
-  has_function_privilege(
-    'authenticated',
-    'public.review_partner_application(uuid,text)',
-    'EXECUTE'
-  ) as authenticated_can_execute_review_function;
+  case
+    when to_regprocedure('public.review_partner_application(uuid,text)') is null then false
+    else has_function_privilege(
+      'authenticated',
+      to_regprocedure('public.review_partner_application(uuid,text)'),
+      'EXECUTE'
+    )
+  end as authenticated_can_execute_review_function;
