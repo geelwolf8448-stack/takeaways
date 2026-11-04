@@ -19,13 +19,11 @@ button.reject{background:#251010;color:#ffd9d9;border:1px solid #a44}button:disa
 <body>
 <header><div class="wrap"><h1>Takeaways Tonight? · Admin</h1><p class="sub">Private restaurant application review</p></div></header>
 <main class="wrap">
-<div class="panel" id="loginPanel"><h2>Administrator sign in</h2><p class="small">Use the administrator account created in Supabase Authentication. Only users added to the admin allowlist can review applications.</p>
-<label for="email">Email</label><input id="email" type="email" autocomplete="username">
-<label for="password">Password</label><input id="password" type="password" autocomplete="current-password">
-<button id="loginButton" onclick="signIn()">Sign in</button>
-<button id="magicButton" class="reject" onclick="sendMagicLink()">Email me a passwordless sign-in link</button>
-<button class="reject" id="resetButton" onclick="sendPasswordReset()">Email me a password-reset link</button>
-<div class="status" id="resetStatus" aria-live="polite">Enter your account email above, then request a reset link.</div>
+<div class="panel" id="loginPanel"><h2>Administrator access</h2>
+<p class="small">No password required. Enter your administrator email and we will send you a secure one-time sign-in link.</p>
+<label for="email">Administrator email</label><input id="email" type="email" autocomplete="email" value="geelwolf8448@gmail.com">
+<button id="magicButton" onclick="sendMagicLink()">Email me a sign-in link</button>
+<div class="status" id="resetStatus" aria-live="polite">Enter your email and request your secure sign-in link.</div>
 </div>
 <section id="dashboard" class="hidden">
 <div class="panel"><div class="row"><div><h2>Pending applications</h2><div class="small" id="who"></div></div><button class="reject" onclick="signOut()">Sign out</button></div><button onclick="loadApplications()">Refresh list</button><div class="status" id="status">Signed in. Loading applications…</div></div>
