@@ -73,7 +73,7 @@ async function loadApplications(){
   const admins=await access.json();
   if(!admins.length)throw new Error("You are signed in, but this account is not on the administrator allowlist yet. The admin user must be added to public.admin_users in Supabase.");
   say("Administrator verified. Loading pending applications…");
-  const response=await fetch(config.supabaseUrl+"/rest/v1/partner_applications?select=id,restaurant_name,area,category,whatsapp,menu,created_at,status&status=eq.pending&order=created_at.asc",{headers:apiHeaders()});
+  const response=await fetch(config.supabaseUrl+"/rest/v1/partner_applications?select=id,restaurant_name,area,category,whatsapp,menu,created_at,status,permission_confirmed,permission_confirmed_at&status=eq.pending&order=created_at.asc",{headers:apiHeaders()});
   const data=await response.json();if(!response.ok)throw new Error(data.message||data.hint||"Could not load applications. Check that the SQL upgrade was run and this account is allowlisted.");
   el("applications").innerHTML=data.length?data.map(app=>card(app)).join(""):'<div class="panel">No pending applications. New submissions will appear here.</div>';
   say(data.length+" pending application(s).");
@@ -82,7 +82,7 @@ async function loadApplications(){
 function esc(value){return String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function card(app){
  const menu=Array.isArray(app.menu)?app.menu.map(item=>Array.isArray(item)?item[0]+" — R"+Number(item[1]).toFixed(2):JSON.stringify(item)).join("\n"):"";
- return '<article class="application"><div class="row"><h2>'+esc(app.restaurant_name)+'</h2><span class="tag">PENDING REVIEW</span></div><p><b>Area:</b> '+esc(app.area)+' · <b>Category:</b> '+esc(app.category)+'</p><p><b>WhatsApp:</b> +'+esc(app.whatsapp)+'</p><p><b>Submitted:</b> '+esc(new Date(app.created_at).toLocaleString())+'</p><div class="menu">'+esc(menu)+'</div><p class="small">Verify the restaurant identity, owner permission, WhatsApp number and menu/prices before approving.</p><button onclick="review(\''+esc(app.id)+'\',\'approved\',this)">Approve & publish</button><button class="reject" onclick="review(\''+esc(app.id)+'\',\'rejected\',this)">Reject</button></article>';
+ return '<article class="application"><div class="row"><h2>'+esc(app.restaurant_name)+'</h2><span class="tag">PENDING REVIEW</span></div><p><b>Area:</b> '+esc(app.area)+' · <b>Category:</b> '+esc(app.category)+'</p><p><b>WhatsApp:</b> +'+esc(app.whatsapp)+'</p><p><b>Submitted:</b> '+esc(new Date(app.created_at).toLocaleString())+'</p><p><b>Permission declaration:</b> '+(app.permission_confirmed===true?"Confirmed by applicant":"<span style=\"color:#ff9b9b\">Missing — do not publish</span>")+'</p><p><b>Confirmation recorded:</b> '+(app.permission_confirmed_at?esc(new Date(app.permission_confirmed_at).toLocaleString()):"Not recorded")+'</p><div class="menu">'+esc(menu)+'</div><p class="small">Verify the restaurant identity, owner permission, WhatsApp number and menu/prices before approving.</p><button onclick="review(\''+esc(app.id)+'\',\'approved\',this)">Approve & publish</button><button class="reject" onclick="review(\''+esc(app.id)+'\',\'rejected\',this)">Reject</button></article>';
 }
 async function review(id,decision,button){
  const action=decision==="approved"?"approve and publish":"reject";
