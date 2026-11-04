@@ -65,3 +65,23 @@ These are additional leads, not confirmed partners. Phone numbers below are publ
 - Public business listings were also checked for Ocean Fish and Takeaway and Vetkoek, The Frying Fish Uvongo, High Rock Pub & Grill and The Rustic Yard. Treat those telephone numbers as leads only and confirm directly.
 
 Do not add any of these businesses to the live app, copy their menus/photos, or enable order requests until written permission and the exact order number/details have been confirmed.
+
+## Further prospects checked for the next outreach round
+
+The following businesses appeared in current local business results. They are prospects only; phone numbers and takeaway participation must be reconfirmed directly with each business before outreach. No menu, logo or contact number may be published in the app without written approval.
+
+| Area | Business | Publicly listed phone | Outreach angle |
+|---|---|---:|---|
+| Glenmore Beach / Port Edward | The Local Basket | +27 60 349 7101 | Local takeout/convenience option; fish and chips mentioned in listing |
+| Black Rock / Port Edward | Suidkus Fish (also listed as Lindie's Fish & Chips) | +27 83 976 0161 | Specialist fish-and-chips takeaway |
+| Port Edward | The Fish Eagle Restaurant at Estuary Hotel & Spa | +27 39 311 2675 | Hotel restaurant with takeaway listed |
+| Port Edward | Spuds Pub & Grill | +27 39 311 1334 | Family-run pub and grill; ask whether takeaway orders are accepted |
+| Munster | Berry Crafty Cafe | +27 83 332 5057 | Cafe/restaurant with takeout listed |
+
+### Verification sources
+
+- Local business search results checked 4 November 2026 for the business names, addresses and listed phone numbers above.
+- Visit KZN South Coast's restaurant directory also lists Fifi's Fresh Fish and Take Away and The Jolly Roger in Hibberdene: https://www.visitkznsouthcoast.co.za/vic/category/restaurants/kwazulu-natal/hibberdene/
+- A Visit KZN South Coast directory PDF includes additional older South Coast restaurant contacts. Treat older directory details as leads, not guaranteed current contacts: https://www.visitkznsouthcoast.co.za/wp-content/uploads/2021/03/Visitor-Info-Portal-on-WebsiteResturants.pdf
+
+Do not send bulk unsolicited messages. Contact the business through its preferred public channel, ask for the owner/manager, and record whether they want further information.
