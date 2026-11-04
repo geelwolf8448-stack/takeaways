@@ -91,5 +91,11 @@ for (const file of ["LAUNCH-KIT.md", "ANDROID-RELEASE.md", "RESTAURANT-AGREEMENT
   check(file + " exists", fs.existsSync(path.join(root, file)));
 }
 
+const signedWorkflow = read(".github/workflows/android-release.yml");
+check("signed Android workflow is manual and verifies the AAB signature", /workflow_dispatch:/.test(signedWorkflow) && /jarsigner -verify/.test(signedWorkflow));
+for (const secret of ["ANDROID_KEYSTORE_BASE64", "ANDROID_KEYSTORE_PASSWORD", "ANDROID_KEY_ALIAS", "ANDROID_KEY_PASSWORD"]) {
+  check("signed workflow uses " + secret, signedWorkflow.includes(secret));
+}
+
 console.log("Takeaways Tonight? static release checks passed: " + checks.length);
 for (const item of checks) console.log("PASS " + item);
