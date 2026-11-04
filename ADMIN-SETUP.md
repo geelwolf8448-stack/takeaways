@@ -15,6 +15,19 @@ Do not run these again just because the admin page is open. The scripts are desi
 ## Admin setup script
 `supabase/admin-setup.sql` looks up the existing Supabase Auth user for `geelwolf8448@gmail.com`, inserts its UUID into `public.admin_users` if not already present, and returns a confirmation row. It requires the Auth user to exist first.
 
+## Email delivery troubleshooting
+
+The current admin browser session has shown Supabase's generic "Error sending magic link email" response. The portal now displays a more useful diagnostic note for that error.
+
+If it appears again:
+1. Open Supabase Dashboard → Logs → Auth Logs and inspect the failed email event and SMTP response.
+2. Confirm the sender address is verified/approved in Brevo.
+3. Confirm Supabase SMTP host is `smtp-relay.brevo.com`, port is `587`, and the username is the Brevo SMTP login (not an API key).
+4. Confirm the SMTP key is current and the Supabase Auth email rate limit has not been reached.
+5. Do not put SMTP credentials in the repository or share them in a chat.
+
+Do not request repeated links until the delivery error is understood. A successful request should display a message telling the owner to open the newest email and click its one-time link in the same browser.
+
 ## One-time acceptance test
 1. Open the admin portal.
 2. Sign in with the existing Supabase Auth account.
