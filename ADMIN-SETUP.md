@@ -28,7 +28,7 @@ If it appears again:
 
 Do not request repeated links until the delivery error is understood. A successful request should display a message telling the owner to open the newest email and click its one-time link in the same browser.
 
-## One-time acceptance test
+## Read-only diagnostic query\n\nIf the admin page reports that the account is not allowlisted or cannot read applications, run `supabase/admin-diagnostic.sql` in Supabase SQL Editor. It only reads account, RLS and function status; it makes no database changes. Use its result to identify the specific failed check before changing anything.\n\n## One-time acceptance test
 1. Open the admin portal.
 2. Sign in with the existing Supabase Auth account.
 3. Read the status under Pending applications.
