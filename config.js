@@ -1,7 +1,7 @@
 // Public browser configuration only.
-// Paste your Supabase Project URL and anon/public key here after creating the project.
+// Supabase project URL. The anon/publishable key will be added separately.
 // NEVER place a service_role key or database password in this file.
 window.TT_CONFIG = {
-  supabaseUrl: "",
+  supabaseUrl: "https://xsrmtokfrqdyfbrqljsm.supabase.co",
   supabaseAnonKey: ""
 };
