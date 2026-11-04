@@ -12,6 +12,8 @@ create table if not exists public.partner_applications (
   whatsapp text not null check (whatsapp ~ '^27[0-9]{9}$'),
   menu jsonb not null check (jsonb_typeof(menu) = 'array' and jsonb_array_length(menu) between 1 and 100),
   status text not null default 'pending' check (status in ('pending','approved','rejected')),
+  permission_confirmed boolean not null default false,
+  permission_confirmed_at timestamptz,
   created_at timestamptz not null default now()
 );
 
@@ -34,6 +36,17 @@ create table if not exists public.admin_users (
   created_at timestamptz not null default now()
 );
 
+-- Server-side timestamp for permission declaration
+create or replace function public.stamp_partner_permission_confirmation()
+returns trigger language plpgsql set search_path = public as $
+begin
+  if new.permission_confirmed is true and new.permission_confirmed_at is null then new.permission_confirmed_at := now(); end if;
+  return new;
+end;
+$;
+drop trigger if exists partner_permission_confirmation_stamp on public.partner_applications;
+create trigger partner_permission_confirmation_stamp before insert or update of permission_confirmed on public.partner_applications for each row execute function public.stamp_partner_permission_confirmation();
+
 alter table public.partner_applications enable row level security;
 alter table public.restaurants enable row level security;
 alter table public.admin_users enable row level security;
@@ -41,7 +54,7 @@ alter table public.admin_users enable row level security;
 drop policy if exists "Anyone can submit partner applications" on public.partner_applications;
 create policy "Anyone can submit partner applications"
 on public.partner_applications for insert to anon, authenticated
-with check (status = 'pending');
+with check (status = 'pending' and permission_confirmed is true and permission_confirmed_at is not null);
 
 drop policy if exists "Admins can view partner applications" on public.partner_applications;
 create policy "Admins can view partner applications"
@@ -100,6 +113,9 @@ begin
   end if;
 
   if p_decision = 'approved' then
+    if application_row.permission_confirmed is not true or application_row.permission_confirmed_at is null then
+      raise exception 'Cannot publish: permission confirmation is missing';
+    end if;
     insert into public.restaurants
       (name, area, category, whatsapp, description, menu, is_published)
     values
