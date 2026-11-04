@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#080808"><title>Takeaways Tonight? · Admin</title>
+<style>
+:root{color-scheme:dark;--gold:#ffd21a;--orange:#ff8500;--panel:#17100a;--muted:#cfc8bd}
+*{box-sizing:border-box}body{margin:0;background:#050505;color:#fff;font:15px/1.5 Arial,sans-serif}
+header{padding:22px 18px;border-bottom:3px solid var(--gold);background:linear-gradient(110deg,#050505,#381609,#090909)}
+.wrap{max-width:980px;margin:auto;padding:20px}h1{margin:0;color:var(--gold);font-size:clamp(25px,5vw,38px)}h2{margin:0 0 12px}
+.sub{color:#eee;margin:5px 0 0}.panel,.application{background:linear-gradient(145deg,#1b120b,#090909);border:1px solid #a97913;border-radius:16px;padding:18px;margin:16px 0}
+label{display:block;font-weight:bold;color:var(--gold);margin:12px 0 5px}input{width:100%;padding:12px;border-radius:9px;border:1px solid #b58a24;background:#050505;color:white}
+button{padding:11px 17px;border:1px solid #fff18a;border-radius:30px;background:linear-gradient(#fff05a,#ff9b00);color:#140d00;font-weight:900;cursor:pointer;margin:8px 8px 0 0}
+button.reject{background:#251010;color:#ffd9d9;border:1px solid #a44}button:disabled{opacity:.5;cursor:wait}
+.small{font-size:12px;color:var(--muted)}.status{padding:10px;border-radius:9px;background:#171717;color:#ffe17b;margin:12px 0;white-space:pre-wrap}
+.row{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center}.tag{color:#ffd21a;font-size:12px;font-weight:bold}.menu{padding:10px;background:#080808;border-radius:8px;white-space:pre-wrap}.hidden{display:none}
+</style>
+</head>
+<body>
+<header><div class="wrap"><h1>Takeaways Tonight? · Admin</h1><p class="sub">Private restaurant application review</p></div></header>
+<main class="wrap">
+<div class="panel" id="loginPanel"><h2>Administrator sign in</h2><p class="small">Use the administrator account created in Supabase Authentication. Only users added to the admin allowlist can review applications.</p>
+<label for="email">Email</label><input id="email" type="email" autocomplete="username">
+<label for="password">Password</label><input id="password" type="password" autocomplete="current-password">
+<button id="loginButton" onclick="signIn()">Sign in</button>
+</div>
+<section id="dashboard" class="hidden">
+<div class="panel"><div class="row"><div><h2>Pending applications</h2><div class="small" id="who"></div></div><button class="reject" onclick="signOut()">Sign out</button></div><button onclick="loadApplications()">Refresh list</button><div class="status" id="status">Signed in. Loading applications…</div></div>
+<div id="applications"></div>
+</section>
+<div class="small">Security: the browser uses only the public Supabase publishable key. Review actions are checked again inside a database function; no secret key is stored here.</div>
+</main>
+<script src="config.js"></script>
+<script>
+let accessToken="",currentEmail="";
+const config=window.TT_CONFIG||{};
+const el=id=>document.getElementById(id);
+function say(message){el("status").textContent=message}
+function apiHeaders(){return {apikey:config.supabaseAnonKey,Authorization:"Bearer "+accessToken,"Content-Type":"application/json"}}
+async function signIn(){
+ if(!config.supabaseUrl||!config.supabaseAnonKey){alert("Supabase configuration is missing.");return}
+ const button=el("loginButton");button.disabled=true;
+ try{
+  const response=await fetch(config.supabaseUrl+"/auth/v1/token?grant_type=password",{method:"POST",headers:{apikey:config.supabaseAnonKey,"Content-Type":"application/json"},body:JSON.stringify({email:el("email").value.trim(),password:el("password").value})});
+  const data=await response.json();
+  if(!response.ok)throw new Error(data.msg||data.message||"Sign-in failed.");
+  accessToken=data.access_token;currentEmail=data.user?.email||el("email").value;
+  el("loginPanel").classList.add("hidden");el("dashboard").classList.remove("hidden");el("who").textContent="Signed in as "+currentEmail;
+  await loadApplications();
+ }catch(error){alert(error.message)}finally{button.disabled=false}
+}
+async function loadApplications(){
+ say("Loading pending applications…");
+ try{
+  const response=await fetch(config.supabaseUrl+"/rest/v1/partner_applications?select=id,restaurant_name,area,category,whatsapp,menu,created_at,status&status=eq.pending&order=created_at.asc",{headers:apiHeaders()});
+  const data=await response.json();if(!response.ok)throw new Error(data.message||data.hint||"Could not load applications. Check that the SQL upgrade was run and this account is allowlisted.");
+  el("applications").innerHTML=data.length?data.map(app=>card(app)).join(""):'<div class="panel">No pending applications. New submissions will appear here.</div>';
+  say(data.length+" pending application(s).");
+ }catch(error){say(error.message)}
+}
+function esc(value){return String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function card(app){
+ const menu=Array.isArray(app.menu)?app.menu.map(item=>Array.isArray(item)?item[0]+" — R"+Number(item[1]).toFixed(2):JSON.stringify(item)).join("\n"):"";
+ return '<article class="application"><div class="row"><h2>'+esc(app.restaurant_name)+'</h2><span class="tag">PENDING REVIEW</span></div><p><b>Area:</b> '+esc(app.area)+' · <b>Category:</b> '+esc(app.category)+'</p><p><b>WhatsApp:</b> +'+esc(app.whatsapp)+'</p><p><b>Submitted:</b> '+esc(new Date(app.created_at).toLocaleString())+'</p><div class="menu">'+esc(menu)+'</div><p class="small">Verify the restaurant identity, owner permission, WhatsApp number and menu/prices before approving.</p><button onclick="review(\''+esc(app.id)+'\',\'approved\',this)">Approve & publish</button><button class="reject" onclick="review(\''+esc(app.id)+'\',\'rejected\',this)">Reject</button></article>';
+}
+async function review(id,decision,button){
+ const action=decision==="approved"?"approve and publish":"reject";
+ if(!confirm("Are you sure you want to "+action+" this restaurant application?"))return;
+ button.disabled=true;
+ try{
+  const response=await fetch(config.supabaseUrl+"/rest/v1/rpc/review_partner_application",{method:"POST",headers:apiHeaders(),body:JSON.stringify({p_application_id:id,p_decision:decision})});
+  const data=await response.text();if(!response.ok)throw new Error(data||"Review action failed.");
+  await loadApplications();
+ }catch(error){alert(error.message);button.disabled=false}
+}
+function signOut(){accessToken="";currentEmail="";el("dashboard").classList.add("hidden");el("loginPanel").classList.remove("hidden");el("password").value="";el("applications").innerHTML=""}
+</script>
+</body></html>
