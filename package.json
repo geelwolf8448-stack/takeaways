@@ -6,7 +6,8 @@
   "scripts": {
     "build:web": "node scripts/prepare-web.js",
     "android:icons": "node scripts/generate-android-icons.js",
-    "android:sync": "npm run build:web && cap sync android"
+    "android:sync": "npm run build:web && cap sync android",
+    "test": "node scripts/validate-release.js"
   },
   "dependencies": {
     "@capacitor/android": "^7.4.3",
