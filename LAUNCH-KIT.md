@@ -79,7 +79,7 @@ The restaurant must confirm the current menu, stock and final price before accep
 
 **App name:** Takeaways Tonight?
 
-**Short description:** Discover South Coast food spots, browse menus and contact local takeaways directly.
+**Short description:** Find South Coast restaurants, browse menus and contact local takeaways.
 
 **Full description:**
 Discover local food along KwaZulu-Natal's South Coast with Takeaways Tonight?.
