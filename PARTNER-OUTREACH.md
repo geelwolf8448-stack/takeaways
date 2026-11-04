@@ -45,3 +45,23 @@ Takeaways Tonight?
 6. Restaurant approves the final public listing before publication.
 
 Status: prospecting document only. No businesses listed above have joined or approved publication.
+
+## Additional prospects identified for the launch
+
+These are additional leads, not confirmed partners. Phone numbers below are public directory/business listings; verify the correct owner/manager and preferred contact channel before sending promotional messages.
+
+| Area | Business | Publicly listed contact | Why approach |
+|---|---|---:|---|
+| Hibberdene | The Jolly Roger Fun Pub & Grub | 039 699 3307 | Pub, grill and takeaway offering; listed by Visit KZN South Coast |
+| Shelly Beach | Ocean Fish and Takeaway and Vetkoek | +27 84 410 5950 | Fish-and-chips and takeaway business |
+| Uvongo | The Frying Fish Uvongo | +27 66 145 2553 | Dedicated fish-and-chips takeaway |
+| Palm Beach / Port Edward | High Rock Pub & Grill | +27 68 819 0045 | Restaurant listing includes takeaway and delivery |
+| Munster / Port Edward | The Rustic Yard | +27 72 340 9317 | Restaurant/pub-style prospect near Mac Banana |
+
+### Source checks
+
+- Visit KZN South Coast restaurant listings: https://www.visitkznsouthcoast.co.za/vic/category/restaurants/kwazulu-natal/hibberdene/
+- Visit KZN South Coast Port Edward restaurant listings: https://www.visitkznsouthcoast.co.za/vic/category/restaurants/kwazulu-natal/port-edward/
+- Public business listings were also checked for Ocean Fish and Takeaway and Vetkoek, The Frying Fish Uvongo, High Rock Pub & Grill and The Rustic Yard. Treat those telephone numbers as leads only and confirm directly.
+
+Do not add any of these businesses to the live app, copy their menus/photos, or enable order requests until written permission and the exact order number/details have been confirmed.
