@@ -53,6 +53,8 @@ check("admin uses passwordless email sign-in", /signInWithOtp/.test(admin.html) 
 check("admin checks explicit allowlist", /admin_users/.test(admin.html) && /review_partner_application/.test(admin.html));
 check("admin has no password field", !/<input[^>]+type=["']password["']/i.test(admin.html));
 
+check("admin shows SMTP troubleshooting for delivery errors", /Supabase Dashboard → Logs → Auth Logs/.test(admin.html));
+
 const callback = compileInlineScripts("reset-password.html");
 check("sign-in callback JavaScript compiles", callback.count > 0);
 check("sign-in callback returns to admin portal", /admin\.html/.test(callback.html));
@@ -74,6 +76,7 @@ check("PWA manifest icon exists", fs.existsSync(path.join(root, manifest.icons[0
 check("service worker cache includes the secure sign-in callback", /reset-password\\.html/.test(worker));
 const prep = read("scripts/prepare-web.js");
 check("Android web bundle includes the service worker", /"service-worker\\.js"/.test(prep));
+check("Android web bundle includes admin and callback pages referenced by cache", /"admin\\.html"/.test(prep) && /"reset-password\\.html"/.test(prep));
 const releaseScript = read("scripts/configure-android-release.js");
 new vm.Script(releaseScript, { filename: "scripts/configure-android-release.js" });
 check("Android signing configuration script compiles", true);
