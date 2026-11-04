@@ -5,7 +5,7 @@
 // No keystore or signing password is written into source control.
 const fs = require("node:fs");
 const path = require("node:path");
-const gradlePath = path.resolve("android/app/build.gradle");
+const gradlePath = path.resolve(process.env.ANDROID_GRADLE_FILE || "android/app/build.gradle");
 const required = ["ANDROID_KEYSTORE_PATH", "ANDROID_KEYSTORE_PASSWORD", "ANDROID_KEY_ALIAS", "ANDROID_KEY_PASSWORD"];
 for (const key of required) {
   if (!process.env[key]) throw new Error("Missing required signing environment variable: " + key);
