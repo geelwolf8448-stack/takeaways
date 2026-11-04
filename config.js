@@ -1,5 +1,5 @@
 // Public browser configuration only.
-// Supabase project URL. The anon/publishable key will be added separately.
+// Supabase project URL and publishable key for browser access (RLS still protects the database).
 // NEVER place a service_role key or database password in this file.
 window.TT_CONFIG = {
   supabaseUrl: "https://xsrmtokfrqdyfbrqljsm.supabase.co",
