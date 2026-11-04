@@ -35,7 +35,7 @@ const requiredIds = [
   "rArea", "rCategory", "rMenu", "rConsent", "installAppButton", "installHint"
 ];
 for (const id of requiredIds) {
-  check("public page has #" + id, new RegExp('id=["\\']' + id + '["\\']').test(publicPage.html));
+  check("public page has #" + id, (publicPage.html.includes('id="'+id+'"') || publicPage.html.includes("id='"+id+"'")));
 }
 check("demo listings are not treated as order-enabled", /Demo only/.test(publicPage.html) && /r\.isDemo!==false/.test(publicPage.html));
 check("orders are restricted to approved non-demo records", /r\.isDemo!==false/.test(publicPage.html) && /is_published=eq\.true/.test(publicPage.html));
