@@ -1,12 +1,12 @@
 {
   "name": "Takeaways Tonight? — Discover local. Order direct. Support local.",
-  "short_name": "Takeaways",
+  "short_name": "Takeaways Tonight?",
   "description": "Discover local takeaways, menus, specials and South Coast experiences from Hibberdene to Port Edward.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#030303",
-  "theme_color": "#030303",
+  "background_color": "#03040b",
+  "theme_color": "#03040b",
   "orientation": "portrait-primary",
   "icons": [
     {
