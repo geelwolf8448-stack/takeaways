@@ -1,37 +1,39 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 620">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 620" role="img" aria-labelledby="title desc">
+<title id="title">Takeaways Tonight? sunset logo</title><desc id="desc">A golden sunset over the ocean with palm trees and a takeaway delivery scooter, above the Takeaways Tonight wordmark.</desc>
 <defs>
- <linearGradient id="sky" x2="0" y2="1"><stop stop-color="#07134d"/><stop offset=".45" stop-color="#e83223"/><stop offset="1" stop-color="#ff9b00"/></linearGradient>
- <linearGradient id="silver" x2="0" y2="1"><stop stop-color="#fff"/><stop offset=".55" stop-color="#f4f4f8"/><stop offset="1" stop-color="#aeb3c0"/></linearGradient>
- <linearGradient id="gold" x2="0" y2="1"><stop stop-color="#fff52d"/><stop offset=".5" stop-color="#ffc400"/><stop offset="1" stop-color="#ff6900"/></linearGradient>
- <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%"><feGaussianBlur in="SourceAlpha" stdDeviation="8"/><feOffset dy="8"/><feComponentTransfer><feFuncA type="linear" slope=".85"/></feComponentTransfer><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+ <linearGradient id="sky" x2="0" y2="1"><stop stop-color="#54245f"/><stop offset=".34" stop-color="#b83c66"/><stop offset=".68" stop-color="#f05b43"/><stop offset="1" stop-color="#ffbd43"/></linearGradient>
+ <linearGradient id="sun" x2="0" y2="1"><stop stop-color="#fff7a0"/><stop offset=".55" stop-color="#ffd34d"/><stop offset="1" stop-color="#ff8b35"/></linearGradient>
+ <linearGradient id="gold" x2="0" y2="1"><stop stop-color="#fff19a"/><stop offset=".45" stop-color="#ffc53c"/><stop offset="1" stop-color="#f36a35"/></linearGradient>
+ <linearGradient id="cream" x2="0" y2="1"><stop stop-color="#fffdf4"/><stop offset="1" stop-color="#ffe3bd"/></linearGradient>
+ <filter id="shadow" x="-30%" y="-30%" width="160%" height="170%"><feGaussianBlur in="SourceAlpha" stdDeviation="9"/><feOffset dy="9"/><feComponentTransfer><feFuncA type="linear" slope=".55"/></feComponentTransfer><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+ <clipPath id="badge"><rect x="45" y="24" width="1110" height="570" rx="78"/></clipPath>
 </defs>
-<rect x="8" y="8" width="1184" height="604" rx="58" fill="#030303" stroke="#ffcf19" stroke-width="13"/>
-<rect x="23" y="23" width="1154" height="574" rx="45" fill="url(#sky)" stroke="#fff0a0" stroke-width="3"/>
-<circle cx="730" cy="220" r="200" fill="#ffca19" opacity=".9"/><circle cx="730" cy="220" r="170" fill="url(#gold)"/>
-<path d="M25 370Q210 315 390 360T760 352T1175 345V590H25Z" fill="#06112d"/>
-<g fill="#03030a"><path d="M25 355Q110 130 82 40Q185 150 195 330Q235 145 390 78Q270 205 245 390Z"/><path d="M1175 355Q1090 130 1118 40Q1015 150 1005 330Q965 145 810 78Q930 205 955 390Z"/></g>
-<!-- delivery rider -->
-<g transform="translate(455 40)" stroke="#050505" stroke-linejoin="round" stroke-linecap="round">
- <circle cx="145" cy="300" r="70" fill="#08090d" stroke="#ffc91a" stroke-width="14"/><circle cx="470" cy="300" r="70" fill="#08090d" stroke="#ffc91a" stroke-width="14"/>
- <path d="M135 275L230 180L390 190L470 275L380 305L270 278L210 245Z" fill="#f04a0b" stroke="#ffca13" stroke-width="15"/>
- <path d="M240 190L205 95L285 35L375 65L390 190L330 230Z" fill="#090b14" stroke="#050505" stroke-width="15"/>
- <path d="M255 82L285 15L375 15L420 82L370 135L290 130Z" fill="#080a12" stroke="#ffc91a" stroke-width="12"/>
- <path d="M300 42L350 27L395 58L370 103L310 98Z" fill="#171c2b" stroke="#fff1a1" stroke-width="6"/>
- <path d="M350 190L450 135L530 165L555 205" fill="none" stroke-width="25"/>
- <!-- delivery box -->
- <path d="M60 115L90 15L330 15L305 185L85 185Z" fill="#08090d" stroke="#ffca13" stroke-width="13"/>
- <path d="M110 50H285" stroke="#ffca13" stroke-width="7"/>
- <path d="M155 125Q195 65 235 125Q195 170 155 125Z" fill="none" stroke="#ffca13" stroke-width="9"/>
- <path d="M175 122L145 145M215 122L245 145" stroke="#ffca13" stroke-width="8"/>
+<g filter="url(#shadow)">
+ <rect x="45" y="24" width="1110" height="570" rx="78" fill="#fff7e9" stroke="#ffcf54" stroke-width="15"/>
+ <g clip-path="url(#badge)">
+  <rect x="55" y="34" width="1090" height="550" fill="url(#sky)"/>
+  <circle cx="790" cy="238" r="205" fill="url(#sun)" stroke="#fff2a4" stroke-width="8"/>
+  <path d="M55 365Q210 326 360 365T665 362T970 350T1145 365V585H55Z" fill="#612e65"/>
+  <path d="M55 407Q250 380 445 408T835 405T1145 398V585H55Z" fill="#174b69"/>
+  <g fill="none" stroke="#ffc65a" stroke-linecap="round"><path d="M90 448Q250 427 410 448T730 448T1050 440" stroke-width="10"/><path d="M130 492Q300 477 470 492T810 490T1100 480" stroke-width="6"/><path d="M90 535Q260 523 430 535T770 535T1100 525" stroke-width="5"/></g>
+  <g fill="#211b38">
+   <path d="M110 450Q165 295 118 92Q210 205 205 335Q265 194 398 150Q285 253 252 426Q350 344 435 367Q315 392 245 470Z"/>
+   <path d="M1090 450Q1035 295 1082 92Q990 205 995 335Q935 194 802 150Q915 253 948 426Q850 344 765 367Q885 392 955 470Z"/>
+  </g>
+  <g transform="translate(480 235)" stroke="#27182f" stroke-width="15" stroke-linecap="round" stroke-linejoin="round">
+   <circle cx="80" cy="230" r="58" fill="#211a30" stroke="#ffc94b" stroke-width="13"/>
+   <circle cx="380" cy="230" r="58" fill="#211a30" stroke="#ffc94b" stroke-width="13"/>
+   <path d="M75 210L160 125L310 140L380 210L290 232L190 205L140 175Z" fill="#f45a39" stroke="#ffc94b" stroke-width="13"/>
+   <path d="M165 135L155 68L220 20L290 55L310 145L260 177Z" fill="#30203d"/>
+   <path d="M190 57L220 5L295 10L330 66L285 105L215 100Z" fill="#30203d" stroke="#ffc94b" stroke-width="11"/>
+   <path d="M220 40L270 25L305 53L282 82L225 80Z" fill="#f9b95c" stroke="#fff0b1" stroke-width="5"/>
+   <path d="M145 120L100 65L280 65L270 165L150 165Z" fill="#fff4d7" stroke="#ffc94b" stroke-width="12"/>
+   <path d="M170 92H250" stroke="#df4c48" stroke-width="8"/>
+  </g>
+ </g>
 </g>
-<!-- chef hat mark -->
-<g transform="translate(40 215)" filter="url(#shadow)" stroke="#090909" stroke-width="12">
- <path d="M35 130C-5 110 0 55 40 40C42 -8 102 -22 132 18C164 -8 220 8 218 58C260 82 245 140 205 145L205 195L48 195Z" fill="url(#silver)"/>
- <path d="M50 150L205 150L215 205L45 205Z" fill="#e6e8ee"/>
+<g filter="url(#shadow)" text-anchor="middle" font-family="Georgia,'Times New Roman',serif" font-style="italic" font-weight="bold">
+ <text x="600" y="505" font-size="94" fill="url(#cream)" stroke="#552747" stroke-width="16" paint-order="stroke">Takeaways</text>
+ <text x="600" y="585" font-size="92" fill="url(#gold)" stroke="#552747" stroke-width="16" paint-order="stroke">Tonight?</text>
 </g>
-<g filter="url(#shadow)" text-anchor="middle" font-family="Georgia,serif" font-style="italic" font-weight="bold">
- <text x="660" y="425" font-size="142" fill="url(#silver)" stroke="#050505" stroke-width="23" paint-order="stroke">Takeaways</text>
- <text x="670" y="548" font-size="150" fill="url(#gold)" stroke="#050505" stroke-width="24" paint-order="stroke">Tonight?</text>
-</g>
-<path d="M140 570Q600 610 1060 570" fill="none" stroke="#f02212" stroke-width="17"/><path d="M150 585Q600 620 1050 585" fill="none" stroke="#ffd51b" stroke-width="5"/>
 </svg>
