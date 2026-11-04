@@ -12,7 +12,7 @@ This document reflects the current repository implementation. Do not repeat setu
 - Partner application submission to Supabase, with local draft fallback if the online request fails.
 - Private admin portal: sign-in, pending applications, approve/reject.
 - SQL approval function with an administrator allowlist.
-- PWA assets and Capacitor Android build workflow.
+- PWA assets and Capacitor Android build workflow.\n- Launch-ready draft copy, restaurant onboarding checklist, customer FAQ and store listing in `LAUNCH-KIT.md`.\n- Manual signed Android release workflow prepared in `.github/workflows/android-release.yml`; secure keystore setup is documented in `ANDROID-RELEASE.md`.
 - Password recovery page.
 
 ## Setup already present — verify only if a real test fails
@@ -36,7 +36,7 @@ Do not repeat SQL setup, SMTP setup or password recovery unless the correspondin
 - Customer registration/login and order history.
 - Restaurant-owner accounts, menu management and restaurant dashboard.
 - Live in-app checkout, PayFast split settlement, refunds, order status management, commission ledger automation and delivery dispatch.
-- Google Play publication and signed production release.
+- Google Play publication and signed production release. A signed build can be generated after the owner creates a private upload keystore and adds the four required GitHub Actions secrets.
 
 The Android workflow has produced successful builds in GitHub Actions. Download the debug APK from the successful workflow run's Artifacts for device testing; do not treat that as a Play Store release.
 
