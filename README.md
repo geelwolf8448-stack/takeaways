@@ -14,14 +14,14 @@ The project has moved beyond the original static preview. Use the code in `index
 - Basket and WhatsApp order-request flow for approved, non-demo restaurant records.
 - Supabase shared restaurant directory: reads only rows with `is_published=true`.
 - Restaurant partner application form: submits to `partner_applications`; if submission fails, it downloads a local draft.
-- Private admin portal with Supabase email/password sign-in, pending application list, and approve/reject actions.
+- Private admin portal with Supabase passwordless email-link sign-in, pending application list, and approve/reject actions.
 - Database-side approval function checks the administrator allowlist and publishes an approved application into `restaurants`.
-- Password recovery page and Supabase recovery integration.
+- Secure one-time sign-in callback page for Supabase email-link authentication.
 - PWA manifest, service worker, branding assets, privacy and terms draft pages.
-- Capacitor Android build workflow. A successful Android build has been recorded in GitHub Actions; retrieve its APK from the workflow run's Artifacts while it remains available.
+- Capacitor Android build workflow with a static release-validation test gate (`npm test`). Debug APK and unsigned AAB are build outputs for testing/release preparation, not Play Store-ready signed releases.
 
 ### Still requires live verification or further development
-- Confirm the SQL setup actually added the intended owner account to `public.admin_users`; a successful SQL run alone is not an end-to-end admin login test.
+- Complete a real passwordless administrator sign-in and confirm the owner account is in `public.admin_users`; a successful SQL run or deployment alone is not an end-to-end admin login test.
 - Test a real partner application from the public site and approve it in the admin portal.
 - Replace demo listings with restaurants that have given written permission and whose details, menus, prices and ordering numbers have been verified.
 - Customer accounts, restaurant-owner accounts and role-specific dashboards are not implemented.
@@ -42,4 +42,4 @@ The project has moved beyond the original static preview. Use the code in `index
 - `supabase/schema.sql` — shared directory, application and approval schema.
 - `supabase/admin-setup.sql` — adds the owner Auth account to the admin allowlist.
 - `supabase/marketplace-schema.sql` and `MARKETPLACE-PAYMENTS.md` — future marketplace planning; not live.
-- `COMPLIANCE-CHECKLIST.md` — pre-launch operational and legal review checklist.
+- `COMPLIANCE-CHECKLIST.md` — pre-launch operational and legal review checklist.\n- `scripts/validate-release.js` — static release checks, run with `npm test`.
