@@ -387,16 +387,16 @@ function sendOrder(){
  if(!basket.length){alert("Your basket is empty.");return;}
  const restaurant=restaurants.find(r=>r.id===basket[0].restaurantId);
  if(!restaurant||restaurant.isDemo!==false){alert("Orders are available only for approved restaurant partners.");return;}
- const whatsapp=String(restaurant.phone||"").replace(/\\D/g,"");
- if(!/^27\\d{9}$/.test(whatsapp)){alert("This restaurant has not supplied a valid WhatsApp number yet. Please contact the restaurant directly.");return;}
+ const whatsapp=String(restaurant.phone||"").replace(/\D/g,"");
+ if(!/^27\d{9}$/.test(whatsapp)){alert("This restaurant has not supplied a valid WhatsApp number yet. Please contact the restaurant directly.");return;}
  const name=document.getElementById("customerName").value.trim();
- const rawPhone=document.getElementById("customerPhone").value.replace(/\\D/g,"");
+ const rawPhone=document.getElementById("customerPhone").value.replace(/\D/g,"");
  const customerPhone=rawPhone.startsWith("0")?"27"+rawPhone.slice(1):rawPhone;
  const fulfilment=document.getElementById("fulfilment").value;
  const address=document.getElementById("deliveryAddress").value.trim();
  const notes=document.getElementById("orderNotes").value.trim();
  if(!name){alert("Please enter your name.");document.getElementById("customerName").focus();return;}
- if(!/^27\\d{9}$/.test(customerPhone)){alert("Please enter a valid South African mobile number, e.g. 0821234567 or 27821234567.");document.getElementById("customerPhone").focus();return;}
+ if(!/^27\d{9}$/.test(customerPhone)){alert("Please enter a valid South African mobile number, e.g. 0821234567 or 27821234567.");document.getElementById("customerPhone").focus();return;}
  if(!fulfilment){alert("Please choose collection or delivery.");document.getElementById("fulfilment").focus();return;}
  if(fulfilment==="Delivery"&&!address){alert("Please enter your delivery address.");document.getElementById("deliveryAddress").focus();return;}
  const total=basket.reduce((sum,item)=>sum+item.price*item.qty,0);
@@ -415,7 +415,7 @@ function sendOrder(){
   ...(notes?["Notes: "+notes]:[]),
   "",
   "Please confirm availability, any delivery fee and the final total before preparing this order. No payment has been made."
- ].join("\\n");
+ ].join("\n");
  window.open("https://wa.me/"+whatsapp+"?text="+encodeURIComponent(message),"_blank","noopener");
  closeDialog("basketDialog");
 }
