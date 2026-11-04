@@ -6,6 +6,8 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
+const os = require("node:os");
+const { spawnSync } = require("node:child_process");
 const root = path.resolve(__dirname, "..");
 const read = (name) => fs.readFileSync(path.join(root, name), "utf8");
 const checks = [];
@@ -84,6 +86,47 @@ check("Android web bundle includes admin and callback pages referenced by cache"
 const releaseScript = read("scripts/configure-android-release.js");
 new vm.Script(releaseScript, { filename: "scripts/configure-android-release.js" });
 check("Android signing configuration script compiles", true);
+const fixtureDir = fs.mkdtempSync(path.join(os.tmpdir(), "takeaways-android-signing-"));
+try {
+  const fixtureGradle = path.join(fixtureDir, "app", "build.gradle");
+  fs.mkdirSync(path.dirname(fixtureGradle), { recursive: true });
+  fs.writeFileSync(fixtureGradle, `plugins { id 'com.android.application' }
+android {
+  namespace 'za.co.takeawaystonight.app'
+  defaultConfig {
+    applicationId 'za.co.takeawaystonight.app'
+    minSdk 23
+    targetSdk 35
+    versionCode 1
+    versionName '1.0'
+  }
+  buildTypes {
+    release {
+      minifyEnabled false
+    }
+  }
+}`);
+  const signingTest = spawnSync(process.execPath, [path.join(root, "scripts/configure-android-release.js")], {
+    cwd: fixtureDir,
+    encoding: "utf8",
+    env: {
+      ...process.env,
+      ANDROID_GRADLE_FILE: fixtureGradle,
+      ANDROID_KEYSTORE_PATH: path.join(fixtureDir, "upload-key.jks"),
+      ANDROID_KEYSTORE_PASSWORD: "test-keystore-password",
+      ANDROID_KEY_ALIAS: "test-alias",
+      ANDROID_KEY_PASSWORD: "test-key-password",
+      ANDROID_VERSION_CODE: "2",
+      ANDROID_VERSION_NAME: "1.2.3"
+    }
+  });
+  const configuredGradle = fs.readFileSync(fixtureGradle, "utf8");
+  check("Android signing script patches a Gradle release fixture", signingTest.status === 0);
+  check("Android signing fixture gets release signing and version metadata", /signingConfig signingConfigs\\.release/.test(configuredGradle) && /versionCode 2/.test(configuredGradle) && /versionName "1.2.3"/.test(configuredGradle));
+  check("Android signing secrets are referenced from environment, not embedded", configuredGradle.includes('System.getenv("ANDROID_KEYSTORE_PASSWORD")') && !configuredGradle.includes("test-keystore-password"));
+} finally {
+  fs.rmSync(fixtureDir, { recursive: true, force: true });
+}
 const callbackSource = callback.html;
 check("magic-link callback verifies Supabase magiclink tokens as magiclink", /type:"magiclink"/.test(callbackSource));
 check("email OTP callback supports email token type", /type:"email"/.test(callbackSource));
