@@ -1,34 +1,30 @@
-# Takeaways Tonight? — private restaurant approval setup
+# Takeaways Tonight? — administrator portal
 
-The public website accepts partner applications. This private admin page lets an allowlisted administrator review them and publish approved restaurants.
+**Admin portal:** https://geelwolf8448-stack.github.io/TAKEAWAYS-TONIGHT-/admin.html
 
-## One-time Supabase setup
+## Current implementation
+The admin page signs in through Supabase Auth. It checks the signed-in user's UUID against `public.admin_users`, then reads pending rows from `public.partner_applications`. Approve/reject actions call the database function `public.review_partner_application`, which performs its own allowlist check.
 
-1. Open the Supabase project dashboard: https://supabase.com/dashboard/project/xsrmtokfrqdyfbrqljsm
-2. Open **SQL Editor** and run the complete contents of `supabase/schema.sql` from this repository. It is safe to re-run and adds the protected administrator allowlist and approval function.
-3. In Supabase, open **Authentication → Users → Add user**. Create an administrator account using an email address and a strong password you control. Confirm the user if the dashboard offers that option.
-4. Copy the new user's **UID** from the Users list.
-5. In SQL Editor, run this statement after replacing the example UUID with that exact UID:
+## Setup status
+The project owner reports that:
+- The main schema in `supabase/schema.sql` was run.
+- The owner allowlist script in `supabase/admin-setup.sql` was run.
 
-```sql
-insert into public.admin_users (user_id)
-values ('PASTE-THE-ADMIN-USER-UUID-HERE')
-on conflict (user_id) do nothing;
-```
+Do not run these again just because the admin page is open. The scripts are designed to be safe to re-run, but first verify the actual status message shown in the admin portal.
 
-Only add accounts you personally control. Do not add a restaurant applicant as an administrator.
+## Admin setup script
+`supabase/admin-setup.sql` looks up the existing Supabase Auth user for `geelwolf8448@gmail.com`, inserts its UUID into `public.admin_users` if not already present, and returns a confirmation row. It requires the Auth user to exist first.
 
-## Open the admin page
+## One-time acceptance test
+1. Open the admin portal.
+2. Sign in with the existing Supabase Auth account.
+3. Read the status under Pending applications.
+4. If it reports that the account is not allowlisted, inspect the result of `supabase/admin-setup.sql` in Supabase SQL Editor before making any further changes.
+5. Submit a test partner application from the public site, then refresh the admin list.
+6. Approve only a test listing or a restaurant that has explicitly authorised publication.
 
-After GitHub Pages deploys, open:
-
-https://geelwolf8448-stack.github.io/TAKEAWAYS-TONIGHT-/admin.html
-
-Sign in with the administrator email and password created above. Pending applications will appear for review. **Approve & publish** copies the application into the public restaurant directory; **Reject** marks it rejected. The database rechecks the user's admin permission on every action.
-
-## Security notes
-
-- The page contains only the public Supabase publishable key.
-- Never paste a Supabase `service_role` or secret key into GitHub, website files, or chat.
-- Public visitors can submit applications and read published restaurants only.
-- The admin page is not a substitute for verifying the restaurant and obtaining owner permission before publication.
+## Security
+- Browser code uses only the public Supabase publishable key.
+- Never place a Supabase service-role key or database password in GitHub or browser code.
+- Public users may submit applications and read published restaurant listings only.
+- Application review is restricted by database-side administrator checks.
