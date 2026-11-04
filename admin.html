@@ -40,19 +40,6 @@ const supabaseClient=(window.supabase&&config.supabaseUrl&&config.supabaseAnonKe
 const el=id=>document.getElementById(id);
 function say(message){el("status").textContent=message}
 function apiHeaders(){return {apikey:config.supabaseAnonKey,Authorization:"Bearer "+accessToken,"Content-Type":"application/json"}}
-async function sendPasswordReset(){
- const email=el("email").value.trim();
- if(!email){el("resetStatus").textContent="Enter your Supabase account email first.";el("email").focus();return;}
- if(!config.supabaseUrl||!config.supabaseAnonKey){el("resetStatus").textContent="Supabase configuration is missing.";return;}
- const button=el("resetButton");button.disabled=true;el("resetStatus").textContent="Requesting a password-reset email…";
- const redirect="https://geelwolf8448-stack.github.io/TAKEAWAYS-TONIGHT-/reset-password.html";
- try{
-  const response=await fetch(config.supabaseUrl+"/auth/v1/recover?redirect_to="+encodeURIComponent(redirect),{method:"POST",headers:{apikey:config.supabaseAnonKey,"Content-Type":"application/json"},body:JSON.stringify({email})});
-  if(!response.ok){let detail="";try{const data=await response.json();detail=data.msg||data.message||data.error_description||"";}catch{}throw new Error(detail||"Supabase did not accept the reset request. Check Auth logs.");}
-  el("resetStatus").textContent="Supabase accepted the request. Check Inbox, Spam, Promotions and All Mail for the newest message titled Reset your password. The message must contain a Reset password link. If it has no link, the Supabase Recovery email template needs correction.";
- }catch(error){el("resetStatus").textContent=error.message;}
- finally{button.disabled=false;}
-}
 async function sendMagicLink(){
  const email=el("email").value.trim();
  if(!email){el("resetStatus").textContent="Enter your account email first.";el("email").focus();return;}
@@ -72,18 +59,6 @@ async function restoreExistingSession(){
   accessToken=data.session.access_token;currentEmail=data.session.user.email||"";currentUserId=data.session.user.id||"";
   el("loginPanel").classList.add("hidden");el("dashboard").classList.remove("hidden");el("who").textContent="Signed in as "+currentEmail;await loadApplications();
  }catch(e){el("resetStatus").textContent=e.message||"Could not restore your sign-in session."}
-}
-async function signIn(){
- if(!config.supabaseUrl||!config.supabaseAnonKey){alert("Supabase configuration is missing.");return}
- const button=el("loginButton");button.disabled=true;
- try{
-  const response=await fetch(config.supabaseUrl+"/auth/v1/token?grant_type=password",{method:"POST",headers:{apikey:config.supabaseAnonKey,"Content-Type":"application/json"},body:JSON.stringify({email:el("email").value.trim(),password:el("password").value})});
-  const data=await response.json();
-  if(!response.ok)throw new Error(data.msg||data.message||"Sign-in failed.");
-  accessToken=data.access_token;currentEmail=data.user?.email||el("email").value;currentUserId=data.user?.id||"";
-  el("loginPanel").classList.add("hidden");el("dashboard").classList.remove("hidden");el("who").textContent="Signed in as "+currentEmail;
-  await loadApplications();
- }catch(error){alert(error.message)}finally{button.disabled=false}
 }
 async function loadApplications(){
  say("Checking administrator access…");
@@ -115,6 +90,6 @@ async function review(id,decision,button){
   await loadApplications();
  }catch(error){alert(error.message);button.disabled=false}
 }
-function signOut(){accessToken="";currentEmail="";el("dashboard").classList.add("hidden");el("loginPanel").classList.remove("hidden");el("password").value="";el("applications").innerHTML=""}
+async function signOut(){try{if(supabaseClient)await supabaseClient.auth.signOut()}finally{accessToken="";currentEmail="";currentUserId="";el("dashboard").classList.add("hidden");el("loginPanel").classList.remove("hidden");el("applications").innerHTML="";el("resetStatus").textContent="Signed out. Request a fresh one-time sign-in link when you are ready."}}
 </script>
 </body></html>
