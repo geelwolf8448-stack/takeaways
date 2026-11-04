@@ -97,5 +97,9 @@ async function review(id,decision,button){
  }catch(error){alert(error.message);button.disabled=false}
 }
 async function signOut(){try{if(supabaseClient)await supabaseClient.auth.signOut()}finally{accessToken="";currentEmail="";currentUserId="";el("dashboard").classList.add("hidden");el("loginPanel").classList.remove("hidden");el("applications").innerHTML="";el("resetStatus").textContent="Signed out. Request a fresh one-time sign-in link when you are ready."}}
+
+// Restore a valid Supabase session whenever the admin page is opened or revisited.
+// This is essential after the one-time email callback redirects back to this page.
+restoreExistingSession();
 </script>
 </body></html>
