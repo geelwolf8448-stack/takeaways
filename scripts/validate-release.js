@@ -122,7 +122,7 @@ android {
   });
   const configuredGradle = fs.readFileSync(fixtureGradle, "utf8");
   check("Android signing script patches a Gradle release fixture", signingTest.status === 0);
-  check("Android signing fixture gets release signing and version metadata", /signingConfig signingConfigs\\.release/.test(configuredGradle) && /versionCode 2/.test(configuredGradle) && /versionName "1.2.3"/.test(configuredGradle));
+  check("Android signing fixture gets release signing and version metadata", /signingConfig signingConfigs\.release/.test(configuredGradle) && /versionCode 2/.test(configuredGradle) && /versionName "1.2.3"/.test(configuredGradle));
   check("Android signing secrets are referenced from environment, not embedded", configuredGradle.includes('System.getenv("ANDROID_KEYSTORE_PASSWORD")') && !configuredGradle.includes("test-keystore-password"));
 } finally {
   fs.rmSync(fixtureDir, { recursive: true, force: true });
