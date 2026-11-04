@@ -1,46 +1,48 @@
-# Takeaways Tonight? — simple launch plan
+# Takeaways Tonight? — current launch checklist
 
-**Live preview:** https://geelwolf8448-stack.github.io/TAKEAWAYS-TONIGHT-/
+**Website:** https://geelwolf8448-stack.github.io/TAKEAWAYS-TONIGHT-/
 
-## Important: no Supabase setup is needed right now
+This document reflects the current repository implementation. Do not repeat setup steps that have already been completed.
 
-We are changing the order of work to keep the launch simple and avoid unnecessary setup. The website preview can run on GitHub Pages without Supabase. Leave the Supabase dashboard alone for now. Do not create database tables or copy API keys at this stage.
+## Already implemented in code
+- Public responsive restaurant directory with search and category filters.
+- Demo menu cards, menu dialog and basket.
+- WhatsApp order-request flow for approved non-demo listings.
+- Supabase shared restaurant directory read for published restaurants.
+- Partner application submission to Supabase, with local draft fallback if the online request fails.
+- Private admin portal: sign-in, pending applications, approve/reject.
+- SQL approval function with an administrator allowlist.
+- PWA assets and Capacitor Android build workflow.
+- Password recovery page.
 
-## What works in the current preview
+## Setup already present — verify only if a real test fails
+- GitHub Pages repository and website.
+- Supabase project and browser configuration in `config.js`.
+- Supabase schema in `supabase/schema.sql`.
+- Owner allowlist setup script in `supabase/admin-setup.sql` (owner reports it has been run).
+- Brevo SMTP configuration was completed in Supabase; a fresh password recovery flow has not yet been verified end to end.
 
-- Mobile-friendly South Coast food directory preview.
-- Search and category filters.
-- Demonstration menus and basket.
-- Demonstration menu and basket only; live ordering and in-app payments are not enabled.
-- A restaurant application form that prepares a downloadable draft on the device.
+## Next technical acceptance tests (do these once, in order)
+1. Open the live public website and confirm the directory status says the shared directory is connected (zero published restaurants is acceptable at first).
+2. Submit one clearly labelled test restaurant application using details controlled by the project owner.
+3. Sign in to `admin.html`; confirm the owner account is recognised as an administrator and the test application appears.
+4. Approve the test application and confirm it appears on the public directory.
+5. Remove the test listing/application after verification if it is not a real partner.
+6. Test the WhatsApp order-request message with a real partner only after written permission and verified details.
 
-## What is not live yet
+Do not repeat SQL setup, SMTP setup or password recovery unless the corresponding acceptance test proves it is necessary.
 
-- The three visible restaurants are demo listings, not actual partners.
-- Partner applications are not submitted to the platform.
-- There are no customer/restaurant logins, shared order dashboard, live online payments, refunds or delivery dispatch.
-- No restaurant should be shown as a partner until it has given permission and its details have been checked.
+## Not implemented yet
+- Customer registration/login and order history.
+- Restaurant-owner accounts, menu management and restaurant dashboard.
+- Live in-app checkout, PayFast split settlement, refunds, order status management, commission ledger automation and delivery dispatch.
+- Google Play publication and signed production release.
 
-## First real-world launch steps
+The Android workflow has produced successful builds in GitHub Actions. Download the debug APK from the successful workflow run's Artifacts for device testing; do not treat that as a Play Store release.
 
-1. Approach restaurants across Hibberdene, Pumula, Umzumbe, Umtentweni, Port Shepstone, Shelly Beach, Uvongo, Margate, Ramsgate, Southbroom and Port Edward.
-2. Ask permission to display their business name, current menu, prices and WhatsApp ordering number.
-3. Verify the WhatsApp number and test an order request with the owner.
-4. Add only confirmed restaurant details to the website.
-5. The selected future model is in-app ordering, customer payment, restaurant acceptance and order-status updates.
-6. The selected platform commission is 15% of the food subtotal on successfully completed orders, excluding delivery charges in the initial design. The commission is not active until the payment integration and signed partner terms are approved.
-7. Keep any restaurant listing subscription separate from order commission, with written terms and clear cancellation/billing conditions.
-8. Build and test shared authentication, order records, restaurant dashboards, payment-provider callbacks, refund handling and commission reconciliation before taking real orders.
-
-## Future database setup (not required today)
-
-The repository includes `supabase/schema.sql` and `config.js` as a later foundation. When we are ready, we can connect them. Never place a database password or Supabase `service_role` key in website code or share either in chat. Only a Supabase anon/public key is intended for browser use, with correct Row Level Security policies.
-
-## Before commercial launch
-
-- Confirm written permission from each restaurant.
-- Confirm menus, prices, opening hours and fulfilment arrangements.
-- Add accurate operator contact details to the privacy notice and terms.
-- Get appropriate legal/privacy review.
-- Do not collect or process customer payments until a compliant payment setup has been designed and tested.
-\n\n## Marketplace ordering and payments (new build)\n\nSee `MARKETPLACE-PAYMENTS.md` and `supabase/marketplace-schema.sql`. The current website is still a preview; these files do not activate live checkout. Do not accept real customer payments until provider approval, backend functions, security testing, refunds, restaurant agreements and legal/accounting review are complete.\n
+## Commercial and compliance release gates
+- Obtain written permission and verify every restaurant's menu, prices, WhatsApp number, opening hours and fulfilment arrangements.
+- Replace/remove demo restaurants before public launch.
+- Complete operator identity/contact details, privacy notice, terms, POPIA/PAIA processes and appropriate South African legal/accounting review.
+- Agree restaurant subscription terms in writing before billing.
+- Keep customer food payments outside the platform until a secure, approved and tested payment integration is genuinely deployed.
