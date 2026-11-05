@@ -422,7 +422,7 @@ async function sendOrder(){
   const restaurantId=String(restaurant.id).replace(/^shared-/,"");
   const response=await fetch(window.TT_CONFIG.supabaseUrl+"/functions/v1/marketplace-api",{
    method:"POST",headers:{apikey:window.TT_CONFIG.supabaseAnonKey,Authorization:"Bearer "+token,"Content-Type":"application/json"},
-   body:JSON.stringify({action:"create_order",restaurantId,customerName,customerPhone:phone,fulfilmentType:fulfilment.toLowerCase(),deliveryAddress:address,notes,items:basket.map(i=>({name:i.name,quantity:i.qty})),idempotencyKey})
+   body:JSON.stringify({action:"create_order",restaurantId,customerName,customerPhone:phone,fulfilmentType:fulfilment.toLowerCase(),deliveryAddress:address,notes,items:basket.map(i=>({name:i.name,quantity:i.qty,priceCents:Math.round(i.price*100)})),idempotencyKey})
   });
   const result=await response.json();if(!response.ok)throw new Error(result.error||"Your order could not be submitted.");
   const order=result.order,whatsapp=String(restaurant.phone||"").replace(/\D/g,"");
