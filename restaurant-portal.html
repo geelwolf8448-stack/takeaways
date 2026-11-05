@@ -84,15 +84,6 @@ async function api(action,extra){
  const result=await response.json();if(!response.ok)throw new Error(result.error||"The request could not be completed.");return result;
 }
 function menuText(menu){return (Array.isArray(menu)?menu:[]).map(i=>Array.isArray(i)?i[0]+" - "+Number(i[1]).toFixed(2):"").filter(Boolean).join("\n")}
-async function saveListing(id){
- const rawPhone=$("phone-"+id).value.replace(/\D/g,""),whatsapp=rawPhone.startsWith("0")?"27"+rawPhone.slice(1):rawPhone;
- const menu=$("menu-"+id).value.split("\n").map(line=>{const m=line.match(/^\s*(.+?)\s*-\s*(\d+(?:\.\d{1,2})?)\s*$/);return m?[m[1].trim(),Number(m[2])]:null}).filter(Boolean);
- if(!/^27\d{9}$/.test(whatsapp)){alert("Enter a valid South African WhatsApp number.");return}
- if(!menu.length){alert("Enter at least one menu item as Name - 99.00");return}
- const {error}=await sb.from("restaurants").update({menu,whatsapp}).eq("id",id);
- if(error){alert("Listing not saved: "+error.message);return}
- alert("Restaurant contact details and menu updated.");await loadDashboard();
-}
 async function enableOrderNotifications(){
  if(!("Notification" in window)){ $("notificationStatus").textContent="This browser does not support desktop notifications. Keep the portal open and watch the order alert panel.";return; }
  try{
@@ -147,8 +138,8 @@ async function loadRestaurantsOrders(){
 async function renderRestaurants(){
  const root=$("restaurants");
  if(!memberships.length){root.innerHTML="";return}
- root.innerHTML='<div class="panel"><h2>Your restaurants</h2><div class="grid">'+memberships.map(m=>{
- const r=m.restaurant;return '<article class="restaurant"><div class="top"><h2>'+esc(r.name)+'</h2><span class="tag">'+esc(m.member_role.toUpperCase())+'</span></div><p>'+esc(r.area)+' · '+esc(r.category)+'</p><label>WhatsApp number</label><input id="phone-'+r.id+'" value="'+esc(r.whatsapp)+'"><label>Menu (one item per line: Name - 99.00)</label><textarea id="menu-'+r.id+'" rows="5">'+esc(menuText(r.menu))+'</textarea><button onclick="saveListing(\''+r.id+'\')">Save listing details</button></article>'
+ root.innerHTML='<div class="panel"><h2>Your restaurants</h2><p class="small">Menu items, prices, specials, contact details and opening hours are managed centrally by Takeaways Tonight? Please contact the platform administrator before making any changes. Do not advertise an unapproved menu change to customers through this portal.</p><div class="grid">'+memberships.map(m=>{
+ const r=m.restaurant;return '<article class="restaurant"><div class="top"><h2>'+esc(r.name)+'</h2><span class="tag">'+esc(m.member_role.toUpperCase())+'</span></div><p>'+esc(r.area)+' · '+esc(r.category)+'</p><p><b>WhatsApp:</b> '+esc(r.whatsapp)+'</p><p><b>Current menu:</b></p><div class="items">'+esc(menuText(r.menu)||"Menu details are being prepared.").replace(/\n/g,"<br>")+'</div><p class="small">To report a special, price change, new item or unavailable item, contact the Takeaways Tonight? administrator.</p></article>'
  }).join("")+'</div><h2>Commission ledger</h2><div id="commissionArea" class="status">Loading commission records…</div><h2>Customer orders</h2><div id="ordersArea"><p class="small">Loading orders…</p></div></div>';
  await loadRestaurantsOrders();
  startOrderPolling();
