@@ -7,11 +7,11 @@ The linked Supabase project is configured and the following is now deployed:
 - Customer profiles are created automatically when an Auth account is created.
 - Customers can sign in using a one-time email link, update their contact details and view their private order history.
 - Restaurant owners can request access to an already approved restaurant. The platform administrator must review the request before membership is granted.
-- Approved restaurant owners/managers can update their menu and manage orders for their own restaurant.
+- Approved restaurant owners/managers can view and manage orders for their own restaurant. New-order browser notifications are available while the owner portal remains open and the owner grants notification permission; closed-browser/background push is not yet implemented. Menu, price, specials and listing changes are centrally managed by the platform administrator.
 - Customer orders are created through the authenticated `marketplace-api` Edge Function.
 - The server reads the restaurant's current published menu and calculates the order prices itself. Browser-supplied prices are not trusted.
 - Orders are restricted to one restaurant each. The customer is redirected to the restaurant's WhatsApp after the order is saved.
-- The restaurant confirms availability, delivery fee, final total and payment directly with the customer.
+- The restaurant confirms availability, delivery fee, final total and payment directly with the customer. The restaurant portal checks for new submitted orders every 15 seconds while signed in and open; browser pop-up notifications require permission. It does not yet send push notifications when the portal/browser is closed.
 - Restaurant staff can accept/reject, prepare, mark ready, confirm direct payment and complete orders. Completion is blocked until the restaurant confirms it has been paid.
 - The commission ledger records 15% of the food subtotal only after completion. Delivery charges are excluded.
 
