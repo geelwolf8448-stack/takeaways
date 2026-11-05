@@ -3,9 +3,11 @@ import { App } from "https://esm.sh/@capacitor/app@7.0.0";
 const isNative = Boolean(window.Capacitor && typeof window.Capacitor.isNativePlatform === "function" && window.Capacitor.isNativePlatform());
 if (isNative) {
   const client = window.TT_SUPABASE_CLIENT;
+  const handledUrls = new Set();
 
   async function completeNativeSignIn(rawUrl) {
-    if (!client || !rawUrl) return;
+    if (!client || !rawUrl || handledUrls.has(rawUrl)) return;
+    handledUrls.add(rawUrl);
     try {
       const url = new URL(rawUrl);
       const hash = new URLSearchParams(url.hash.replace(/^#/, ""));
