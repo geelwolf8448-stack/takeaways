@@ -51,6 +51,7 @@ nav{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}
 <script>
 const cfg=window.TT_CONFIG||{};
 const sb=window.supabase&&cfg.supabaseUrl&&cfg.supabaseAnonKey?window.supabase.createClient(cfg.supabaseUrl,cfg.supabaseAnonKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}):null;
+window.TT_SUPABASE_CLIENT=sb;
 const $=id=>document.getElementById(id);
 let session=null;
 function money(c){return "R"+(Number(c||0)/100).toFixed(2)}
@@ -63,7 +64,7 @@ async function sendLink(){
  if(!email.includes("@")){$("loginStatus").textContent="Please enter a valid email address.";return}
  const b=$("sendLink");b.disabled=true;$("loginStatus").textContent="Sending your secure sign-in link…";
  try{
-  const {error}=await sb.auth.signInWithOtp({email,options:{emailRedirectTo:"https://geelwolf8448-stack.github.io/takeaways/account.html"+(new URLSearchParams(location.search).get("return")==="checkout"?"?return=checkout":""),shouldCreateUser:true,data:{full_name:name,phone}}});
+  const {error}=await sb.auth.signInWithOtp({email,options:{emailRedirectTo:(window.Capacitor?.isNativePlatform?.()?"takeawaystonight://auth/callback?target=account":"https://geelwolf8448-stack.github.io/takeaways/account.html"+(new URLSearchParams(location.search).get("return")==="checkout"?"?return=checkout":"")),shouldCreateUser:true,data:{full_name:name,phone}}});
   if(error)throw error;
   $("loginStatus").textContent="Check your email and open the newest Takeaways Tonight? sign-in link in this browser. The link can only be used once.";
  }catch(e){$("loginStatus").textContent=e.message||"Could not send the sign-in link."}
@@ -99,4 +100,5 @@ if(sb){
  sb.auth.getSession().then(({data})=>{session=data.session;if(session)loadAccount()});
 }else{$("loginStatus").textContent="Account service is temporarily unavailable."}
 </script>
+<script type="module" src="native-auth.js"></script>
 </body></html>
