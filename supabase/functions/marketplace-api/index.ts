@@ -18,6 +18,87 @@ const admin = createClient(supabaseUrl, serviceKey, {
   auth: { persistSession: false, autoRefreshToken: false },
 });
 
+let fcmAccessToken: { value: string; expiresAt: number } | null = null;
+const base64Url = (input: string | Uint8Array) => {
+  const bytes = typeof input === "string" ? new TextEncoder().encode(input) : input;
+  let binary = "";
+  for (const byte of bytes) binary += String.fromCharCode(byte);
+  return btoa(binary).replace(/=/g, "").replace(/\\+/g, "-").replace(/\\//g, "_");
+};
+
+async function getFcmAccessToken(serviceAccount: Record<string, string>) {
+  if (fcmAccessToken && fcmAccessToken.expiresAt > Date.now() + 60000) return fcmAccessToken.value;
+  const now = Math.floor(Date.now() / 1000);
+  const header = base64Url(JSON.stringify({ alg: "RS256", typ: "JWT" }));
+  const claim = base64Url(JSON.stringify({
+    iss: serviceAccount.client_email,
+    scope: "https://www.googleapis.com/auth/firebase.messaging",
+    aud: "https://oauth2.googleapis.com/token",
+    iat: now,
+    exp: now + 3600
+  }));
+  const unsigned = header + "." + claim;
+  const pem = serviceAccount.private_key.replace(/\\n/g, "\n").replace(/-----BEGIN PRIVATE KEY-----|-----END PRIVATE KEY-----|\\s/g, "");
+  const keyBytes = Uint8Array.from(atob(pem), ch => ch.charCodeAt(0));
+  const key = await crypto.subtle.importKey("pkcs8", keyBytes, { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" }, false, ["sign"]);
+  const signature = new Uint8Array(await crypto.subtle.sign("RSASSA-PKCS1-v1_5", key, new TextEncoder().encode(unsigned)));
+  const assertion = unsigned + "." + base64Url(signature);
+  const response = await fetch("https://oauth2.googleapis.com/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
+      assertion
+    })
+  });
+  const result = await response.json();
+  if (!response.ok || !result.access_token) throw new Error("Firebase OAuth token request failed.");
+  fcmAccessToken = { value: result.access_token, expiresAt: Date.now() + 3500000 };
+  return result.access_token as string;
+}
+
+async function sendNewOrderPush(restaurantId: string, orderId: string, orderNumber: number) {
+  const rawCredentials = Deno.env.get("FIREBASE_SERVICE_ACCOUNT_JSON");
+  if (!rawCredentials) return;
+  try {
+    const serviceAccount = JSON.parse(rawCredentials);
+    const { data: members, error: memberError } = await admin.from("restaurant_members")
+      .select("user_id").eq("restaurant_id", restaurantId);
+    if (memberError || !members?.length) return;
+    const userIds = [...new Set(members.map((member: { user_id: string }) => member.user_id))];
+    const { data: devices, error: deviceError } = await admin.from("restaurant_push_tokens")
+      .select("id,device_token").in("user_id", userIds);
+    if (deviceError || !devices?.length) return;
+    const accessToken = await getFcmAccessToken(serviceAccount);
+    await Promise.all(devices.map(async (device: { id: string; device_token: string }) => {
+      const response = await fetch("https://fcm.googleapis.com/v1/projects/" + serviceAccount.project_id + "/messages:send", {
+        method: "POST",
+        headers: { "Authorization": "Bearer " + accessToken, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: {
+            token: device.device_token,
+            notification: {
+              title: "New customer order",
+              body: "Order #" + orderNumber + " is waiting. Open Takeaways Tonight? to review."
+            },
+            data: { screen: "orders", orderId, orderNumber: String(orderNumber) },
+            android: { priority: "HIGH", notification: { channel_id: "orders", sound: "default" } }
+          }
+        })
+      });
+      if (!response.ok) {
+        const details = await response.text();
+        console.error("FCM send failed for a registered device:", response.status, details.slice(0, 500));
+        if (response.status === 404 || details.includes("UNREGISTERED")) {
+          await admin.from("restaurant_push_tokens").delete().eq("id", device.id);
+        }
+      }
+    }));
+  } catch (error) {
+    console.error("Background order notification could not be sent:", error);
+  }
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "POST") return reply(405, { error: "Method not allowed" });
@@ -133,6 +214,7 @@ Deno.serve(async (req: Request) => {
         console.error("Order item insert failed", itemError);
         return reply(500, { error: "We could not save the items in your order. Please try again." });
       }
+      await sendNewOrderPush(restaurant.id, order.id, order.order_number);
       return reply(201, {
         order,
         restaurantName: restaurant.name,
