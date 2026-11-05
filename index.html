@@ -395,10 +395,10 @@ async function sendOrder(){
  const fulfilment=document.getElementById("fulfilment").value;
  const address=document.getElementById("deliveryAddress").value.trim();
  const notes=document.getElementById("orderNotes").value.trim();
- const saved={items:basket,customerName:name,customerPhone:rawPhone,fulfilment,address,notes};
+ const saved={items:basket,customerName:name,customerPhone:rawPhone,fulfilment,address,notes,savedAt:Date.now()};
  const {data:sessionData}=homeSupabase?await homeSupabase.auth.getSession():{data:{session:null}};
  const session=sessionData.session;
- if(!session){sessionStorage.setItem("tt_pending_checkout",JSON.stringify(saved));location.href="account.html?return=checkout";return;}
+ if(!session){localStorage.setItem("tt_pending_checkout",JSON.stringify(saved));location.href="account.html?return=checkout";return;}
  let customerName=name,phone=customerPhone;
  if(!customerName||!phone){
   const {data:profile}=await homeSupabase.from("marketplace_profiles").select("full_name,phone").eq("user_id",session.user.id).maybeSingle();
@@ -428,7 +428,7 @@ async function sendOrder(){
   const order=result.order,whatsapp=String(restaurant.phone||"").replace(/\D/g,"");
   const lines=basket.map(item=>item.qty+" x "+item.name+" — "+money(item.price*item.qty));
   const message=["ORDER REQUEST — Takeaways Tonight?","Order reference: #"+order.order_number,"Restaurant: "+restaurant.name,"Customer: "+customerName,"Customer mobile: +"+phone,"Fulfilment: "+fulfilment,...(fulfilment==="Delivery"?["Delivery address: "+address]:[]),"","Items:",...lines,"Food subtotal: "+money(basket.reduce((sum,item)=>sum+item.price*item.qty,0)),...(notes?["Notes: "+notes]:[]),"","Please confirm availability, any delivery charge, final total and payment arrangements. Payment is made directly to the restaurant. No payment has been made through Takeaways Tonight?"].join("\n");
-  sessionStorage.removeItem("tt_pending_checkout");sessionStorage.removeItem("tt_order_idempotency");
+  localStorage.removeItem("tt_pending_checkout");sessionStorage.removeItem("tt_order_idempotency");
   basket=[];render();closeDialog("basketDialog");
   alert("Your order request #"+order.order_number+" has been saved to your account. WhatsApp will open so you can notify the restaurant.");
   const waUrl="https://wa.me/"+whatsapp+"?text="+encodeURIComponent(message);
@@ -464,9 +464,9 @@ function closeDialog(id){document.getElementById(id).close()}
 const homeConfig=window.TT_CONFIG||{};
 const homeSupabase=window.supabase&&homeConfig.supabaseUrl&&homeConfig.supabaseAnonKey?window.supabase.createClient(homeConfig.supabaseUrl,homeConfig.supabaseAnonKey,{auth:{persistSession:true,autoRefreshToken:true}}):null;
 async function restorePendingCheckout(){
- const raw=sessionStorage.getItem("tt_pending_checkout");if(!raw)return;
- try{const saved=JSON.parse(raw);if(Array.isArray(saved.items)&&saved.items.length){basket=saved.items;document.getElementById("customerName").value=saved.customerName||"";document.getElementById("customerPhone").value=saved.customerPhone||"";document.getElementById("fulfilment").value=saved.fulfilment||"";document.getElementById("deliveryAddress").value=saved.address||"";document.getElementById("orderNotes").value=saved.notes||"";openBasket();}}
- catch(e){sessionStorage.removeItem("tt_pending_checkout")}
+ const raw=localStorage.getItem("tt_pending_checkout");if(!raw)return;
+ try{const saved=JSON.parse(raw);if(saved.savedAt&&Date.now()-saved.savedAt>30*60*1000){localStorage.removeItem("tt_pending_checkout");return;}if(Array.isArray(saved.items)&&saved.items.length){basket=saved.items;document.getElementById("customerName").value=saved.customerName||"";document.getElementById("customerPhone").value=saved.customerPhone||"";document.getElementById("fulfilment").value=saved.fulfilment||"";document.getElementById("deliveryAddress").value=saved.address||"";document.getElementById("orderNotes").value=saved.notes||"";openBasket();}}
+ catch(e){localStorage.removeItem("tt_pending_checkout")}
 }
 render();
 loadSharedRestaurants().then(restorePendingCheckout);
