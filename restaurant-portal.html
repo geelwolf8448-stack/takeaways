@@ -119,7 +119,7 @@ async function renderRestaurants(){
  const root=$("restaurants");
  if(!memberships.length){root.innerHTML="";return}
  root.innerHTML='<div class="panel"><h2>Your restaurants</h2><div class="grid">'+memberships.map(m=>{
- const r=m.restaurant;return '<article class="restaurant"><div class="top"><h2>'+esc(r.name)+'</h2><span class="tag">'+esc(m.member_role.toUpperCase())+'</span></div><p>'+esc(r.area)+' · '+esc(r.category)+'</p><label>WhatsApp number</label><input id="phone-'+r.id+'" value="'+esc(r.whatsapp)+'" disabled><label>Menu (one item per line: Name - 99.00)</label><textarea id="menu-'+r.id+'" rows="5">'+esc(menuText(r.menu))+'</textarea><button onclick="saveListing(\''+r.id+'\')">Save listing details</button></article>'
+ const r=m.restaurant;return '<article class="restaurant"><div class="top"><h2>'+esc(r.name)+'</h2><span class="tag">'+esc(m.member_role.toUpperCase())+'</span></div><p>'+esc(r.area)+' · '+esc(r.category)+'</p><label>WhatsApp number</label><input id="phone-'+r.id+'" value="'+esc(r.whatsapp)+'"><label>Menu (one item per line: Name - 99.00)</label><textarea id="menu-'+r.id+'" rows="5">'+esc(menuText(r.menu))+'</textarea><button onclick="saveListing(\''+r.id+'\')">Save listing details</button></article>'
  }).join("")+'</div><h2>Commission ledger</h2><div id="commissionArea" class="status">Loading commission records…</div><h2>Customer orders</h2><div id="ordersArea"><p class="small">Loading orders…</p></div></div>';
  await loadRestaurantsOrders();
 }
