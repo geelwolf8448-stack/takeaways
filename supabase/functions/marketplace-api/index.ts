@@ -59,6 +59,7 @@ Deno.serve(async (req: Request) => {
       const { data: existing } = await admin.from("marketplace_orders")
         .select("id,order_number,status,total_cents")
         .eq("idempotency_key", idempotencyKey)
+        .eq("customer_id", user.id)
         .maybeSingle();
       if (existing) return reply(200, { order: existing, reused: true });
 
@@ -113,7 +114,7 @@ Deno.serve(async (req: Request) => {
         if (orderError?.code === "23505") {
           const { data: duplicate } = await admin.from("marketplace_orders")
             .select("id,order_number,status,total_cents,created_at")
-            .eq("idempotency_key", idempotencyKey).maybeSingle();
+            .eq("idempotency_key", idempotencyKey).eq("customer_id", user.id).maybeSingle();
           if (duplicate) return reply(200, { order: duplicate, reused: true });
         }
         console.error("Order insert failed", orderError);
