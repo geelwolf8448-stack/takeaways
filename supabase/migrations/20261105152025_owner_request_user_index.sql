@@ -1,0 +1,1 @@
+create index if not exists restaurant_owner_requests_user_idx on public.restaurant_owner_requests(user_id, created_at desc);
