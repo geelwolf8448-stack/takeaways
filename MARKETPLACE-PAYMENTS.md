@@ -33,7 +33,7 @@ PayFast has not been configured in this project. No PayFast merchant ID, merchan
 
 The intended integration requires:
 
-1. Written PayFast confirmation that Takeaways Tonight? is eligible for the relevant marketplace/split-payment product.
+1. Written PayFast confirmation that Takeaways Tonight? is eligible for the relevant marketplace/split-payment product and confirmation of which account must be primary (the platform or the restaurant). PayFast's enablement guidance says the platform provides its Merchant ID and Merchant Key to the primary account holder, so the earlier assumption that the platform is primary must not be treated as final.
 2. A confirmed settlement and refund model, including what happens when a restaurant rejects an order or a customer receives a full/partial refund.
 3. A verified merchant onboarding process for every restaurant that receives a split payout.
 4. A clear commercial decision on whether the 15% is collected at payment time or invoiced after a completed order. These are not the same cash-flow model.
@@ -43,9 +43,9 @@ The intended integration requires:
 
 ### Split-payment architecture constraint
 
-The earlier proposal is for the platform to be the primary merchant and one restaurant to be the secondary merchant, with the restaurant receiving 85% and the platform retaining 15%. The basket must remain limited to one restaurant if the provider supports only one secondary recipient.
+The commercial proposal is to allocate 85% of the food subtotal to the restaurant and 15% to the platform. The primary/secondary account direction must be confirmed with PayFast; its current guidance says both accounts must take action and describes the platform sharing its merchant ID/key with the primary account holder. The basket must remain limited to one restaurant because each transaction can split to only one receiving merchant.
 
-A provider split at checkout distributes money at payment time; it does not wait for an order to be completed. Therefore, it must not be enabled until PayFast confirms the exact settlement, cancellation and refund rules and the business chooses a consistent commission-recognition policy.
+A provider split at checkout distributes money at payment time; it does not wait for an order to be completed. Therefore, it must not be enabled until PayFast confirms the exact account structure, settlement, cancellation and refund rules and the business chooses a consistent commission-recognition policy.
 
 Official provider references to verify during implementation:
 - https://support.payfast.help/portal/en/kb/articles/can-i-split-a-payment-20-9-2022
