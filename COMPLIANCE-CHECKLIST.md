@@ -34,7 +34,7 @@ This is an operational checklist, not a legal opinion or a licence. The operator
 - Verify the restaurant's identity and that the person applying is authorised.
 - Obtain written permission to publish the business listing, menu, prices, photos and contact number.
 - Verify the WhatsApp number with the owner and test the order-request message.
-- Record who is responsible for menu accuracy, allergens, pricing, food preparation, fulfilment, customer complaints and refunds.
+- Record who is responsible for menu accuracy, allergens, pricing, food preparation, fulfilment, customer complaints and refunds. Restaurant owners must notify the platform administrator of specials, menu additions/removals, price changes, opening-hour changes and delivery changes; the administrator publishes approved updates centrally.
 - Obtain written agreement for the Premium listing price, R1,000 monthly subscription, once-off R250 setup fee, 7-day introductory trial, billing start date and cancellation process.
 - Do not advertise a business as a partner until it has approved its listing.
 
