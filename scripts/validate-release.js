@@ -86,6 +86,11 @@ check("new submitted orders trigger an in-dashboard alert and browser notificati
 check("restaurant owners request verified access", /restaurant_owner_requests/.test(restaurantPortal.html));
 check("restaurant-owner magic links route back into native Android app", /za.co.takeawaystonight.app:\/\/auth\/callback\?target=restaurant/.test(restaurantPortal.html));
 check("restaurant portal loads native push registration module", /native-push\.js/.test(restaurantPortal.html));
+const firebaseAndroidConfig = read("scripts/configure-firebase-android.js");
+new vm.Script(firebaseAndroidConfig, { filename: "configure-firebase-android.js" });
+check("Firebase Android Gradle configuration script compiles", true);
+check("Firebase Android setup validates the app package name", /za\\.co\\.takeawaystonight\\.app/.test(firebaseAndroidConfig));
+check("Firebase Android setup applies the Google Services Gradle plugin", /com\\.google\\.gms\\.google-services/.test(firebaseAndroidConfig));
 const nativePush = read("native-push.js");
 new vm.Script(nativePush.replace(/^import[^\n]*\n/, ""), { filename: "native-push.js" });
 check("native Android push module JavaScript compiles", true);
