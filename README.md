@@ -22,7 +22,7 @@ The project has moved beyond the original static preview. Use the code in `index
 - Restaurant-owner portal with verified access requests, approved listing menu updates and order management.
 - Marketplace order database and authenticated Edge Function: validates live menu prices server-side, creates one-restaurant orders, supports idempotency, and enforces restaurant-authorised order status changes.
 - Commission ledger records the proposed 15% food-subtotal commission only after an order is completed and marked paid directly to the restaurant. No commission payment or PayFast split is currently collected.
-- Capacitor Android build workflow with a static release-validation test gate (`npm test`). Debug APK and unsigned AAB are build outputs for testing/release preparation, not Play Store-ready signed releases.
+- Capacitor Android build workflow with a static release-validation test gate (`npm test`). Customer and restaurant-owner email sign-in uses a custom Android deep link to return to the installed app. Debug APK and unsigned AAB are build outputs for testing/release preparation, not Play Store-ready signed releases.
 
 ### Still requires live verification or further development
 - Complete a real passwordless administrator sign-in and confirm the owner account is in `public.admin_users`; a successful SQL run or deployment alone is not an end-to-end admin login test.
@@ -45,7 +45,7 @@ The project has moved beyond the original static preview. Use the code in `index
 - `config.js` — public Supabase URL and publishable key only. Never put service-role keys here.
 - `supabase/schema.sql` — shared directory, application and approval schema.
 - `supabase/admin-setup.sql` — adds the owner Auth account to the admin allowlist.
-- `account.html` — customer sign-in, profile and order history.
+- `account.html` — customer sign-in, profile and order history.\n- `native-auth.js` — restores Supabase email-link sessions when the Android app is opened through its custom URL scheme.\n- `scripts/configure-android-deeplinks.js` — configures the Android intent filter and `takeawaystonight` scheme during builds.
 - `restaurant-portal.html` — restaurant-owner access requests, menu management and order dashboard.
 - `supabase/functions/marketplace-api/index.ts` — deployed authenticated order and owner-access API.
 - `supabase/migrations/20261105151101_customer_accounts_orders_foundation.sql` — source for the deployed customer, restaurant-owner and order schema.
