@@ -84,7 +84,7 @@ async function loadAccount(){
 async function saveProfile(){
  const full_name=$("profileName").value.trim(),raw=$("profilePhone").value.replace(/\D/g,""),phone=raw.startsWith("0")?"27"+raw.slice(1):raw;
  if(full_name.length<2||!/^27\d{9}$/.test(phone)){alert("Enter your name and a valid South African mobile number.");return}
- const {error}=await sb.from("marketplace_profiles").upsert({user_id:session.user.id,full_name,phone},{onConflict:"user_id"});
+ const {error}=await sb.from("marketplace_profiles").update({full_name,phone}).eq("user_id",session.user.id);
  $("accountStatus").textContent=error?"Could not save details: "+error.message:"Your details have been saved.";
 }
 async function loadOrders(){
