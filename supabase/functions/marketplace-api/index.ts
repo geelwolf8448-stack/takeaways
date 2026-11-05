@@ -90,6 +90,10 @@ Deno.serve(async (req: Request) => {
         );
         if (!menuItem) return reply(400, { error: `"${name}" is no longer on this restaurant's menu. Refresh the menu.` });
         const unitPriceCents = Math.round(menuItem.price * 100);
+        const suppliedPriceCents = Number(raw?.priceCents);
+        if (!Number.isInteger(suppliedPriceCents) || suppliedPriceCents !== unitPriceCents) {
+          return reply(409, { error: `The price for "${name}" has changed. Refresh the menu before submitting your order.` });
+        }
         subtotalCents += unitPriceCents * quantity;
         orderItems.push({ item_name: name, quantity, unit_price_cents: unitPriceCents });
       }
