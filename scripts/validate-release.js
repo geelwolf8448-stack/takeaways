@@ -81,7 +81,7 @@ check("customer magic links route back into native Android app", /za.co.takeaway
 const restaurantPortal = compileInlineScripts("restaurant-portal.html");
 check("restaurant owner portal inline JavaScript compiles", restaurantPortal.count > 0);
 check("restaurant portal can request browser notification permission", /Notification\.requestPermission\(\)/.test(restaurantPortal.html));
-check("restaurant portal polls for new orders while signed in", /window\.setInterval\(\(\)=>\{if\(session&&memberships\.length\)loadRestaurantsOrders\(\)\},15000\)/.test(restaurantPortal.html));
+check("restaurant portal polls for new orders while signed in", /window\.setInterval\(\s*\(\s*\)\s*=>\s*\{\s*if\s*\(\s*session\s*&&\s*memberships\.length\s*\)\s*loadRestaurantsOrders\(\)\s*;\s*\}\s*,\s*15000\s*\)/.test(restaurantPortal.html));
 check("new submitted orders trigger an in-dashboard alert and browser notification", /announceNewOrders\(data\|\|\[\]\)/.test(restaurantPortal.html) && /new Notification\("New Takeaways Tonight\? order"/.test(restaurantPortal.html));
 check("restaurant owners request verified access", /restaurant_owner_requests/.test(restaurantPortal.html));
 check("restaurant-owner magic links route back into native Android app", /za.co.takeawaystonight.app:\/\/auth\/callback\?target=restaurant/.test(restaurantPortal.html));
