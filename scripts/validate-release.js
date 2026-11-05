@@ -87,6 +87,7 @@ check("restaurant owners can update their menu and contact details", /saveListin
 check("web and native pages load the shared auth deep-link handler", /native-auth\.js/.test(publicPage.html) && /native-auth\.js/.test(account.html) && /native-auth\.js/.test(restaurantPortal.html));
 const nativeAuth = read("native-auth.js");
 check("native auth handler restores Supabase sessions from app links", /App\.addListener\("appUrlOpen"/.test(nativeAuth) && /App\.getLaunchUrl\(\)/.test(nativeAuth) && /client\.auth\.setSession/.test(nativeAuth));
+check("native auth handler prevents duplicate magic-link restoration", /handledUrls\.has\(rawUrl\)/.test(nativeAuth));
 const packageJson = JSON.parse(read("package.json"));
 check("Capacitor App plugin is installed for native deep links", Boolean(packageJson.dependencies["@capacitor/app"]));
 const marketplaceApi = read("supabase/functions/marketplace-api/index.ts");
