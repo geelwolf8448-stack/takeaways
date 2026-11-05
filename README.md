@@ -14,11 +14,11 @@ The project has moved beyond the original static preview. Use the code in `index
 - Basket and WhatsApp order-request flow for approved, non-demo restaurant records.
 - Supabase shared restaurant directory: reads only rows with `is_published=true`.
 - Restaurant partner application form: submits to `partner_applications`; if submission fails, it downloads a local draft.
-- Private admin portal with Supabase passwordless email-link sign-in, pending application list, and approve/reject actions.
+- Private admin portal with Supabase passwordless email-link sign-in, pending application list, restaurant-owner access review, and marketplace reporting.
 - Database-side approval function checks the administrator allowlist and publishes an approved application into `restaurants`.
 - Secure one-time sign-in callback page for Supabase email-link authentication.
 - PWA manifest, service worker, branding assets, privacy and terms draft pages.
-- Capacitor Android build workflow with a static release-validation test gate (`npm test`). Debug APK and unsigned AAB are build outputs for testing/release preparation, not Play Store-ready signed releases.
+- Customer account portal with passwordless sign-in, editable contact profile and private order history.\n- Restaurant-owner portal with verified access requests, approved listing menu updates and order management.\n- Marketplace order database and authenticated Edge Function: validates live menu prices server-side, creates one-restaurant orders, supports idempotency, and enforces restaurant-authorised order status changes.\n- Commission ledger records the proposed 15% food-subtotal commission only after an order is completed and marked paid directly to the restaurant. No commission payment or PayFast split is currently collected.\n- Capacitor Android build workflow with a static release-validation test gate (`npm test`). Debug APK and unsigned AAB are build outputs for testing/release preparation, not Play Store-ready signed releases.
 
 ### Still requires live verification or further development
 - Complete a real passwordless administrator sign-in and confirm the owner account is in `public.admin_users`; a successful SQL run or deployment alone is not an end-to-end admin login test.
@@ -41,5 +41,5 @@ The project has moved beyond the original static preview. Use the code in `index
 - `config.js` — public Supabase URL and publishable key only. Never put service-role keys here.
 - `supabase/schema.sql` — shared directory, application and approval schema.
 - `supabase/admin-setup.sql` — adds the owner Auth account to the admin allowlist.
-- `supabase/marketplace-schema.sql` and `MARKETPLACE-PAYMENTS.md` — future marketplace planning; not live.
+- `account.html` — customer sign-in, profile and order history.\n- `restaurant-portal.html` — restaurant-owner access requests, menu management and order dashboard.\n- `supabase/functions/marketplace-api/index.ts` — deployed authenticated order and owner-access API.\n- `supabase/marketplace-schema.sql` — original marketplace planning reference; the additive customer/order migrations are tracked in Supabase and should be retained separately.\n- `MARKETPLACE-PAYMENTS.md` — current payment status, commission design and activation gates.
 - `COMPLIANCE-CHECKLIST.md` — pre-launch operational and legal review checklist.\n- `scripts/validate-release.js` — static release checks, run with `npm test`.\n- `LAUNCH-KIT.md` — ready-to-adapt public launch copy, restaurant invitation, onboarding checklist, customer FAQ and Google Play listing draft.\n- `ANDROID-RELEASE.md` — secure upload-keystore instructions and signed release process.\n- `RESTAURANT-AGREEMENT-TEMPLATE.md` — draft listing permission and commercial terms template for legal review.\n- `.github/workflows/android-release.yml` — manual signed APK/AAB workflow; requires four private GitHub Actions signing secrets.
