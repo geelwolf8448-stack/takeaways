@@ -166,7 +166,7 @@ android {
   const deepLinkTest = spawnSync(process.execPath, [path.join(root, "scripts/configure-android-deeplinks.js")], {
     cwd: root,
     encoding: "utf8",
-    env: { ...process.env, ANDROID_MANIFEST_FILE: fixtureManifest, ANDROID_STRINGS_FILE: fixtureStrings }
+    env: { ...process.env, ANDROID_MANIFEST_FILE: fixtureManifest, ANDROID_STRINGS_FILE: fixtureStrings, ANDROID_DEEP_LINK_SCHEME: "za.co.takeawaystonight.app" }
   });
   const configuredManifest = fs.readFileSync(fixtureManifest, "utf8");
   const configuredStrings = fs.readFileSync(fixtureStrings, "utf8");
