@@ -62,9 +62,6 @@ create table if not exists public.restaurant_owner_requests (
 );
 create unique index if not exists restaurant_owner_requests_one_pending_per_user_restaurant
 on public.restaurant_owner_requests(user_id,restaurant_id) where status='pending';
-create index if not exists restaurant_owner_requests_restaurant_idx on public.restaurant_owner_requests(restaurant_id);
-create index if not exists restaurant_owner_requests_user_idx on public.restaurant_owner_requests(user_id,created_at desc);
-create index if not exists restaurant_owner_requests_reviewed_by_idx on public.restaurant_owner_requests(reviewed_by);
 
 create table if not exists public.marketplace_orders (
   id uuid primary key default gen_random_uuid(),
@@ -92,11 +89,8 @@ create table if not exists public.marketplace_orders (
   completed_at timestamptz,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
-  idempotency_key text,
   check (fulfilment_type <> 'delivery' or char_length(coalesce(delivery_address,''))>=5)
 );
-create unique index if not exists marketplace_orders_idempotency_key_idx
-on public.marketplace_orders(idempotency_key) where idempotency_key is not null;
 create index if not exists marketplace_orders_customer_created_idx on public.marketplace_orders(customer_id,created_at desc);
 create index if not exists marketplace_orders_restaurant_created_idx on public.marketplace_orders(restaurant_id,created_at desc);
 
@@ -177,15 +171,6 @@ drop trigger if exists marketplace_order_commission_trigger on public.marketplac
 create trigger marketplace_order_commission_trigger
 before update of status,payment_status on public.marketplace_orders
 for each row execute function private.record_completed_order_commission();
-
-create or replace function private.touch_marketplace_profile_updated_at()
-returns trigger language plpgsql set search_path = '' as $$
-begin new.updated_at:=now(); return new; end;
-$$;
-revoke all on function private.touch_marketplace_profile_updated_at() from public, anon, authenticated;
-drop trigger if exists marketplace_profiles_touch_updated_at on public.marketplace_profiles;
-create trigger marketplace_profiles_touch_updated_at before update on public.marketplace_profiles
-for each row execute function private.touch_marketplace_profile_updated_at();
 
 alter table public.marketplace_profiles enable row level security;
 alter table public.platform_admins enable row level security;
