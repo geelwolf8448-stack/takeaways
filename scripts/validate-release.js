@@ -43,7 +43,7 @@ check("demo listings are not treated as order-enabled", /Demo only/.test(publicP
 check("demo cards are not labelled as confirmed featured partners", !/Our featured restaurants/.test(publicPage.html));
 check("orders are restricted to approved non-demo records", /r\.isDemo!==false/.test(publicPage.html) && /is_published=eq\.true/.test(publicPage.html));
 check("WhatsApp order request is generated", /https:\/\/wa\.me\//.test(publicPage.html) && /No payment has been made/.test(publicPage.html));
-check("public page explains WhatsApp requests are not secure in-app checkout", /Send an order request directly to the restaurant on WhatsApp/.test(publicPage.html) && !/secure checkout are being prepared/.test(publicPage.html));
+check("public page explains WhatsApp requests are not secure in-app checkout", /Signed-in customers can submit an order request and notify the restaurant on WhatsApp/.test(publicPage.html) && /marketplace-api/.test(publicPage.html) && !/secure checkout are being prepared/.test(publicPage.html));
 check("South African customer and restaurant phone numbers are validated", /\^27\\d\{9\}\$/.test(publicPage.html));
 check("delivery address is required for delivery", /fulfilment==="Delivery"&&!address/.test(publicPage.html));
 check("partner application requires permission declaration", /rConsent/.test(publicPage.html) && /permission_confirmed:true/.test(publicPage.html));
@@ -57,6 +57,8 @@ const admin = compileInlineScripts("admin.html");
 check("admin portal inline JavaScript compiles", admin.count > 0);
 check("admin uses passwordless email sign-in", /signInWithOtp/.test(admin.html) && /shouldCreateUser:false/.test(admin.html));
 check("admin checks explicit allowlist", /admin_users/.test(admin.html) && /review_partner_application/.test(admin.html));
+check("admin can review restaurant owner access requests", /review_owner_request/.test(admin.html) && /ownerRequests/.test(admin.html));
+check("admin has marketplace reporting", /commission_ledger/.test(admin.html) && /marketplaceOverview/.test(admin.html));
 check("admin has no password field", !/<input[^>]+type=["']password["']/i.test(admin.html));
 
 check("admin shows SMTP troubleshooting for delivery errors", /Supabase Dashboard → Logs → Auth Logs/.test(admin.html));
@@ -64,6 +66,16 @@ check("admin shows SMTP troubleshooting for delivery errors", /Supabase Dashboar
 const callback = compileInlineScripts("reset-password.html");
 check("sign-in callback JavaScript compiles", callback.count > 0);
 check("sign-in callback returns to admin portal", /admin\.html/.test(callback.html));
+
+const account = compileInlineScripts("account.html");
+check("customer account inline JavaScript compiles", account.count > 0);
+check("customer accounts use passwordless email sign-in", /signInWithOtp/.test(account.html) && /shouldCreateUser:true/.test(account.html));
+check("customer portal displays private order history", /marketplace_orders/.test(account.html) && /customer_id/.test(account.html));
+
+const restaurantPortal = compileInlineScripts("restaurant-portal.html");
+check("restaurant owner portal inline JavaScript compiles", restaurantPortal.count > 0);
+check("restaurant owners request verified access", /restaurant_owner_requests/.test(restaurantPortal.html));
+check("restaurant owner portal uses server-side order updates", /marketplace-api/.test(restaurantPortal.html) && /update_order/.test(restaurantPortal.html));
 
 const worker = read("service-worker.js");
 new vm.Script(worker, { filename: "service-worker.js" });
