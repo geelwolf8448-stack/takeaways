@@ -3,9 +3,10 @@
 This is an operational checklist, not a legal opinion or a licence. The operator must confirm the facts and obtain South African legal/accounting advice where appropriate before trading.
 
 ## Business identity and website disclosures
-- Decide who legally operates Takeaways Tonight? (individual, registered company or other entity).
+- [x] Business structure confirmed: individual sole proprietor trading as Takeaways Tonight?.
+- [ ] Confirm and record the proprietor's full legal name exactly as it should appear in legal disclosures.
 - Add the operator's full legal name, legal status, physical/business address, telephone number and monitored email address to the website.
-- If operated by a company, add its registration number, office-bearer details and place of registration.
+- If operated by a company, add its registration number, office-bearer details and place of registration. Not applicable to the current sole-proprietor structure unless the structure changes.
 - Add the address for service of legal documents and clear customer/restaurant support details.
 - Ensure the privacy notice and terms identify the real operator and describe the actual service, not planned features.
 - ECTA section 43 requires prescribed supplier identity and contact information to be made available for relevant electronic transactions. Have a South African lawyer confirm how it applies to this directory and its paid restaurant listing service.
