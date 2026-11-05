@@ -315,7 +315,7 @@ dialog::backdrop{background:#3a193d99!important}
 </style>
 <body>
 <header class="poster-header">
-<nav class="poster-nav"><span class="nav-location">📍 KZN SOUTH COAST</span><div class="nav-actions"><button class="secondary" onclick="openBasket()">🛒 Basket <span id="basketCount">0</span></button><button class="dark" onclick="openAdmin()">Restaurant portal</button></div></nav>
+<nav class="poster-nav"><span class="nav-location">📍 KZN SOUTH COAST</span><div class="nav-actions"><a class="secondary" href="account.html" style="display:inline-block;padding:8px 12px;border-radius:30px;color:#ffe48a;text-decoration:none;border:1px solid #a97913;background:#20170e">My account</a><button class="secondary" onclick="openBasket()">🛒 Basket <span id="basketCount">0</span></button><a class="dark" href="restaurant-portal.html" style="display:inline-block;padding:8px 12px;border-radius:30px;color:#fff;text-decoration:none;border:1px solid #a97913;background:#20170e">Restaurant portal</a></div></nav>
 <div class="poster-main">
 <div class="poster-logo-wrap"><img class="poster-logo" src="logo.svg" alt="Takeaways Tonight? — chef hat and delivery rider logo"></div>
 <div class="poster-tagline">Discover local. Order direct. Support local.</div>
@@ -333,18 +333,18 @@ dialog::backdrop{background:#3a193d99!important}
 <div class="deals"><div class="deal"><small>FOOD CHALLENGE</small><h3>The R100<br>meal challenge</h3><p>Find a filling local deal for a hundred rand.</p><b>R100</b></div><div class="deal"><small>TONIGHT'S SPOTLIGHT</small><h3>Give local<br>food a go</h3><p>Discover a new South Coast favourite.</p><b>★</b></div><div class="deal"><small>COMMUNITY VOTE</small><h3>South Coast<br>Food Wars</h3><p>Help choose the people's favourite.</p><b>♥</b></div></div>
 <div class="section-ribbon"><span>★</span> How Takeaways Tonight? works <span>★</span></div>
 <section class="promo-panel"><div class="steps"><div class="step"><div style="font-size:30px">🔎</div><b>1. DISCOVER</b><p>Find local restaurants, areas and food categories.</p></div><div class="step"><div style="font-size:30px">🍽️</div><b>2. BROWSE</b><p>Explore menus, prices and local specials.</p></div><div class="step"><div style="font-size:30px">🛵</div><b>3. ORDER DIRECT</b><p>Send an order request directly to the restaurant on WhatsApp. The restaurant confirms availability, the final total and payment arrangements.</p></div></div></section>
-<section id="owners" class="promo-panel"><div class="eyebrow">RESTAURANT OWNERS</div><h2>Put your menu in front of hungry locals.</h2><p>Join the South Coast's local food discovery platform, showcase your menu and specials, and reach customers from Hibberdene to Port Edward.</p><div style="display:flex;flex-wrap:wrap;gap:10px"><button onclick="openAdmin()">APPLY TO JOIN</button><button class="secondary" onclick="inviteRestaurant()">INVITE A RESTAURANT</button></div><p class="notice">Proposed founding listing: Premium R1,000 per month plus once-off R250 setup, with a 7-day introductory trial. This offer is subject to a written agreement. In-app checkout and the planned 15% food-order commission are not active in this version.</p></section>
+<section id="owners" class="promo-panel"><div class="eyebrow">RESTAURANT OWNERS</div><h2>Put your menu in front of hungry locals.</h2><p>Join the South Coast's local food discovery platform, showcase your menu and specials, and reach customers from Hibberdene to Port Edward.</p><div style="display:flex;flex-wrap:wrap;gap:10px"><button onclick="openAdmin()">APPLY TO JOIN</button><a class="secondary" href="restaurant-portal.html" style="display:inline-block;padding:10px 15px;border-radius:30px;color:#ffe48a;text-decoration:none;border:1px solid #a97913;background:#20170e">RESTAURANT OWNER LOGIN</a><button class="secondary" onclick="inviteRestaurant()">INVITE A RESTAURANT</button></div><p class="notice">Proposed founding listing: Premium R1,000 per month plus once-off R250 setup, with a 7-day introductory trial. This offer is subject to a written agreement. In-app checkout and the planned 15% food-order commission are not active in this version.</p></section>
 <div class="section-ribbon" id="featured"><span>★</span> Explore restaurants & menus <span>★</span></div>
 <div class="section-head"><div><h2>Find your food</h2><p>Choose a category and discover local favourites.</p></div></div><div class="filters" id="filters"></div>
 <div class="section-head"><div><h2>Local restaurants</h2><p id="resultCount">Browse the directory.</p><p class="notice" id="directoryStatus" role="status">Connecting to the shared restaurant directory…</p></div></div><div class="grid" id="restaurants"></div>
-<p class="notice">ORDERING PREVIEW — Customers can send order requests directly to participating restaurants through WhatsApp. Takeaways Tonight? does not collect payments or guarantee acceptance; confirm prices, delivery fees and payment directly with the restaurant.</p>
+<p class="notice">ORDERING — Signed-in customers can submit an order request and notify the restaurant on WhatsApp. The restaurant confirms availability, final delivery charges and payment directly. Takeaways Tonight? does not collect food-order payments yet.</p>
 </main>
 <nav class="mobile-dock" aria-label="App navigation"><a href="#"><span>⌂</span>Home</a><a href="#restaurants"><span>🍴</span>Menus</a><a href="#campaigns"><span>★</span>Specials</a><a href="#owners"><span>♥</span>Join</a></nav>
 <footer><b>Takeaways Tonight?</b><br><em>Discover local. Order direct. Support local.</em><br><br>From Hibberdene to Port Edward · Your food. Tonight.<br><br><a href="privacy.html">Privacy notice</a> · <a href="terms.html">Terms of use</a></footer>
 <dialog id="menuDialog"><div class="modal-head"><h2 id="menuTitle">Restaurant menu</h2><button class="x" onclick="closeDialog('menuDialog')">✕</button></div><div class="modal-body"><div id="menuContent"></div><div class="total" id="menuTotal">Basket total: R0</div><button style="width:100%" onclick="openBasket()">View basket & order</button></div></dialog>
-<dialog id="basketDialog"><div class="modal-head"><h2>Your basket</h2><button class="x" onclick="closeDialog('basketDialog')">✕</button></div><div class="modal-body"><div id="basketContent"></div><div class="total" id="basketTotal">Total: R0</div><div class="field"><label for="customerName">Your name</label><input id="customerName" autocomplete="name" placeholder="Name for the order"></div><div class="field"><label for="customerPhone">Your mobile number</label><input id="customerPhone" type="tel" autocomplete="tel" placeholder="Number the restaurant can contact you"></div><div class="field"><label for="fulfilment">How would you like your food?</label><select id="fulfilment" required onchange="fulfilmentChanged()"><option value="" selected disabled>Choose collection or delivery</option><option value="Collection">Collection — I will pick it up</option><option value="Delivery">Delivery — bring it to my address</option></select></div><div class="field" id="deliveryAddressField" hidden><label for="deliveryAddress">Delivery address</label><textarea id="deliveryAddress" rows="2" autocomplete="street-address" placeholder="House/flat number, street, suburb and area"></textarea></div><div class="field"><label for="orderNotes">Order notes (optional)</label><textarea id="orderNotes" rows="2" placeholder="For example: gate instructions, collection time or food preferences"></textarea></div><button style="width:100%" id="sendOrder" onclick="sendOrder()" disabled>Send order request on WhatsApp</button><p class="notice">Your order request will open in WhatsApp and go directly to the restaurant. The restaurant must confirm availability, delivery fees and the final total. Takeaways Tonight? does not collect payment in this preview.</p></div></dialog>
+<dialog id="basketDialog"><div class="modal-head"><h2>Your basket</h2><button class="x" onclick="closeDialog('basketDialog')">✕</button></div><div class="modal-body"><div id="basketContent"></div><div class="total" id="basketTotal">Total: R0</div><div class="field"><label for="customerName">Your name</label><input id="customerName" autocomplete="name" placeholder="Name for the order"></div><div class="field"><label for="customerPhone">Your mobile number</label><input id="customerPhone" type="tel" autocomplete="tel" placeholder="Number the restaurant can contact you"></div><div class="field"><label for="fulfilment">How would you like your food?</label><select id="fulfilment" required onchange="fulfilmentChanged()"><option value="" selected disabled>Choose collection or delivery</option><option value="Collection">Collection — I will pick it up</option><option value="Delivery">Delivery — bring it to my address</option></select></div><div class="field" id="deliveryAddressField" hidden><label for="deliveryAddress">Delivery address</label><textarea id="deliveryAddress" rows="2" autocomplete="street-address" placeholder="House/flat number, street, suburb and area"></textarea></div><div class="field"><label for="orderNotes">Order notes (optional)</label><textarea id="orderNotes" rows="2" placeholder="For example: gate instructions, collection time or food preferences"></textarea></div><button style="width:100%" id="sendOrder" onclick="sendOrder()" disabled>Submit order & notify restaurant</button><p class="notice">You need a customer account to submit an order. Your request is saved in your account and the restaurant is notified on WhatsApp. Pay the restaurant directly after it confirms the order. Takeaways Tonight? does not collect food-order payments.</p></div></dialog>
 <dialog id="adminDialog"><div class="modal-head"><h2>Restaurant portal</h2><button class="x" onclick="closeDialog('adminDialog')">✕</button></div><div class="modal-body">
-<div class="admin-note"><b>Restaurant applications are connected:</b> submissions are sent securely to our shared database for review. Approved restaurants are published only after their details and permission are verified. Customer order requests go directly to the restaurant's WhatsApp. Restaurant-owner logins, order management and in-app payments are not available yet.</div>
+<div class="admin-note"><b>Restaurant applications:</b> submissions are sent securely for review. Approved restaurants are published only after their details and permission are verified. Existing restaurant owners can sign in to the <a href="restaurant-portal.html">Restaurant Portal</a> to request access and manage orders. Customer accounts and order history are available through <a href="account.html">My Account</a>. Online PayFast payments are not active yet.</div>
 <div class="field"><label>Restaurant name</label><input id="rName" placeholder="Your restaurant name"></div><div class="field"><label>Area</label><select id="rArea"><option>Hibberdene</option><option>Pumula / Umzumbe</option><option>Anerley</option><option>Southport</option><option>Umtentweni</option><option>Port Shepstone</option><option>Sunwich Port</option><option>Sea Park</option><option>Oslo Beach</option><option>Shelly Beach</option><option>St Michael’s</option><option>Uvongo</option><option>Margate</option><option>Manaba</option><option>Ramsgate</option><option>Southbroom</option><option>Trafalgar</option><option>San Lameer / Marina Beach</option><option>Palm Beach</option><option>Munster / Glenmore</option><option>Port Edward</option><option>Other South Coast</option></select></div>
 <div class="field"><label>Business category</label><select id="rCategory"><option>Burgers</option><option>Pizza</option><option>Fish & chips</option><option>Chicken</option><option>Seafood</option><option>Takeaways</option><option>Bars & experiences</option><option>Other</option></select></div>
 <div class="field"><label>WhatsApp number (country code, digits only)</label><input id="rPhone" placeholder="e.g. 27821234567"></div>
@@ -352,6 +352,7 @@ dialog::backdrop{background:#3a193d99!important}
 <label class="consent-row" style="display:flex;gap:10px;align-items:flex-start;font-weight:normal"><input id="rConsent" type="checkbox" style="width:auto;margin-top:4px" required><span>I am authorised to submit these business details and have the business’s permission. The application stays private until approved. Please read our <a href="privacy.html" target="_blank" rel="noopener">privacy notice</a>.</span></label>
 <button style="width:100%" onclick="addRestaurant()">Submit restaurant application</button><p class="notice">Your application is sent privately for review. It will not appear in the public directory until the restaurant is verified and approved.</p>
 </div></dialog>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
 <script>
 const baseRestaurants=[
@@ -379,46 +380,61 @@ function renderFilters(){document.getElementById("filters").innerHTML=categories
 function render(){renderFilters();let q=document.getElementById("search").value.toLowerCase();let shown=restaurants.filter(r=>(activeFilter==="All"||r.category===activeFilter)&&[r.name,r.area,r.category,...r.items.map(i=>i[0])].join(" ").toLowerCase().includes(q));document.getElementById("resultCount").textContent=shown.length+" listing(s) · Demo cards are examples; partner listings require owner approval";document.getElementById("restaurants").innerHTML=shown.length?shown.map(r=>`<article class="card"><div class="food-art">${r.emoji||"🍽️"}</div><div class="card-body"><div class="meta"><small>📍 ${esc(r.area)}</small><span class="pill">${r.isDemo===false?"LOCAL PREVIEW":"DEMO"}</span></div><h3>${esc(r.name)}</h3><p>${esc(r.desc||"Local takeaway")}</p><div class="card-actions"><button class="secondary" onclick="openMenu('${r.id}')">View menu</button>${r.isDemo===false?`<button onclick="openMenu('${r.id}')">Order</button>`:`<button class="dark" disabled>Demo only</button>`}</div></div></article>`).join(""):`<div class="empty">No matches yet. Try another search or category.</div>`;document.getElementById("basketCount").textContent=basket.reduce((a,b)=>a+b.qty,0)}
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function openMenu(id){currentRestaurant=restaurants.find(r=>r.id===id);if(!currentRestaurant)return;document.getElementById("menuTitle").textContent=currentRestaurant.name;document.getElementById("menuContent").innerHTML=currentRestaurant.items.map((it,i)=>`<div class="menu-item"><div><p>${esc(it[0])}</p><small>${money(it[1])}</small></div><button onclick="addToBasket('${id}',${i})">Add +</button></div>`).join("")+(currentRestaurant.isDemo===false?"":'<p class="notice">Demo listing only. Ordering is not enabled for sample restaurants.</p>');updateMenuTotal();document.getElementById("menuDialog").showModal()}
-function addToBasket(id,i){let r=restaurants.find(x=>x.id===id);if(r.isDemo!==false){alert("This is a demo listing. Order requests are available only for approved restaurant partners with verified WhatsApp details.");return}if(basket.length&&basket[0].restaurantId!==id){if(!confirm("Your basket contains another restaurant. Clear it and start this restaurant's order?"))return;basket=[]}let item=r.items[i];let found=basket.find(x=>x.name===item[0]&&x.restaurantId===id);if(found)found.qty++;else basket.push({restaurantId:id,restaurant:r.name,name:item[0],price:Number(item[1]),qty:1});updateMenuTotal();render()}
+function addToBasket(id,i){sessionStorage.removeItem("tt_order_idempotency");let r=restaurants.find(x=>x.id===id);if(r.isDemo!==false){alert("This is a demo listing. Order requests are available only for approved restaurant partners with verified WhatsApp details.");return}if(basket.length&&basket[0].restaurantId!==id){if(!confirm("Your basket contains another restaurant. Clear it and start this restaurant's order?"))return;basket=[]}let item=r.items[i];let found=basket.find(x=>x.name===item[0]&&x.restaurantId===id);if(found)found.qty++;else basket.push({restaurantId:id,restaurant:r.name,name:item[0],price:Number(item[1]),qty:1});updateMenuTotal();render()}
 function updateMenuTotal(){let total=basket.reduce((a,b)=>a+b.price*b.qty,0);document.getElementById("menuTotal").textContent="Basket total: "+money(total)}
 function fulfilmentChanged(){const delivery=document.getElementById("fulfilment").value==="Delivery";const wrap=document.getElementById("deliveryAddressField");const address=document.getElementById("deliveryAddress");wrap.hidden=!delivery;address.required=delivery;if(!delivery)address.value="";}
 function openBasket(){closeDialog("menuDialog");let content=document.getElementById("basketContent");if(!basket.length)content.innerHTML='<div class="empty">Your basket is empty. Browse a menu to add something delicious.</div>';else content.innerHTML=basket.map((b,i)=>`<div class="basket-item"><div><b>${esc(b.name)}</b><br><small>${money(b.price)} each</small></div><div class="qty"><button class="secondary" onclick="changeQty(${i},-1)">−</button>${b.qty}<button onclick="changeQty(${i},1)">+</button></div></div>`).join("");document.getElementById("basketTotal").textContent="Total: "+money(basket.reduce((a,b)=>a+b.price*b.qty,0));document.getElementById("sendOrder").disabled=!basket.length;fulfilmentChanged();document.getElementById("basketDialog").showModal()}
-function changeQty(i,d){basket[i].qty+=d;if(basket[i].qty<=0)basket.splice(i,1);openBasket();render()}
-function sendOrder(){
+function changeQty(i,d){sessionStorage.removeItem("tt_order_idempotency");basket[i].qty+=d;if(basket[i].qty<=0)basket.splice(i,1);openBasket();render()}
+async function sendOrder(){
  if(!basket.length){alert("Your basket is empty.");return;}
  const restaurant=restaurants.find(r=>r.id===basket[0].restaurantId);
  if(!restaurant||restaurant.isDemo!==false){alert("Orders are available only for approved restaurant partners.");return;}
- const whatsapp=String(restaurant.phone||"").replace(/\D/g,"");
- if(!/^27\d{9}$/.test(whatsapp)){alert("This restaurant has not supplied a valid WhatsApp number yet. Please contact the restaurant directly.");return;}
  const name=document.getElementById("customerName").value.trim();
  const rawPhone=document.getElementById("customerPhone").value.replace(/\D/g,"");
  const customerPhone=rawPhone.startsWith("0")?"27"+rawPhone.slice(1):rawPhone;
  const fulfilment=document.getElementById("fulfilment").value;
  const address=document.getElementById("deliveryAddress").value.trim();
  const notes=document.getElementById("orderNotes").value.trim();
- if(!name){alert("Please enter your name.");document.getElementById("customerName").focus();return;}
- if(!/^27\d{9}$/.test(customerPhone)){alert("Please enter a valid South African mobile number, e.g. 0821234567 or 27821234567.");document.getElementById("customerPhone").focus();return;}
+ const saved={items:basket,customerName:name,customerPhone:rawPhone,fulfilment,address,notes};
+ const {data:sessionData}=homeSupabase?await homeSupabase.auth.getSession():{data:{session:null}};
+ const session=sessionData.session;
+ if(!session){sessionStorage.setItem("tt_pending_checkout",JSON.stringify(saved));location.href="account.html?return=checkout";return;}
+ let customerName=name,phone=customerPhone;
+ if(!customerName||!phone){
+  const {data:profile}=await homeSupabase.from("marketplace_profiles").select("full_name,phone").eq("user_id",session.user.id).maybeSingle();
+  if(!customerName)customerName=profile?.full_name||session.user.user_metadata?.full_name||"";
+  if(!phone)phone=profile?.phone||session.user.user_metadata?.phone||"";
+  document.getElementById("customerName").value=customerName;
+  document.getElementById("customerPhone").value=phone;
+ }
+ if(!customerName){alert("Please enter your name.");document.getElementById("customerName").focus();return;}
+ if(!/^27\d{9}$/.test(phone)){alert("Please enter a valid South African mobile number.");document.getElementById("customerPhone").focus();return;}
  if(!fulfilment){alert("Please choose collection or delivery.");document.getElementById("fulfilment").focus();return;}
  if(fulfilment==="Delivery"&&!address){alert("Please enter your delivery address.");document.getElementById("deliveryAddress").focus();return;}
- const total=basket.reduce((sum,item)=>sum+item.price*item.qty,0);
- const lines=basket.map(item=>item.qty+" x "+item.name+" — "+money(item.price*item.qty));
- const message=[
-  "ORDER REQUEST — Takeaways Tonight?",
-  "Restaurant: "+restaurant.name,
-  "Customer: "+name,
-  "Customer mobile: +"+customerPhone,
-  "Fulfilment: "+fulfilment,
-  ...(fulfilment==="Delivery"?["Delivery address: "+address]:[]),
-  "",
-  "Items:",
-  ...lines,
-  "Item total: "+money(total),
-  ...(notes?["Notes: "+notes]:[]),
-  "",
-  "Please confirm availability, any delivery fee and the final total before preparing this order. No payment has been made."
- ].join("\n");
- window.open("https://wa.me/"+whatsapp+"?text="+encodeURIComponent(message),"_blank","noopener");
- closeDialog("basketDialog");
+ if(!homeSupabase){alert("The secure order service is unavailable. Please try again later.");return;}
+ const waWindow=window.open("about:blank","_blank");
+ const button=document.getElementById("sendOrder");button.disabled=true;button.textContent="Submitting your order…";
+ try{
+  const {data:authData}=await homeSupabase.auth.getSession();
+  const token=authData.session?.access_token;if(!token)throw new Error("Your sign-in session has expired. Please sign in again.");
+  const idempotencyKey=sessionStorage.getItem("tt_order_idempotency")||crypto.randomUUID();
+  sessionStorage.setItem("tt_order_idempotency",idempotencyKey);
+  const restaurantId=String(restaurant.id).replace(/^shared-/,"");
+  const response=await fetch(window.TT_CONFIG.supabaseUrl+"/functions/v1/marketplace-api",{
+   method:"POST",headers:{apikey:window.TT_CONFIG.supabaseAnonKey,Authorization:"Bearer "+token,"Content-Type":"application/json"},
+   body:JSON.stringify({action:"create_order",restaurantId,customerName,customerPhone:phone,fulfilmentType:fulfilment.toLowerCase(),deliveryAddress:address,notes,items:basket.map(i=>({name:i.name,quantity:i.qty})),idempotencyKey})
+  });
+  const result=await response.json();if(!response.ok)throw new Error(result.error||"Your order could not be submitted.");
+  const order=result.order,whatsapp=String(restaurant.phone||"").replace(/\D/g,"");
+  const lines=basket.map(item=>item.qty+" x "+item.name+" — "+money(item.price*item.qty));
+  const message=["ORDER REQUEST — Takeaways Tonight?","Order reference: #"+order.order_number,"Restaurant: "+restaurant.name,"Customer: "+customerName,"Customer mobile: +"+phone,"Fulfilment: "+fulfilment,...(fulfilment==="Delivery"?["Delivery address: "+address]:[]),"","Items:",...lines,"Food subtotal: "+money(basket.reduce((sum,item)=>sum+item.price*item.qty,0)),...(notes?["Notes: "+notes]:[]),"","Please confirm availability, any delivery charge, final total and payment arrangements. Payment is made directly to the restaurant. No payment has been made through Takeaways Tonight?"].join("\n");
+  sessionStorage.removeItem("tt_pending_checkout");sessionStorage.removeItem("tt_order_idempotency");
+  basket=[];render();closeDialog("basketDialog");
+  alert("Your order request #"+order.order_number+" has been saved to your account. WhatsApp will open so you can notify the restaurant.");
+  const waUrl="https://wa.me/"+whatsapp+"?text="+encodeURIComponent(message);
+  if(waWindow)waWindow.location.href=waUrl;else window.location.href=waUrl;
+ }catch(error){if(waWindow)waWindow.close();alert(error.message||"Order submission failed. Please try again.");}
+ finally{button.disabled=!basket.length;button.textContent="Submit order & notify restaurant";}
 }
 function inviteRestaurant(){const message="Hi! I'm sharing Takeaways Tonight?, a new South Coast food directory helping local people discover takeaway menus and restaurant specials from Hibberdene all the way to Port Edward. We're inviting local restaurants to join our launch. Our proposed Premium listing is R1,000 per month, plus a once-off R250 setup fee, with a 7-day introductory trial, subject to a written agreement. If you're interested, you can view the preview here: https://geelwolf8448-stack.github.io/takeaways/ and use the Restaurant portal to prepare an application. Any listing will only be published after the restaurant confirms its details and gives permission. Would you be interested in chatting?";window.open("https://wa.me/?text="+encodeURIComponent(message),"_blank");}
 function openAdmin(){document.getElementById("adminDialog").showModal()}
@@ -445,8 +461,15 @@ const payload={restaurant_name:name,area,category,whatsapp:phone,menu,status:"pe
 if(databaseReady()){const c=window.TT_CONFIG;try{const response=await fetch(c.supabaseUrl+"/rest/v1/partner_applications",{method:"POST",headers:{apikey:c.supabaseAnonKey,"Content-Type":"application/json",Prefer:"return=minimal"},body:JSON.stringify(payload)});if(!response.ok)throw new Error("Submission was not accepted");closeDialog("adminDialog");alert("Application submitted for review. It is private and will not appear in the public directory unless approved.");return}catch(error){alert("The online submission could not be completed. Your application will be downloaded instead so you do not lose the information.")}}
 let summary="TAKEAWAYS TONIGHT? — RESTAURANT PARTNER APPLICATION\n\nRestaurant: "+name+"\nArea: "+area+"\nCategory: "+category+"\nRestaurant WhatsApp: "+phone+"\n\nMENU SUBMITTED (OWNER MUST VERIFY)\n"+menu.map(x=>x[0]+" — R"+x[1].toFixed(2)).join("\n")+"\n\nI confirm I am authorised to submit these details for this restaurant. Please contact me to verify the menu, prices, ordering arrangements and permission before publication.\n\nStatus: APPLICATION DRAFT — NOT PUBLISHED";let blob=new Blob([summary],{type:"text/plain;charset=utf-8"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="takeaways-tonight-partner-application.txt";document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);closeDialog("adminDialog");alert("The online application could not be submitted. Please check your connection and try again. No application was saved.");}
 function closeDialog(id){document.getElementById(id).close()}
+const homeConfig=window.TT_CONFIG||{};
+const homeSupabase=window.supabase&&homeConfig.supabaseUrl&&homeConfig.supabaseAnonKey?window.supabase.createClient(homeConfig.supabaseUrl,homeConfig.supabaseAnonKey,{auth:{persistSession:true,autoRefreshToken:true}}):null;
+async function restorePendingCheckout(){
+ const raw=sessionStorage.getItem("tt_pending_checkout");if(!raw)return;
+ try{const saved=JSON.parse(raw);if(Array.isArray(saved.items)&&saved.items.length){basket=saved.items;document.getElementById("customerName").value=saved.customerName||"";document.getElementById("customerPhone").value=saved.customerPhone||"";document.getElementById("fulfilment").value=saved.fulfilment||"";document.getElementById("deliveryAddress").value=saved.address||"";document.getElementById("orderNotes").value=saved.notes||"";openBasket();}}
+ catch(e){sessionStorage.removeItem("tt_pending_checkout")}
+}
 render();
-loadSharedRestaurants();
+loadSharedRestaurants().then(restorePendingCheckout);
 if ("serviceWorker" in navigator && location.protocol.startsWith("http")) { window.addEventListener("load", () => navigator.serviceWorker.register("./service-worker.js").catch(() => {})); }
 </script>
 </body></html>
