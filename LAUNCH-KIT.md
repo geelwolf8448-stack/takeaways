@@ -4,6 +4,8 @@
 **Launch area planned:** Hibberdene to Port Edward, KwaZulu-Natal South Coast.
 **Current service:** Restaurant discovery, customer accounts, saved order requests and WhatsApp restaurant notifications. Customers pay restaurants directly; no in-app payment or delivery fleet is active.
 
+> Business structure: Takeaways Tonight? is operated by an individual sole proprietor in their own name, trading as Takeaways Tonight?. The proprietor's legal name and public contact details must be confirmed before they are published.
+
 > Launch truth: this is a launch kit for the pilot. Do not describe a restaurant as a partner until its owner has approved the listing in writing. Replace all demo cards before a public commercial launch.
 
 ## 1. Short public description
@@ -112,7 +114,7 @@ Please note: a submitted order and WhatsApp message are requests, not confirmati
 
 ## 8. Operator details to complete before public commercial launch
 
-- Legal operator name and status: **[ADD VERIFIED DETAILS]**
+- Legal operator name and status: **Individual sole proprietor trading as Takeaways Tonight?; add the proprietor's verified full legal name**
 - Business/registered address: **[ADD VERIFIED DETAILS]**
 - Customer and restaurant support email: **[ADD MONITORED EMAIL]**
 - Support telephone/WhatsApp: **[ADD VERIFIED NUMBER]**
