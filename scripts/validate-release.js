@@ -85,19 +85,28 @@ check("restaurant portal polls for new orders while signed in", /window\.setInte
 check("new submitted orders trigger an in-dashboard alert and browser notification", /announceNewOrders\(data\|\|\[\]\)/.test(restaurantPortal.html) && /new Notification\("New Takeaways Tonight\? order"/.test(restaurantPortal.html));
 check("restaurant owners request verified access", /restaurant_owner_requests/.test(restaurantPortal.html));
 check("restaurant-owner magic links route back into native Android app", /za.co.takeawaystonight.app:\/\/auth\/callback\?target=restaurant/.test(restaurantPortal.html));
+check("restaurant portal loads native push registration module", /native-push\.js/.test(restaurantPortal.html));
+const nativePush = read("native-push.js");
+new vm.Script(nativePush.replace(/^import[^\n]*\n/, ""), { filename: "native-push.js" });
+check("native Android push module JavaScript compiles", true);
+check("native push stores FCM tokens against the signed-in user", /restaurant_push_tokens/.test(nativePush) && /user_id: session\.user\.id/.test(nativePush));
+check("native push requests permission and registers the Android device", /requestPermissions/.test(nativePush) && /PushNotifications\.register/.test(nativePush));
 check("restaurant owner portal uses server-side order updates", /marketplace-api/.test(restaurantPortal.html) && /update_order/.test(restaurantPortal.html));
-check("restaurant menu and listing changes are centrally managed", /managed centrally by Takeaways Tonight/.test(restaurantPortal.html) && !/saveListing/.test(restaurantPortal.html) && /commission_ledger/.test(restaurantPortal.html));
+check("restaurant menu and listing changes are centrally managed", /managed centrally by Takeaways Tonight/.test(restaurantPortal.html) && !/saveListing/.test(restaurantPortal.html));
+check("restaurant portal does not expose commission ledger data", !/commission_ledger|commissionArea/.test(restaurantPortal.html));
 check("web and native pages load the shared auth deep-link handler", /native-auth\.js/.test(publicPage.html) && /native-auth\.js/.test(account.html) && /native-auth\.js/.test(restaurantPortal.html));
 const nativeAuth = read("native-auth.js");
 check("native auth handler restores Supabase sessions from app links", /App\.addListener\("appUrlOpen"/.test(nativeAuth) && /App\.getLaunchUrl\(\)/.test(nativeAuth) && /client\.auth\.setSession/.test(nativeAuth));
 check("native auth handler prevents duplicate magic-link restoration", /handledUrls\.has\(rawUrl\)/.test(nativeAuth));
 const packageJson = JSON.parse(read("package.json"));
 check("Capacitor App plugin is installed for native deep links", Boolean(packageJson.dependencies["@capacitor/app"]));
+check("Capacitor native push plugin is installed", packageJson.dependencies["@capacitor/push-notifications"] === "7.0.7");
 const marketplaceApi = read("supabase/functions/marketplace-api/index.ts");
 check("marketplace API validates the signed-in customer", /auth.getUser\(token\)/.test(marketplaceApi));
 check("marketplace API calculates prices from the published menu", /normalizedMenu/.test(marketplaceApi) && /suppliedPriceCents !== unitPriceCents/.test(marketplaceApi));
 check("marketplace API binds idempotency keys to the customer", /eq\("customer_id", user.id\)/.test(marketplaceApi));
 check("marketplace API restricts order status transitions and owner approvals", /update_order/.test(marketplaceApi) && /review_owner_request/.test(marketplaceApi));
+check("marketplace API sends FCM order notifications server-side", /sendNewOrderPush/.test(marketplaceApi) && /FIREBASE_SERVICE_ACCOUNT_JSON/.test(marketplaceApi) && /fcm\.googleapis\.com/.test(marketplaceApi));
 check("marketplace API only grants owner access to published restaurants", /restaurantRow\.is_published/.test(marketplaceApi));
 
 const worker = read("service-worker.js");
@@ -122,6 +131,8 @@ check("Android web bundle includes the service worker", /"service-worker\.js"/.t
 check("Android web bundle includes admin and callback pages referenced by cache", /"admin\.html"/.test(prep) && /"reset-password\.html"/.test(prep));
 check("Android web bundle includes customer and restaurant portals", /"account\.html"/.test(prep) && /"restaurant-portal\.html"/.test(prep));
 check("Android web bundle includes native auth handler", /"native-auth\.js"/.test(prep));
+check("Android web bundle includes native push module", /"native-push\.js"/.test(prep));
+check("service worker caches native push module", /native-push\.js/.test(worker));
 const releaseScript = read("scripts/configure-android-release.js");
 new vm.Script(releaseScript, { filename: "scripts/configure-android-release.js" });
 check("Android signing configuration script compiles", true);
@@ -145,6 +156,7 @@ android {
     }
   }
 }`);
+  fs.writeFileSync(path.join(fixtureDir, "variables.gradle"), "ext {\\n  compileSdkVersion = 35\\n  targetSdkVersion = 35\\n}\\n");
   const signingTest = spawnSync(process.execPath, [path.join(root, "scripts/configure-android-release.js")], {
     cwd: fixtureDir,
     encoding: "utf8",
@@ -162,6 +174,8 @@ android {
   const configuredGradle = fs.readFileSync(fixtureGradle, "utf8");
   check("Android signing script patches a Gradle release fixture", signingTest.status === 0);
   check("Android signing fixture gets release signing and version metadata", /signingConfig signingConfigs\.release/.test(configuredGradle) && /versionCode 2/.test(configuredGradle) && /versionName "1.2.3"/.test(configuredGradle));
+  const configuredVariables = fs.readFileSync(path.join(fixtureDir, "variables.gradle"), "utf8");
+  check("Android release script configures compile and target SDK API 36", /compileSdkVersion = 36/.test(configuredVariables) && /targetSdkVersion = 36/.test(configuredVariables));
   check("Android signing secrets are referenced from environment, not embedded", configuredGradle.includes('System.getenv("ANDROID_KEYSTORE_PASSWORD")') && !configuredGradle.includes("test-keystore-password"));
   const fixtureManifest = path.join(fixtureDir, "AndroidManifest.xml");
   const fixtureStrings = path.join(fixtureDir, "strings.xml");
@@ -189,6 +203,8 @@ for (const file of ["LAUNCH-KIT.md", "ANDROID-RELEASE.md", "RESTAURANT-AGREEMENT
 
 const signedWorkflow = read(".github/workflows/android-release.yml");
 check("signed Android workflow is manual and verifies the AAB signature", /workflow_dispatch:/.test(signedWorkflow) && /jarsigner -verify/.test(signedWorkflow));
+check("signed Android release requires Firebase client configuration", /google-services\.json/.test(signedWorkflow));
+check("signed Android release configures API 36", /ANDROID_TARGET_SDK/.test(read("scripts/configure-android-release.js")) && /ANDROID_COMPILE_SDK/.test(read("scripts/configure-android-release.js")));
 for (const secret of ["ANDROID_KEYSTORE_BASE64", "ANDROID_KEYSTORE_PASSWORD", "ANDROID_KEY_ALIAS", "ANDROID_KEY_PASSWORD"]) {
   check("signed workflow uses " + secret, signedWorkflow.includes(secret));
 }
