@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#080808">
+<title>My Account · Takeaways Tonight?</title>
+<style>
+:root{color-scheme:dark;--gold:#ffd21a;--orange:#ff8500;--panel:#17100a;--muted:#d4c8bb}
+*{box-sizing:border-box}body{margin:0;background:#050505;color:#fff;font:15px/1.5 Arial,sans-serif}
+header{padding:22px 18px;border-bottom:3px solid var(--gold);background:linear-gradient(110deg,#050505,#381609,#090909)}
+.wrap{max-width:900px;margin:auto;padding:20px}h1{margin:0;color:var(--gold);font-size:clamp(25px,5vw,38px)}h2{color:var(--gold);margin:0 0 12px}
+p{color:#eee}.small{font-size:12px;color:var(--muted)}.panel,.order{background:linear-gradient(145deg,#1b120b,#090909);border:1px solid #a97913;border-radius:16px;padding:18px;margin:16px 0}
+label{display:block;font-weight:bold;color:var(--gold);margin:12px 0 5px}input{width:100%;padding:12px;border-radius:9px;border:1px solid #b58a24;background:#050505;color:white}
+button,.linkbtn{display:inline-block;padding:11px 17px;border:1px solid #fff18a;border-radius:30px;background:linear-gradient(#fff05a,#ff9b00);color:#140d00;font-weight:900;cursor:pointer;margin:8px 8px 0 0;text-decoration:none}
+button.secondary,.linkbtn.secondary{background:#20170e;color:#ffe48a;border-color:#a97913}
+button:disabled{opacity:.5;cursor:wait}.status{padding:10px;border-radius:9px;background:#171717;color:#ffe17b;margin:12px 0;white-space:pre-wrap}
+.hidden{display:none}.order-top{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}.tag{color:#ffd21a;font-weight:bold;font-size:12px}.items{padding:10px;background:#080808;border-radius:8px;margin-top:10px}
+nav{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}
+</style>
+</head>
+<body>
+<header><div class="wrap"><h1>My Takeaways Tonight? Account</h1><p class="small">Your details, order history and restaurant access.</p><nav><a class="linkbtn secondary" href="index.html">← Back to restaurants</a><a class="linkbtn secondary" href="restaurant-portal.html">Restaurant owner portal</a></nav></div></header>
+<main class="wrap">
+<section class="panel" id="loginPanel">
+<h2>Sign in or create your account</h2>
+<p class="small">We use a secure one-time email link. No password is needed. A new account is created when you sign in for the first time.</p>
+<label for="fullName">Your name</label><input id="fullName" autocomplete="name" placeholder="Full name">
+<label for="phone">Mobile number</label><input id="phone" type="tel" autocomplete="tel" placeholder="082 123 4567">
+<label for="email">Email address</label><input id="email" type="email" autocomplete="email" placeholder="you@example.com">
+<button id="sendLink" onclick="sendLink()">Email me a secure sign-in link</button>
+<div class="status" id="loginStatus" aria-live="polite">Enter your details to continue.</div>
+</section>
+<section class="hidden" id="accountPanel">
+<div class="panel">
+<div class="order-top"><div><h2>Welcome</h2><div id="signedInAs" class="small"></div></div><button class="secondary" onclick="signOut()">Sign out</button></div>
+<div class="status" id="accountStatus">Loading your account…</div>
+<label for="profileName">Full name</label><input id="profileName" autocomplete="name">
+<label for="profilePhone">Mobile number</label><input id="profilePhone" type="tel" autocomplete="tel">
+<button onclick="saveProfile()">Save my details</button>
+</div>
+<div class="panel" id="checkoutReturn" hidden>
+<h2>Your basket is ready</h2><p>You have signed in successfully. Return to the restaurant page to submit your order.</p>
+<a class="linkbtn" href="index.html#restaurants">Continue to checkout</a>
+</div>
+<div class="panel"><h2>My orders</h2><div id="orders"><p class="small">Your orders will appear here after you submit them.</p></div></div>
+<div class="panel"><h2>Restaurant owner?</h2><p>Use the restaurant portal to request access to an approved restaurant, manage your menu and handle customer orders.</p><a class="linkbtn" href="restaurant-portal.html">Open restaurant portal</a></div>
+</section>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script>
+const cfg=window.TT_CONFIG||{};
+const sb=window.supabase&&cfg.supabaseUrl&&cfg.supabaseAnonKey?window.supabase.createClient(cfg.supabaseUrl,cfg.supabaseAnonKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}):null;
+const $=id=>document.getElementById(id);
+let session=null;
+function money(c){return "R"+(Number(c||0)/100).toFixed(2)}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+async function sendLink(){
+ if(!sb){$("loginStatus").textContent="Account service is not configured. Please try again later.";return}
+ const email=$("email").value.trim(),name=$("fullName").value.trim(),raw=$("phone").value.replace(/\D/g,""),phone=raw.startsWith("0")?"27"+raw.slice(1):raw;
+ if(name.length<2){$("loginStatus").textContent="Please enter your name.";return}
+ if(!/^27\d{9}$/.test(phone)){$("loginStatus").textContent="Please enter a valid South African mobile number.";return}
+ if(!email.includes("@")){$("loginStatus").textContent="Please enter a valid email address.";return}
+ const b=$("sendLink");b.disabled=true;$("loginStatus").textContent="Sending your secure sign-in link…";
+ try{
+  const {error}=await sb.auth.signInWithOtp({email,options:{emailRedirectTo:"https://geelwolf8448-stack.github.io/takeaways/account.html",shouldCreateUser:true,data:{full_name:name,phone}}});
+  if(error)throw error;
+  $("loginStatus").textContent="Check your email and open the newest Takeaways Tonight? sign-in link in this browser. The link can only be used once.";
+ }catch(e){$("loginStatus").textContent=e.message||"Could not send the sign-in link."}
+ finally{b.disabled=false}
+}
+async function loadAccount(){
+ if(!session)return;
+ $("loginPanel").classList.add("hidden");$("accountPanel").classList.remove("hidden");
+ $("signedInAs").textContent=session.user.email||"Signed in";
+ $("checkoutReturn").hidden=new URLSearchParams(location.search).get("return")!=="checkout";
+ const {data:profile,error}=await sb.from("marketplace_profiles").select("full_name,phone").eq("user_id",session.user.id).maybeSingle();
+ if(error){$("accountStatus").textContent="Could not load your profile: "+error.message;return}
+ $("profileName").value=profile?.full_name||session.user.user_metadata?.full_name||"";
+ $("profilePhone").value=profile?.phone||session.user.user_metadata?.phone||"";
+ $("accountStatus").textContent="Your account is active. Your order history is private to your account.";
+ await loadOrders();
+}
+async function saveProfile(){
+ const full_name=$("profileName").value.trim(),raw=$("profilePhone").value.replace(/\D/g,""),phone=raw.startsWith("0")?"27"+raw.slice(1):raw;
+ if(full_name.length<2||!/^27\d{9}$/.test(phone)){alert("Enter your name and a valid South African mobile number.");return}
+ const {error}=await sb.from("marketplace_profiles").upsert({user_id:session.user.id,full_name,phone},{onConflict:"user_id"});
+ $("accountStatus").textContent=error?"Could not save details: "+error.message:"Your details have been saved.";
+}
+async function loadOrders(){
+ const {data,error}=await sb.from("marketplace_orders").select("id,order_number,status,payment_status,total_cents,created_at,restaurant:restaurants(name),marketplace_order_items(item_name,quantity,unit_price_cents)").eq("customer_id",session.user.id).order("created_at",{ascending:false}).limit(30);
+ if(error){$("orders").innerHTML='<p class="small">Could not load your orders right now.</p>';return}
+ if(!data?.length){$("orders").innerHTML='<p class="small">No orders yet. Browse the restaurant directory when you are ready.</p>';return}
+ $("orders").innerHTML=data.map(o=>'<article class="order"><div class="order-top"><b>Order #'+esc(o.order_number)+'</b><span class="tag">'+esc(o.status.replaceAll("_"," ").toUpperCase())+'</span></div><p>'+esc(o.restaurant?.name||"Restaurant")+' · '+new Date(o.created_at).toLocaleString()+'</p><div class="items">'+(o.marketplace_order_items||[]).map(i=>esc(i.quantity)+" × "+esc(i.item_name)+" — "+money(i.unit_price_cents*i.quantity)).join("<br>")+'</div><p><b>Total: '+money(o.total_cents)+'</b></p><p class="small">Payment: '+(o.payment_status==="paid_directly_to_restaurant"?"Confirmed by restaurant":"Pay the restaurant directly after it confirms your order")+'</p></article>').join("");
+}
+async function signOut(){await sb.auth.signOut();session=null;$("accountPanel").classList.add("hidden");$("loginPanel").classList.remove("hidden");$("loginStatus").textContent="You have signed out."}
+if(sb){
+ sb.auth.onAuthStateChange((_event,s)=>{session=s;if(s)loadAccount()});
+ sb.auth.getSession().then(({data})=>{session=data.session;if(session)loadAccount()});
+}else{$("loginStatus").textContent="Account service is temporarily unavailable."}
+</script>
+</body></html>
