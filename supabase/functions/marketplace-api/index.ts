@@ -23,7 +23,7 @@ const base64Url = (input: string | Uint8Array) => {
   const bytes = typeof input === "string" ? new TextEncoder().encode(input) : input;
   let binary = "";
   for (const byte of bytes) binary += String.fromCharCode(byte);
-  return btoa(binary).replace(/=/g, "").replace(/\\+/g, "-").replace(/\\//g, "_");
+  return btoa(binary).replace(/=/g, "").replace(/\+/g, "-").replace(/\//g, "_");
 };
 
 async function getFcmAccessToken(serviceAccount: Record<string, string>) {
@@ -38,7 +38,7 @@ async function getFcmAccessToken(serviceAccount: Record<string, string>) {
     exp: now + 3600
   }));
   const unsigned = header + "." + claim;
-  const pem = serviceAccount.private_key.replace(/\\n/g, "\n").replace(/-----BEGIN PRIVATE KEY-----|-----END PRIVATE KEY-----|\\s/g, "");
+  const pem = serviceAccount.private_key.replace(/\r/g, "").replace(/-----BEGIN PRIVATE KEY-----|-----END PRIVATE KEY-----|\\s/g, "");
   const keyBytes = Uint8Array.from(atob(pem), ch => ch.charCodeAt(0));
   const key = await crypto.subtle.importKey("pkcs8", keyBytes, { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" }, false, ["sign"]);
   const signature = new Uint8Array(await crypto.subtle.sign("RSASSA-PKCS1-v1_5", key, new TextEncoder().encode(unsigned)));
