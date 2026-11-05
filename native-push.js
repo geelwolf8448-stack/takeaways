@@ -41,7 +41,7 @@ async function addListeners() {
   });
   await PushNotifications.addListener("pushNotificationActionPerformed", action => {
     if (action?.notification?.data?.screen === "orders") {
-      window.location.href = "restaurant-portal.html#orders";
+      window.location.href = "restaurant-portal.html#ordersArea";
     }
   });
   await PushNotifications.addListener("pushNotificationReceived", notification => {
