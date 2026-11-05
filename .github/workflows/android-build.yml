@@ -7,6 +7,7 @@ on:
       - "admin.html"
       - "restaurant-portal.html"
       - "native-push.js"
+      - "push-tap-handler.js"
       - "supabase/functions/marketplace-api/index.ts"
       - "scripts/configure-android-release.js"
       - "reset-password.html"
