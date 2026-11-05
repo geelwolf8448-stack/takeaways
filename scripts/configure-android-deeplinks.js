@@ -6,7 +6,7 @@ const path = require("node:path");
 
 const manifestPath = process.env.ANDROID_MANIFEST_FILE || path.join("android", "app", "src", "main", "AndroidManifest.xml");
 const stringsPath = process.env.ANDROID_STRINGS_FILE || path.join("android", "app", "src", "main", "res", "values", "strings.xml");
-const scheme = process.env.ANDROID_DEEP_LINK_SCHEME || "takeawaystonight";
+const scheme = process.env.ANDROID_DEEP_LINK_SCHEME || "za.co.takeawaystonight.app";
 
 if (!/^[a-z][a-z0-9+.-]*$/i.test(scheme)) {
   throw new Error("ANDROID_DEEP_LINK_SCHEME must be a valid URL scheme.");
