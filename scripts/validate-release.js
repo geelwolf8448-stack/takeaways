@@ -76,12 +76,12 @@ check("customer account inline JavaScript compiles", account.count > 0);
 check("customer accounts use passwordless email sign-in", /signInWithOtp/.test(account.html) && /shouldCreateUser:true/.test(account.html));
 check("customer portal displays private order history", /marketplace_orders/.test(account.html) && /customer_id/.test(account.html));
 check("customer portal preserves checkout return after email sign-in", /return=checkout/.test(account.html) && /emailRedirectTo/.test(account.html));
-check("customer magic links route back into native Android app", /takeawaystonight:\/\/auth\/callback\?target=account/.test(account.html));
+check("customer magic links route back into native Android app", /za.co.takeawaystonight.app:\/\/auth\/callback\?target=account/.test(account.html));
 
 const restaurantPortal = compileInlineScripts("restaurant-portal.html");
 check("restaurant owner portal inline JavaScript compiles", restaurantPortal.count > 0);
 check("restaurant owners request verified access", /restaurant_owner_requests/.test(restaurantPortal.html));
-check("restaurant-owner magic links route back into native Android app", /takeawaystonight:\/\/auth\/callback\?target=restaurant/.test(restaurantPortal.html));
+check("restaurant-owner magic links route back into native Android app", /za.co.takeawaystonight.app:\/\/auth\/callback\?target=restaurant/.test(restaurantPortal.html));
 check("restaurant owner portal uses server-side order updates", /marketplace-api/.test(restaurantPortal.html) && /update_order/.test(restaurantPortal.html));
 check("restaurant owners can update their menu and contact details", /saveListing/.test(restaurantPortal.html) && /commission_ledger/.test(restaurantPortal.html));
 check("web and native pages load the shared auth deep-link handler", /native-auth\.js/.test(publicPage.html) && /native-auth\.js/.test(account.html) && /native-auth\.js/.test(restaurantPortal.html));
@@ -172,7 +172,7 @@ android {
   const configuredStrings = fs.readFileSync(fixtureStrings, "utf8");
   check("Android deep-link script patches manifest and scheme fixture", deepLinkTest.status === 0);
   check("Android deep-link intent filter uses the custom scheme", configuredManifest.includes('android:name="android.intent.action.VIEW"') && configuredManifest.includes('android:scheme="@string/custom_url_scheme"'));
-  check("Android custom URL scheme is configured", configuredStrings.includes('<string name="custom_url_scheme">takeawaystonight</string>'));
+  check("Android custom URL scheme is configured", configuredStrings.includes('<string name="custom_url_scheme">za.co.takeawaystonight.app</string>'));
 } finally {
   fs.rmSync(fixtureDir, { recursive: true, force: true });
 }
