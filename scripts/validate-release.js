@@ -86,7 +86,7 @@ check("new submitted orders trigger an in-dashboard alert and browser notificati
 check("restaurant owners request verified access", /restaurant_owner_requests/.test(restaurantPortal.html));
 check("restaurant-owner magic links route back into native Android app", /za.co.takeawaystonight.app:\/\/auth\/callback\?target=restaurant/.test(restaurantPortal.html));
 check("restaurant owner portal uses server-side order updates", /marketplace-api/.test(restaurantPortal.html) && /update_order/.test(restaurantPortal.html));
-check("restaurant owners can update their menu and contact details", /saveListing/.test(restaurantPortal.html) && /commission_ledger/.test(restaurantPortal.html));
+check("restaurant menu and listing changes are centrally managed", /managed centrally by Takeaways Tonight/.test(restaurantPortal.html) && !/saveListing/.test(restaurantPortal.html) && /commission_ledger/.test(restaurantPortal.html));
 check("web and native pages load the shared auth deep-link handler", /native-auth\.js/.test(publicPage.html) && /native-auth\.js/.test(account.html) && /native-auth\.js/.test(restaurantPortal.html));
 const nativeAuth = read("native-auth.js");
 check("native auth handler restores Supabase sessions from app links", /App\.addListener\("appUrlOpen"/.test(nativeAuth) && /App\.getLaunchUrl\(\)/.test(nativeAuth) && /client\.auth\.setSession/.test(nativeAuth));
