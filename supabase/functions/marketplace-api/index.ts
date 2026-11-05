@@ -201,6 +201,12 @@ Deno.serve(async (req: Request) => {
       if (requestError || !requestRow) return reply(404, { error: "Ownership request not found." });
       if (requestRow.status !== "pending") return reply(409, { error: "This request has already been reviewed." });
 
+      const { data: restaurantRow } = await admin.from("restaurants")
+        .select("id,is_published").eq("id", requestRow.restaurant_id).maybeSingle();
+      if (!restaurantRow || !restaurantRow.is_published) {
+        return reply(409, { error: "This restaurant is no longer published. The access request cannot be approved." });
+      }
+
       if (decision === "approved") {
         const { error: memberError } = await admin.from("restaurant_members").upsert({
           restaurant_id: requestRow.restaurant_id,
