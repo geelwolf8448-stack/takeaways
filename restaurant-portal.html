@@ -27,7 +27,7 @@ button.secondary,.linkbtn.secondary{background:#20170e;color:#ffe48a;border-colo
 <button id="sendLink" onclick="sendLink()">Email me a secure sign-in link</button><div class="status" id="loginStatus">Enter your details to continue.</div>
 </section>
 <section id="dashboard" class="hidden">
-<div class="panel"><div class="top"><div><h2>Restaurant dashboard</h2><div class="small" id="signedIn"></div></div><button class="secondary" onclick="signOut()">Sign out</button></div><div class="status" id="status">Loading…</div><div class="status" id="orderAlert" role="status" aria-live="polite">New order alerts are not enabled yet.</div><button id="enableNotifications" onclick="enableOrderNotifications()">Enable order pop-up notifications</button><span class="small" id="notificationStatus">Keep this restaurant portal open to receive new-order alerts.</span></div>
+<div class="panel"><div class="top"><div><h2>Restaurant dashboard</h2><div class="small" id="signedIn"></div></div><button class="secondary" onclick="signOut()">Sign out</button></div><div class="status" id="status">Loading…</div><div class="status" id="orderAlert" role="status" aria-live="polite">Enable push notifications to receive new orders even when the app is closed.</div><button id="enableNotifications" onclick="enableOrderNotifications()">Enable background order notifications</button><span class="small" id="notificationStatus">For Android background alerts, enable push notifications once on this device.</span></div>
 <section class="panel"><h2>Request access to a restaurant</h2><p class="small">Choose an already approved restaurant. The platform administrator will verify your authority before granting access. If your restaurant is not listed yet, submit a partner application first.</p>
 <label for="restaurantSelect">Restaurant</label><select id="restaurantSelect"><option value="">Loading approved restaurants…</option></select>
 <label for="requestRole">Your role</label><select id="requestRole"><option value="owner">Owner</option><option value="manager">Manager</option></select>
@@ -42,7 +42,8 @@ button.secondary,.linkbtn.secondary{background:#20170e;color:#ffe48a;border-colo
 const cfg=window.TT_CONFIG||{};
 const sb=window.supabase&&cfg.supabaseUrl&&cfg.supabaseAnonKey?window.supabase.createClient(cfg.supabaseUrl,cfg.supabaseAnonKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}):null;
 window.TT_SUPABASE_CLIENT=sb;
-const $=id=>document.getElementById(id);let session=null,memberships=[];let knownOrderIds=new Set();let orderPollStarted=false;let notificationsEnabled=false;
+const $=id=>document.getElementById(id);let session=null,memberships=[];
+window.TT_PUSH_CONTEXT=()=>({sb,session,memberships});let knownOrderIds=new Set();let orderPollStarted=false;let notificationsEnabled=false;
 const money=c=>"R"+(Number(c||0)/100).toFixed(2);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 async function sendLink(){
@@ -68,6 +69,7 @@ async function loadDashboard(){
  $("requestStatus").innerHTML=requestHtml;
  $("status").textContent=memberships.length?("You have access to "+memberships.length+" restaurant(s)."):"You do not yet have access to a restaurant. Submit an access request above or apply to list a new restaurant.";
  await renderRestaurants();
+ if(window.Capacitor?.isNativePlatform?.()&&window.TT_NATIVE_PUSH?.sync){await window.TT_NATIVE_PUSH.sync();}
 }
 async function submitOwnershipRequest(){
  const restaurantId=$("restaurantSelect").value,profileName=$("name").value.trim()||session.user.user_metadata?.full_name||"Restaurant owner";
@@ -85,13 +87,16 @@ async function api(action,extra){
 }
 function menuText(menu){return (Array.isArray(menu)?menu:[]).map(i=>Array.isArray(i)?i[0]+" - "+Number(i[1]).toFixed(2):"").filter(Boolean).join("\n")}
 async function enableOrderNotifications(){
- if(!("Notification" in window)){ $("notificationStatus").textContent="This browser does not support desktop notifications. Keep the portal open and watch the order alert panel.";return; }
  try{
-  const permission=await Notification.requestPermission();
-  notificationsEnabled=permission==="granted";
-  $("notificationStatus").textContent=notificationsEnabled?"Order pop-up notifications are enabled on this device. Keep this portal open.": "Notifications were not allowed. New orders will still appear in the dashboard while it is open.";
-  $("enableNotifications").textContent=notificationsEnabled?"Notifications enabled":"Enable order pop-up notifications";
- }catch(e){$("notificationStatus").textContent="Could not enable notifications. Keep the portal open to see order alerts."}
+  if(window.Capacitor?.isNativePlatform?.()){
+   if(!window.TT_NATIVE_PUSH){$("notificationStatus").textContent="The native push module is still loading. Please try again in a moment.";return;}
+   await window.TT_NATIVE_PUSH.enable();return;
+  }
+  if(!("Notification" in window)){$("notificationStatus").textContent="This browser does not support notifications. Use the Android app for background order alerts.";return;}
+  const permission=await Notification.requestPermission();notificationsEnabled=permission==="granted";
+  $("notificationStatus").textContent=notificationsEnabled?"Browser alerts are enabled while this portal is open. For alerts when it is closed, use the Android app.":"Notifications were not allowed. Keep this portal open to see new orders.";
+  $("enableNotifications").textContent=notificationsEnabled?"Browser alerts enabled":"Enable background order notifications";
+ }catch(e){$("notificationStatus").textContent=e.message||"Could not enable notifications."}
 }
 function announceNewOrders(rows){
  const pending=(rows||[]).filter(o=>o.status==="submitted");
@@ -117,12 +122,7 @@ async function changeOrder(orderId,status,markPaid=false){
 }
 async function loadRestaurantsOrders(){
  const ids=memberships.map(m=>m.restaurant_id);if(!ids.length)return;
- const [{data,error},{data:ledger,error:ledgerError}]=await Promise.all([
-  sb.from("marketplace_orders").select("id,order_number,restaurant_id,status,payment_status,total_cents,created_at,customer_name,customer_phone,fulfilment_type,delivery_address,customer_notes,marketplace_order_items(item_name,quantity,unit_price_cents)").in("restaurant_id",ids).order("created_at",{ascending:false}).limit(60),
-  sb.from("commission_ledger").select("commission_cents,status,restaurant_id").in("restaurant_id",ids)
- ]);
- if(ledgerError){$("commissionArea").textContent="Commission records are not available right now."}
- else{const total=(ledger||[]).filter(x=>x.status!=="reversed").reduce((sum,x)=>sum+Number(x.commission_cents||0),0);$("commissionArea").textContent="Recorded proposed commission: "+money(total)+". This is an internal record only; no commission has been collected or invoiced."}
+ const {data,error}=await sb.from("marketplace_orders").select("id,order_number,restaurant_id,status,payment_status,total_cents,created_at,customer_name,customer_phone,fulfilment_type,delivery_address,customer_notes,marketplace_order_items(item_name,quantity,unit_price_cents)").in("restaurant_id",ids).order("created_at",{ascending:false}).limit(60);
  if(error){$("ordersArea").innerHTML='<p class="small">Could not load orders.</p>';return}
  announceNewOrders(data||[]);
  $("ordersArea").innerHTML=data?.length?data.map(o=>{
@@ -140,13 +140,13 @@ async function renderRestaurants(){
  if(!memberships.length){root.innerHTML="";return}
  root.innerHTML='<div class="panel"><h2>Your restaurants</h2><p class="small">Menu items, prices, specials, contact details and opening hours are managed centrally by Takeaways Tonight? Please contact the platform administrator before making any changes. Do not advertise an unapproved menu change to customers through this portal.</p><div class="grid">'+memberships.map(m=>{
  const r=m.restaurant;return '<article class="restaurant"><div class="top"><h2>'+esc(r.name)+'</h2><span class="tag">'+esc(m.member_role.toUpperCase())+'</span></div><p>'+esc(r.area)+' · '+esc(r.category)+'</p><p><b>WhatsApp:</b> '+esc(r.whatsapp)+'</p><p><b>Current menu:</b></p><div class="items">'+esc(menuText(r.menu)||"Menu details are being prepared.").replace(/\n/g,"<br>")+'</div><p class="small">To report a special, price change, new item or unavailable item, contact the Takeaways Tonight? administrator.</p></article>'
- }).join("")+'</div><h2>Commission ledger</h2><div id="commissionArea" class="status">Loading commission records…</div><h2>Customer orders</h2><div id="ordersArea"><p class="small">Loading orders…</p></div></div>';
+ }).join("")+'</div><h2>Customer orders</h2><div id="ordersArea"><p class="small">Loading orders…</p></div></div>';
  await loadRestaurantsOrders();
  startOrderPolling();
 }
-async function signOut(){await sb.auth.signOut();session=null;$("dashboard").classList.add("hidden");$("loginPanel").classList.remove("hidden");$("loginStatus").textContent="You have signed out."}
+async function signOut(){if(session?.user?.id){await sb.from("restaurant_push_tokens").delete().eq("user_id",session.user.id);}if(window.Capacitor?.isNativePlatform?.()&&window.TT_NATIVE_PUSH){await window.TT_NATIVE_PUSH.unregister().catch(()=>{});}await sb.auth.signOut();session=null;$("dashboard").classList.add("hidden");$("loginPanel").classList.remove("hidden");$("loginStatus").textContent="You have signed out."}
 if(sb){sb.auth.onAuthStateChange((_e,s)=>{session=s;if(s)loadDashboard()});sb.auth.getSession().then(({data})=>{session=data.session;if(session)loadDashboard()})}
 else $("loginStatus").textContent="Account service is temporarily unavailable.";
 </script>
-<script type="module" src="native-auth.js"></script>
+<script type="module" src="native-auth.js"></script><script type="module" src="native-push.js"></script>
 </body></html>
