@@ -76,6 +76,12 @@ const restaurantPortal = compileInlineScripts("restaurant-portal.html");
 check("restaurant owner portal inline JavaScript compiles", restaurantPortal.count > 0);
 check("restaurant owners request verified access", /restaurant_owner_requests/.test(restaurantPortal.html));
 check("restaurant owner portal uses server-side order updates", /marketplace-api/.test(restaurantPortal.html) && /update_order/.test(restaurantPortal.html));
+check("restaurant owners can update their menu and contact details", /saveListing/.test(restaurantPortal.html) && /commission_ledger/.test(restaurantPortal.html));
+const marketplaceApi = read("supabase/functions/marketplace-api/index.ts");
+check("marketplace API validates the signed-in customer", /auth.getUser\(token\)/.test(marketplaceApi));
+check("marketplace API calculates prices from the published menu", /normalizedMenu/.test(marketplaceApi) && /suppliedPriceCents !== unitPriceCents/.test(marketplaceApi));
+check("marketplace API binds idempotency keys to the customer", /eq\("customer_id", user.id\)/.test(marketplaceApi));
+check("marketplace API restricts order status transitions and owner approvals", /update_order/.test(marketplaceApi) && /review_owner_request/.test(marketplaceApi));
 
 const worker = read("service-worker.js");
 new vm.Script(worker, { filename: "service-worker.js" });
