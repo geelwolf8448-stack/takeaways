@@ -10,7 +10,7 @@ This document reflects the current repository implementation. Do not repeat setu
 - WhatsApp order-request flow for approved non-demo listings.
 - Supabase shared restaurant directory read for published restaurants.
 - Partner application submission to Supabase, with local draft fallback if the online request fails.
-- Private admin portal: sign-in, pending applications, approve/reject.
+- Private admin portal: sign-in, pending applications, approve/reject, owner-access review and marketplace overview.\n- Customer account portal: passwordless sign-in, profile and private order history.\n- Restaurant owner portal: passwordless sign-in, access requests, menu updates and order management for approved restaurant members.\n- Authenticated marketplace Edge Function validates live menu prices, saves orders and enforces restaurant-authorised status changes.\n- Commission ledger records the proposed 15% of food subtotal on completed orders that the restaurant has marked paid directly. It does not collect commission.
 - SQL approval function with an administrator allowlist.
 - PWA assets and Capacitor Android build workflow.\n- Launch-ready draft copy, restaurant onboarding checklist, customer FAQ and store listing in `LAUNCH-KIT.md`.\n- Manual signed Android release workflow prepared in `.github/workflows/android-release.yml`; secure keystore setup is documented in `ANDROID-RELEASE.md`.
 - Password recovery page.
@@ -28,7 +28,7 @@ This document reflects the current repository implementation. Do not repeat setu
 3. Sign in to `admin.html`; confirm the owner account is recognised as an administrator and the test application appears.
 4. Approve the test application and confirm it appears on the public directory.
 5. Remove the test listing/application after verification if it is not a real partner.
-6. Test the WhatsApp order-request message with a real partner only after written permission and verified details.
+6. Create a test customer account and verify the profile appears in the account page.\n7. After a real restaurant is approved, have its authorised owner create an account and submit an access request. Approve it in the admin portal and verify that the owner can see only that restaurant.\n8. Submit a test customer order against a real approved menu, verify the saved order and WhatsApp notification, and test the full restaurant status flow including direct-payment confirmation.\n9. Verify the 15% ledger calculation on a completed test order, then remove test records if they are not genuine business transactions.
 
 Do not repeat SQL setup, SMTP setup or password recovery unless the corresponding acceptance test proves it is necessary.
 
@@ -45,4 +45,4 @@ The Android workflow has produced successful builds in GitHub Actions. Download 
 - Replace/remove demo restaurants before public launch.
 - Complete operator identity/contact details, privacy notice, terms, POPIA/PAIA processes and appropriate South African legal/accounting review.
 - Agree restaurant subscription terms in writing before billing.
-- Keep customer food payments outside the platform until a secure, approved and tested payment integration is genuinely deployed.
+- Keep customer food payments outside the platform until PayFast approves the merchant/split model and a secure, approved and tested payment integration is genuinely deployed. Do not invoice or collect the proposed 15% commission until written restaurant agreements and legal/accounting review are complete.
