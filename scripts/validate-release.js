@@ -50,6 +50,8 @@ check("partner application requires permission declaration", /rConsent/.test(pub
 check("partner applications remain pending until admin approval", /status:"pending"/.test(publicPage.html) && /will not appear in the public directory unless approved/.test(publicPage.html));
 check("public directory fetch filters published restaurants", /is_published=eq\.true/.test(publicPage.html));
 check("privacy and terms pages are linked", /privacy\.html/.test(publicPage.html) && /terms\.html/.test(publicPage.html));
+check("privacy notice describes saved customer orders", /order history/.test(read("privacy.html")) && /delivery address/.test(read("privacy.html")));
+check("terms distinguish order requests from restaurant acceptance", /not an accepted order/.test(read("terms.html")));
 check("mobile navigation does not advertise unfinished favourites/orders/settings tabs", !/Favourites|>Orders<|>Settings</.test(publicPage.html));
 check("mobile navigation links to real sections", /href="#restaurants"/.test(publicPage.html) && /href="#campaigns"/.test(publicPage.html) && /href="#owners"/.test(publicPage.html));
 
@@ -71,6 +73,7 @@ const account = compileInlineScripts("account.html");
 check("customer account inline JavaScript compiles", account.count > 0);
 check("customer accounts use passwordless email sign-in", /signInWithOtp/.test(account.html) && /shouldCreateUser:true/.test(account.html));
 check("customer portal displays private order history", /marketplace_orders/.test(account.html) && /customer_id/.test(account.html));
+check("customer portal preserves checkout return after email sign-in", /return=checkout/.test(account.html) && /emailRedirectTo/.test(account.html));
 
 const restaurantPortal = compileInlineScripts("restaurant-portal.html");
 check("restaurant owner portal inline JavaScript compiles", restaurantPortal.count > 0);
@@ -82,6 +85,7 @@ check("marketplace API validates the signed-in customer", /auth.getUser\(token\)
 check("marketplace API calculates prices from the published menu", /normalizedMenu/.test(marketplaceApi) && /suppliedPriceCents !== unitPriceCents/.test(marketplaceApi));
 check("marketplace API binds idempotency keys to the customer", /eq\("customer_id", user.id\)/.test(marketplaceApi));
 check("marketplace API restricts order status transitions and owner approvals", /update_order/.test(marketplaceApi) && /review_owner_request/.test(marketplaceApi));
+check("marketplace API only grants owner access to published restaurants", /restaurantRow\.is_published/.test(marketplaceApi));
 
 const worker = read("service-worker.js");
 new vm.Script(worker, { filename: "service-worker.js" });
