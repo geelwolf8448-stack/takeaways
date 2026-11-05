@@ -49,16 +49,16 @@ const androidDir = path.resolve(path.dirname(gradlePath), "..");
 const variablesPath = path.join(androidDir, "variables.gradle");
 const targetSdk = process.env.ANDROID_TARGET_SDK || "36";
 const compileSdk = process.env.ANDROID_COMPILE_SDK || "36";
-if (!/^\\d+$/.test(targetSdk) || !/^\\d+$/.test(compileSdk)) {
+if (!/^\d+$/.test(targetSdk) || !/^\d+$/.test(compileSdk)) {
   throw new Error("ANDROID_TARGET_SDK and ANDROID_COMPILE_SDK must be numeric API levels.");
 }
 if (fs.existsSync(variablesPath)) {
   let variables = fs.readFileSync(variablesPath, "utf8");
-  if (!/compileSdkVersion\\s*=\\s*\\d+/.test(variables) || !/targetSdkVersion\\s*=\\s*\\d+/.test(variables)) {
+  if (!/compileSdkVersion\s*=\s*\d+/.test(variables) || !/targetSdkVersion\s*=\s*\d+/.test(variables)) {
     throw new Error("Could not find compileSdkVersion and targetSdkVersion in android/variables.gradle.");
   }
-  variables = variables.replace(/compileSdkVersion\\s*=\\s*\\d+/, "compileSdkVersion = " + compileSdk);
-  variables = variables.replace(/targetSdkVersion\\s*=\\s*\\d+/, "targetSdkVersion = " + targetSdk);
+  variables = variables.replace(/compileSdkVersion\s*=\s*\d+/, "compileSdkVersion = " + compileSdk);
+  variables = variables.replace(/targetSdkVersion\s*=\s*\d+/, "targetSdkVersion = " + targetSdk);
   fs.writeFileSync(variablesPath, variables);
   console.log("Configured Android compile/target SDK API " + compileSdk + "/" + targetSdk + ".");
 } else {
