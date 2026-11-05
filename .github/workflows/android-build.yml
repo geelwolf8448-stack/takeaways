@@ -5,6 +5,10 @@ on:
     paths:
       - "index.html"
       - "admin.html"
+      - "restaurant-portal.html"
+      - "native-push.js"
+      - "supabase/functions/marketplace-api/index.ts"
+      - "scripts/configure-android-release.js"
       - "reset-password.html"
       - "privacy.html"
       - "terms.html"
@@ -40,6 +44,14 @@ jobs:
         run: npm run android:icons
       - name: Sync Android project
         run: npx cap sync android
+
+      - name: Add Firebase client configuration when supplied
+        run: |
+          if [ -f google-services.json ]; then
+            cp google-services.json android/app/google-services.json
+          else
+            echo "Firebase client config not yet supplied; this is a test build without working background push."
+          fi
       - name: Configure Android email sign-in deep link
         run: npm run android:deeplinks
       - name: Set up Java
