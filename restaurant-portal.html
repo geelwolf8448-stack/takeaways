@@ -61,7 +61,7 @@ async function loadDashboard(){
   sb.from("restaurants").select("id,name,area,category").eq("is_published",true).order("name"),
   sb.from("restaurant_owner_requests").select("id,restaurant_id,status,created_at,restaurant:restaurants(name)").eq("user_id",session.user.id).order("created_at",{ascending:false})
  ]);
- if(memberError||restError||reqError){$("status").textContent="Could not load your portal data. Please refresh or contact support.";return}
+ if(memberError||restError||reqError){const problem=memberError||restError||reqError;$("status").textContent="PORTAL DATA ERROR: "+(problem.message||"Unknown database error")+" (code: "+(problem.code||"not supplied")+"). Please send this message to support.";return}
  const memberIds=(memberRows||[]).map(m=>m.restaurant_id);
  let ownedRestaurants=[];
  if(memberIds.length){
@@ -76,7 +76,7 @@ async function loadDashboard(){
  let requestHtml=(requests||[]).map(r=>'<p class="small">'+esc(r.restaurant?.name||"Restaurant")+' — access request: <b>'+esc(r.status)+'</b></p>').join("");
  $("requestStatus").innerHTML=requestHtml;
  $("status").textContent=memberships.length?("You have access to "+memberships.length+" restaurant(s)."):"You do not yet have access to a restaurant. Submit an access request above or apply to list a new restaurant.";
- await renderRestaurants();
+ try{await renderRestaurants();}catch(renderError){const message=renderError?.message||String(renderError);$("restaurants").innerHTML='<div class="panel"><h2>Your restaurants</h2><div class="status">DISPLAY ERROR: '+esc(message)+'</div><p class="small">Your account access was found, but the restaurant card could not be drawn. Please send this exact message to support.</p></div>';$("status").textContent="Restaurant display error: "+message;return;}
  if(window.Capacitor?.isNativePlatform?.()&&window.TT_NATIVE_PUSH?.sync){await window.TT_NATIVE_PUSH.sync();}
 }
 async function submitOwnershipRequest(){
@@ -146,6 +146,8 @@ async function loadRestaurantsOrders(){
 async function renderRestaurants(){
  const root=$("restaurants");
  if(!memberships.length){root.innerHTML="";return}
+ const missing=memberships.filter(m=>!m.restaurant);
+ if(missing.length){const diagnostic="Memberships found: "+memberships.length+"; restaurant records returned: "+memberships.filter(m=>m.restaurant).length+"; missing restaurant records: "+missing.length+". Roles: "+missing.map(m=>m.member_role||"unknown").join(", ")+". This indicates the signed-in session can read the membership but cannot retrieve the matching restaurant row.";$("status").textContent="ACCESS FOUND, LISTING NOT VISIBLE — "+diagnostic;root.innerHTML='<div class="panel"><h2>Your restaurants</h2><div class="status">We found your restaurant access, but the restaurant listing did not load.</div><p>'+esc(diagnostic)+'</p><p class="small">This is a diagnostic fallback, not a published listing. The test restaurant remains unpublished. Please send a screenshot of this message so the access issue can be pinpointed.</p></div>';return;}
  root.innerHTML='<div class="panel"><h2>Your restaurants</h2><p class="small">Menu items, prices, specials, contact details and opening hours are managed centrally by Takeaways Tonight? Please contact the platform administrator before making any changes. Do not advertise an unapproved menu change to customers through this portal.</p><div class="grid">'+memberships.map(m=>{
  const r=m.restaurant;return '<article class="restaurant"><div class="top"><h2>'+esc(r.name)+'</h2><span class="tag">'+esc(m.member_role.toUpperCase())+'</span></div><p>'+esc(r.area)+' · '+esc(r.category)+'</p><p><b>WhatsApp:</b> '+esc(r.whatsapp)+'</p><p><b>Current menu:</b></p><div class="items">'+esc(menuText(r.menu)||"Menu details are being prepared.").replace(/\n/g,"<br>")+'</div><p class="small">To report a special, price change, new item or unavailable item, contact the Takeaways Tonight? administrator.</p></article>'
  }).join("")+'</div><h2>Customer orders</h2><div id="ordersArea"><p class="small">Loading orders…</p></div></div>';
