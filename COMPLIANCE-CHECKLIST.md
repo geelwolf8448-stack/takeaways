@@ -20,14 +20,14 @@ This is an operational checklist, not a legal opinion or a licence. The operator
 - Create a process for access, correction, objection and deletion requests, and for responding to security incidents.
 - Do not collect card numbers, CVVs, banking passwords, OTPs or unnecessary identity documents.
 
-## Customer orders and payment — mandatory platform rule
-- Takeaways Tonight? is a discovery and order-request service only.
-- A basket or WhatsApp message is an order request, not restaurant acceptance.
-- The restaurant confirms availability, final price, delivery/collection arrangements and timing.
-- Customers pay the restaurant directly using payment details verified with that restaurant.
-- Takeaways Tonight? must not collect, process, hold, transfer or refund customer food-order funds.
-- Takeaways Tonight? does not charge restaurants a commission on food orders.
-- Do not display an order as accepted or paid until the restaurant confirms the relevant status directly.
+## Customer orders and payment — current operating rule
+- The current platform records customer order requests and sends a WhatsApp notification to the restaurant.
+- A submitted order is not restaurant acceptance. The restaurant confirms availability, final price, delivery/collection arrangements and timing.
+- Customers pay the restaurant directly using payment details verified with that restaurant. Takeaways Tonight? does not currently collect, hold, transfer or refund customer food-order funds.
+- The restaurant portal can record that direct payment was received. Do not mark an order completed until the restaurant has confirmed payment.
+- The platform currently records a proposed 15% commission in an internal ledger only when a paid order is completed. This is not an automatic debit, invoice or collection. Do not charge or invoice commission until signed restaurant terms and South African legal/accounting review are complete.
+- The proposed PayFast split-payment model is not live. Do not activate it until PayFast approves the merchant/split arrangement, refunds and settlement rules are tested, and the commercial model is reconciled with the completion-based commission ledger.
+- Do not display an order as paid unless the restaurant confirms direct payment or a future verified payment-provider notification confirms it.
 - Restaurant subscriptions/setup fees are separate platform-to-business payments. Do not activate recurring billing until the subscription contract, invoices, cancellation/refund rules and a compliant payment method are ready.
 
 ## Restaurant onboarding
