@@ -4,7 +4,7 @@ This is an operational checklist, not a legal opinion or a licence. The operator
 
 ## Business identity and website disclosures
 - [x] Business structure confirmed: individual sole proprietor trading as Takeaways Tonight?.
-- [ ] Confirm and record the proprietor's full legal name exactly as it should appear in legal disclosures.
+- [x] Proprietor's full legal name confirmed: Antione Els (individual sole proprietor trading as Takeaways Tonight?).
 - Add the operator's full legal name, legal status, physical/business address, telephone number and monitored email address to the website.
 - If operated by a company, add its registration number, office-bearer details and place of registration. Not applicable to the current sole-proprietor structure unless the structure changes.
 - Add the address for service of legal documents and clear customer/restaurant support details.
@@ -12,7 +12,7 @@ This is an operational checklist, not a legal opinion or a licence. The operator
 - ECTA section 43 requires prescribed supplier identity and contact information to be made available for relevant electronic transactions. Have a South African lawyer confirm how it applies to this directory and its paid restaurant listing service.
 
 ## POPIA and PAIA
-- Identify and register the Information Officer with the Information Regulator where required.
+- [ ] Register the sole proprietor, Antione Els, as the proposed Information Officer with the Information Regulator before assuming the duties; retain registration confirmation.
 - Prepare and maintain the PAIA manual and records of processing operations as applicable.
 - Document what personal information is collected, why it is needed, who receives it, retention periods, security controls and how people can exercise their rights.
 - Obtain appropriate permission before publishing a restaurant's contact details, menu, photographs, logo or other supplied material.
