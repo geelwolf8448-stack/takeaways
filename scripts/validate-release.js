@@ -76,12 +76,19 @@ check("customer account inline JavaScript compiles", account.count > 0);
 check("customer accounts use passwordless email sign-in", /signInWithOtp/.test(account.html) && /shouldCreateUser:true/.test(account.html));
 check("customer portal displays private order history", /marketplace_orders/.test(account.html) && /customer_id/.test(account.html));
 check("customer portal preserves checkout return after email sign-in", /return=checkout/.test(account.html) && /emailRedirectTo/.test(account.html));
+check("customer magic links route back into native Android app", /takeawaystonight:\/\/auth\/callback\?target=account/.test(account.html));
 
 const restaurantPortal = compileInlineScripts("restaurant-portal.html");
 check("restaurant owner portal inline JavaScript compiles", restaurantPortal.count > 0);
 check("restaurant owners request verified access", /restaurant_owner_requests/.test(restaurantPortal.html));
+check("restaurant-owner magic links route back into native Android app", /takeawaystonight:\/\/auth\/callback\?target=restaurant/.test(restaurantPortal.html));
 check("restaurant owner portal uses server-side order updates", /marketplace-api/.test(restaurantPortal.html) && /update_order/.test(restaurantPortal.html));
 check("restaurant owners can update their menu and contact details", /saveListing/.test(restaurantPortal.html) && /commission_ledger/.test(restaurantPortal.html));
+check("web and native pages load the shared auth deep-link handler", /native-auth\.js/.test(publicPage.html) && /native-auth\.js/.test(account.html) && /native-auth\.js/.test(restaurantPortal.html));
+const nativeAuth = read("native-auth.js");
+check("native auth handler restores Supabase sessions from app links", /App\.addListener\("appUrlOpen"/.test(nativeAuth) && /App\.getLaunchUrl\(\)/.test(nativeAuth) && /client\.auth\.setSession/.test(nativeAuth));
+const packageJson = JSON.parse(read("package.json"));
+check("Capacitor App plugin is installed for native deep links", Boolean(packageJson.dependencies["@capacitor/app"]));
 const marketplaceApi = read("supabase/functions/marketplace-api/index.ts");
 check("marketplace API validates the signed-in customer", /auth.getUser\(token\)/.test(marketplaceApi));
 check("marketplace API calculates prices from the published menu", /normalizedMenu/.test(marketplaceApi) && /suppliedPriceCents !== unitPriceCents/.test(marketplaceApi));
@@ -105,10 +112,12 @@ check("PWA manifest is valid JSON and uses the black/gold brand", manifest.name.
 check("PWA manifest icon exists", fs.existsSync(path.join(root, manifest.icons[0].src)));
 check("service worker cache includes the secure sign-in callback", /reset-password\.html/.test(worker));
 check("service worker cache includes customer and restaurant portals", /account\.html/.test(worker) && /restaurant-portal\.html/.test(worker));
+check("service worker cache includes native auth handler", /native-auth\.js/.test(worker));
 const prep = read("scripts/prepare-web.js");
 check("Android web bundle includes the service worker", /"service-worker\.js"/.test(prep));
 check("Android web bundle includes admin and callback pages referenced by cache", /"admin\.html"/.test(prep) && /"reset-password\.html"/.test(prep));
 check("Android web bundle includes customer and restaurant portals", /"account\.html"/.test(prep) && /"restaurant-portal\.html"/.test(prep));
+check("Android web bundle includes native auth handler", /"native-auth\.js"/.test(prep));
 const releaseScript = read("scripts/configure-android-release.js");
 new vm.Script(releaseScript, { filename: "scripts/configure-android-release.js" });
 check("Android signing configuration script compiles", true);
@@ -150,6 +159,20 @@ android {
   check("Android signing script patches a Gradle release fixture", signingTest.status === 0);
   check("Android signing fixture gets release signing and version metadata", /signingConfig signingConfigs\.release/.test(configuredGradle) && /versionCode 2/.test(configuredGradle) && /versionName "1.2.3"/.test(configuredGradle));
   check("Android signing secrets are referenced from environment, not embedded", configuredGradle.includes('System.getenv("ANDROID_KEYSTORE_PASSWORD")') && !configuredGradle.includes("test-keystore-password"));
+  const fixtureManifest = path.join(fixtureDir, "AndroidManifest.xml");
+  const fixtureStrings = path.join(fixtureDir, "strings.xml");
+  fs.writeFileSync(fixtureManifest, '<manifest xmlns:android="http://schemas.android.com/apk/res/android"><application><activity android:name=".MainActivity"></activity></application></manifest>');
+  fs.writeFileSync(fixtureStrings, '<resources><string name="app_name">Test</string><string name="custom_url_scheme">za.co.test</string></resources>');
+  const deepLinkTest = spawnSync(process.execPath, [path.join(root, "scripts/configure-android-deeplinks.js")], {
+    cwd: root,
+    encoding: "utf8",
+    env: { ...process.env, ANDROID_MANIFEST_FILE: fixtureManifest, ANDROID_STRINGS_FILE: fixtureStrings }
+  });
+  const configuredManifest = fs.readFileSync(fixtureManifest, "utf8");
+  const configuredStrings = fs.readFileSync(fixtureStrings, "utf8");
+  check("Android deep-link script patches manifest and scheme fixture", deepLinkTest.status === 0);
+  check("Android deep-link intent filter uses the custom scheme", configuredManifest.includes('android:name="android.intent.action.VIEW"') && configuredManifest.includes('android:scheme="@string/custom_url_scheme"'));
+  check("Android custom URL scheme is configured", configuredStrings.includes('<string name="custom_url_scheme">takeawaystonight</string>'));
 } finally {
   fs.rmSync(fixtureDir, { recursive: true, force: true });
 }
