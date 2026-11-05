@@ -474,4 +474,5 @@ loadSharedRestaurants().then(restorePendingCheckout);
 if ("serviceWorker" in navigator && location.protocol.startsWith("http")) { window.addEventListener("load", () => navigator.serviceWorker.register("./service-worker.js").catch(() => {})); }
 </script>
 <script type="module" src="native-auth.js"></script>
+<script type="module" src="push-tap-handler.js"></script>
 </body></html>
