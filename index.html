@@ -463,6 +463,7 @@ let summary="TAKEAWAYS TONIGHT? — RESTAURANT PARTNER APPLICATION\n\nRestaurant
 function closeDialog(id){document.getElementById(id).close()}
 const homeConfig=window.TT_CONFIG||{};
 const homeSupabase=window.supabase&&homeConfig.supabaseUrl&&homeConfig.supabaseAnonKey?window.supabase.createClient(homeConfig.supabaseUrl,homeConfig.supabaseAnonKey,{auth:{persistSession:true,autoRefreshToken:true}}):null;
+window.TT_SUPABASE_CLIENT=homeSupabase;
 async function restorePendingCheckout(){
  const raw=localStorage.getItem("tt_pending_checkout");if(!raw)return;
  try{const saved=JSON.parse(raw);if(saved.savedAt&&Date.now()-saved.savedAt>30*60*1000){localStorage.removeItem("tt_pending_checkout");return;}if(Array.isArray(saved.items)&&saved.items.length){basket=saved.items;document.getElementById("customerName").value=saved.customerName||"";document.getElementById("customerPhone").value=saved.customerPhone||"";document.getElementById("fulfilment").value=saved.fulfilment||"";document.getElementById("deliveryAddress").value=saved.address||"";document.getElementById("orderNotes").value=saved.notes||"";openBasket();}}
@@ -472,4 +473,5 @@ render();
 loadSharedRestaurants().then(restorePendingCheckout);
 if ("serviceWorker" in navigator && location.protocol.startsWith("http")) { window.addEventListener("load", () => navigator.serviceWorker.register("./service-worker.js").catch(() => {})); }
 </script>
+<script type="module" src="native-auth.js"></script>
 </body></html>
