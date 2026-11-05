@@ -57,12 +57,20 @@ async function loadDashboard(){
  if(!session)return;$("loginPanel").classList.add("hidden");$("dashboard").classList.remove("hidden");$("signedIn").textContent=session.user.email||"Signed in";$("status").textContent="Loading restaurant access…";
  const [{data:profile},{data:memberRows,error:memberError},{data:restaurants,error:restError},{data:requests,error:reqError}]=await Promise.all([
   sb.from("marketplace_profiles").select("full_name,phone").eq("user_id",session.user.id).maybeSingle(),
-  sb.from("restaurant_members").select("restaurant_id,member_role,restaurant:restaurants(id,name,area,category,whatsapp,description,menu)").eq("user_id",session.user.id),
+  sb.from("restaurant_members").select("restaurant_id,member_role").eq("user_id",session.user.id),
   sb.from("restaurants").select("id,name,area,category").eq("is_published",true).order("name"),
   sb.from("restaurant_owner_requests").select("id,restaurant_id,status,created_at,restaurant:restaurants(name)").eq("user_id",session.user.id).order("created_at",{ascending:false})
  ]);
  if(memberError||restError||reqError){$("status").textContent="Could not load your portal data. Please refresh or contact support.";return}
- memberships=memberRows||[];
+ const memberIds=(memberRows||[]).map(m=>m.restaurant_id);
+ let ownedRestaurants=[];
+ if(memberIds.length){
+  const {data:ownedRows,error:ownedError}=await sb.from("restaurants").select("id,name,area,category,whatsapp,description,menu").in("id",memberIds);
+  if(ownedError){$("status").textContent="Your restaurant access was found, but the listing could not be loaded: "+ownedError.message;return;}
+  ownedRestaurants=ownedRows||[];
+ }
+ const restaurantById=new Map(ownedRestaurants.map(r=>[r.id,r]));
+ memberships=(memberRows||[]).map(m=>({...m,restaurant:restaurantById.get(m.restaurant_id)||null}));
  if(profile){$("name").value=profile.full_name||"";$("phone").value=profile.phone||"";}
  $("restaurantSelect").innerHTML='<option value="">Choose a restaurant…</option>'+(restaurants||[]).map(r=>'<option value="'+esc(r.id)+'">'+esc(r.name)+' · '+esc(r.area)+'</option>').join("");
  let requestHtml=(requests||[]).map(r=>'<p class="small">'+esc(r.restaurant?.name||"Restaurant")+' — access request: <b>'+esc(r.status)+'</b></p>').join("");
