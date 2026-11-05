@@ -16,8 +16,10 @@ Push delivery cannot work until the platform owner completes the following Fireb
 2. Create a Firebase project for Takeaways Tonight? or select the project already created for it.
 3. Add an Android app with this exact package name: `za.co.takeawaystonight.app`.
 4. Download `google-services.json`.
-5. Add that file to the root of the GitHub repository `geelwolf8448-stack/takeaways` and commit it. This is the Firebase client configuration file; do not substitute a service-account private key.
-6. Confirm Firebase Cloud Messaging is enabled for the project.
+5. Add that file to the root of the GitHub repository `geelwolf8448-stack/takeaways` and commit it. This is the Firebase client configuration file; do not substitute a service-account private key. The signed and debug Android workflows copy it into `android/app/`.
+6. Confirm the JSON includes the exact Android package name `za.co.takeawaystonight.app`.
+7. The build workflow runs `scripts/configure-firebase-android.js`, which validates the package name and adds Google's Gradle plugin (version 4.5.0) to the generated Android project. Do not manually edit generated Gradle files.
+8. Confirm Firebase Cloud Messaging is enabled for the project.
 
 ### 2. Add the server credential to Supabase
 
