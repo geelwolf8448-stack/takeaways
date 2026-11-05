@@ -31,7 +31,7 @@ This document reflects the current repository implementation. Do not repeat setu
 
 ## Next technical acceptance tests (do these once, in order)
 1. Open the live public website and confirm the directory status says the shared directory is connected (zero published restaurants is acceptable at first).
-2. In Supabase Authentication → URL Configuration, allow the web portal URLs `https://geelwolf8448-stack.github.io/takeaways/account.html` and `https://geelwolf8448-stack.github.io/takeaways/restaurant-portal.html`, plus the Android callback URLs `takeawaystonight://auth/callback?target=account` and `takeawaystonight://auth/callback?target=restaurant`.
+2. In Supabase Authentication → URL Configuration, allow the web portal URLs `https://geelwolf8448-stack.github.io/takeaways/account.html` and `https://geelwolf8448-stack.github.io/takeaways/restaurant-portal.html`, plus the Android callback URLs `za.co.takeawaystonight.app://auth/callback?target=account` and `za.co.takeawaystonight.app://auth/callback?target=restaurant`.
 3. Submit one clearly labelled test restaurant application using details controlled by the project owner.
 4. Sign in to `admin.html`; confirm the owner account is recognised as an administrator and the test application appears.
 5. Approve the test application and confirm it appears on the public directory.
