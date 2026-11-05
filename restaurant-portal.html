@@ -49,7 +49,7 @@ async function sendLink(){
  if(!sb)return;const email=$("email").value.trim(),name=$("name").value.trim(),raw=$("phone").value.replace(/\D/g,""),phone=raw.startsWith("0")?"27"+raw.slice(1):raw;
  if(name.length<2||!/^27\d{9}$/.test(phone)||!email.includes("@")){$("loginStatus").textContent="Enter your name, a valid South African mobile number and email address.";return}
  $("sendLink").disabled=true;$("loginStatus").textContent="Sending your sign-in link…";
- try{const {error}=await sb.auth.signInWithOtp({email,options:{emailRedirectTo:(window.Capacitor?.isNativePlatform?.()?"takeawaystonight://auth/callback?target=restaurant":"https://geelwolf8448-stack.github.io/takeaways/restaurant-portal.html"),shouldCreateUser:true,data:{full_name:name,phone}}});if(error)throw error;$("loginStatus").textContent="Check your email and open the newest one-time sign-in link in this browser."}
+ try{const {error}=await sb.auth.signInWithOtp({email,options:{emailRedirectTo:(window.Capacitor?.isNativePlatform?.()?"za.co.takeawaystonight.app://auth/callback?target=restaurant":"https://geelwolf8448-stack.github.io/takeaways/restaurant-portal.html"),shouldCreateUser:true,data:{full_name:name,phone}}});if(error)throw error;$("loginStatus").textContent="Check your email and open the newest one-time sign-in link in this browser."}
  catch(e){$("loginStatus").textContent=e.message||"Could not send the sign-in link."}finally{$("sendLink").disabled=false}
 }
 async function loadDashboard(){
