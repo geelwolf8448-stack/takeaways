@@ -63,6 +63,7 @@ create table if not exists public.restaurant_owner_requests (
 create unique index if not exists restaurant_owner_requests_one_pending_per_user_restaurant
 on public.restaurant_owner_requests(user_id,restaurant_id) where status='pending';
 create index if not exists restaurant_owner_requests_restaurant_idx on public.restaurant_owner_requests(restaurant_id);
+create index if not exists restaurant_owner_requests_user_idx on public.restaurant_owner_requests(user_id,created_at desc);
 create index if not exists restaurant_owner_requests_reviewed_by_idx on public.restaurant_owner_requests(reviewed_by);
 
 create table if not exists public.marketplace_orders (
