@@ -1,46 +1,70 @@
-# Takeaways Tonight? — 15% marketplace commission build
+# Takeaways Tonight? — marketplace orders, commission and PayFast status
 
-## Commercial rule selected
-- Platform commission: **15% of the food subtotal on each completed order**.
-- Delivery charges are excluded from the commission base in this first design.
-- A rejected, cancelled or fully refunded order earns no commission.
-- Partial refunds require a proportional commission adjustment.
-- Commission is recorded in the ledger only when the order reaches `completed`.
-- Example: R200 food subtotal = R30 gross platform commission, before payment-provider fees, refunds, operating costs and tax.
+## Live implementation as at 5 November 2026
 
-## Intended customer and restaurant journey
-1. Customer chooses items from one restaurant only and checks out in ZAR.
-2. Server creates a pending order using trusted menu prices.
-3. Customer is sent to the approved payment provider to pay securely.
-4. A verified provider notification updates the payment status; a browser return page is never proof of payment.
-5. Restaurant staff sign in and accept or reject the paid order.
-6. Restaurant updates preparing → ready → completed.
-7. On completed status, the database records the 15% commission.
-8. Customer sees order status and receipt; platform owner sees sales, commission, refunds and settlement reports.
+The linked Supabase project is configured and the following is now deployed:
 
-## Payment-provider design decision
-PayFast documentation describes Split Payments and says a split transaction can allocate a percentage to one secondary merchant account. It also says the primary account must enable the feature and the custom integration uses merchant credentials. A split transaction supports only one receiving merchant. See:
+- Customer profiles are created automatically when an Auth account is created.
+- Customers can sign in using a one-time email link, update their contact details and view their private order history.
+- Restaurant owners can request access to an already approved restaurant. The platform administrator must review the request before membership is granted.
+- Approved restaurant owners/managers can update their menu and manage orders for their own restaurant.
+- Customer orders are created through the authenticated `marketplace-api` Edge Function.
+- The server reads the restaurant's current published menu and calculates the order prices itself. Browser-supplied prices are not trusted.
+- Orders are restricted to one restaurant each. The customer is redirected to the restaurant's WhatsApp after the order is saved.
+- The restaurant confirms availability, delivery fee, final total and payment directly with the customer.
+- Restaurant staff can accept/reject, prepare, mark ready, confirm direct payment and complete orders. Completion is blocked until the restaurant confirms it has been paid.
+- The commission ledger records 15% of the food subtotal only after completion. Delivery charges are excluded.
+
+The live customer order method is still **pay the restaurant directly**. Takeaways Tonight? does not currently collect customer food-order money.
+
+## Proposed commercial commission
+
+The proposed marketplace commission is **15% of the food subtotal on completed orders**.
+
+Example: R200 food subtotal × 15% = R30 gross commission, before payment-provider fees, refunds, operating costs and tax.
+
+The current ledger is an internal record only. It does not collect the R30, debit a restaurant, issue an invoice or transfer money. The commercial terms must be agreed in writing with each restaurant and reviewed by a South African accountant/lawyer before any collection or invoicing is activated.
+
+A rejected, cancelled or unpaid order earns no commission. Refunds and partial refunds still need an approved operational process and ledger adjustments before a paid checkout is launched.
+
+## PayFast — not connected yet
+
+PayFast has not been configured in this project. No PayFast merchant ID, merchant key, passphrase or split-payment credentials have been supplied or stored. There is no active PayFast checkout, ITN webhook, automated refund or settlement process.
+
+The intended integration requires:
+
+1. Written PayFast confirmation that Takeaways Tonight? is eligible for the relevant marketplace/split-payment product.
+2. A confirmed settlement and refund model, including what happens when a restaurant rejects an order or a customer receives a full/partial refund.
+3. A verified merchant onboarding process for every restaurant that receives a split payout.
+4. A clear commercial decision on whether the 15% is collected at payment time or invoiced after a completed order. These are not the same cash-flow model.
+5. PayFast Sandbox credentials and tests for successful payment, failed payment, duplicate ITN, invalid signature, amount mismatch, restaurant rejection, full refund, partial refund and reconciliation.
+6. Production credentials stored only as Supabase Edge Function secrets, never in GitHub, browser code or customer devices.
+7. Signed restaurant agreements, updated customer terms/privacy notice and South African legal/accounting review.
+
+### Split-payment architecture constraint
+
+The earlier proposal is for the platform to be the primary merchant and one restaurant to be the secondary merchant, with the restaurant receiving 85% and the platform retaining 15%. The basket must remain limited to one restaurant if the provider supports only one secondary recipient.
+
+A provider split at checkout distributes money at payment time; it does not wait for an order to be completed. Therefore, it must not be enabled until PayFast confirms the exact settlement, cancellation and refund rules and the business chooses a consistent commission-recognition policy.
+
+Official provider references to verify during implementation:
 - https://support.payfast.help/portal/en/kb/articles/can-i-split-a-payment-20-9-2022
 - https://support.payfast.help/portal/en/kb/articles/how-do-i-enable-split-payments-20-9-2022
 - https://developers.payfast.co.za/docs#splitpayments
 
-**Important architecture constraint:** one restaurant per basket/order. The platform would be the primary PayFast merchant and the restaurant the secondary split merchant. If the restaurant receives 85% as the secondary split, the platform retains the remaining 15% before provider fees (subject to PayFast's exact split semantics and written approval). This split happens at payment processing time; it does not mean the provider waits until an order is completed to release the commission. The provider must confirm the rejection/refund/reversal and settlement model in writing before live use.
+## Security and launch rules
 
-## What is not live
-This repository does not yet have:
-- a configured Supabase project or production database;
-- customer/restaurant authentication and role provisioning;
-- Supabase Edge Functions for order creation, payment initiation, ITN verification, status transitions or refunds;
-- approved PayFast marketplace/split-payment merchant configuration;
-- merchant verification and restaurant payout onboarding;
-- a production owner dashboard, automated salary/withdrawal, or reconciliation;
-- legal approval for collecting and splitting customer funds.
+- Never place PayFast merchant keys, passphrases, Supabase service-role keys or bank credentials in GitHub or browser JavaScript.
+- Use Supabase Edge Function secrets for server-only credentials.
+- Browser clients have no direct write access to orders, order items, payments, refunds or commission records.
+- All privileged order actions must validate the signed-in user and restaurant membership on the server.
+- Never treat a browser return page as proof of payment; only a verified provider notification can confirm a payment.
+- Do not accept live customer payments until PayFast approval, security testing, restaurant agreements, refund handling, privacy notices and South African legal/accounting review are complete.
+- Do not describe commission as guaranteed income. Any amount shown is subject to actual completed orders, refunds, provider fees, operating costs and tax.
 
-The SQL file `supabase/marketplace-schema.sql` is a foundation only. It must be reviewed and tested in a separate Supabase project before production. It intentionally grants no browser write access to orders, payments or commission records.
+## Current links
 
-## Credentials and launch safety
-- Never put PayFast merchant keys, passphrases, Supabase service_role keys, or bank credentials in GitHub or browser JavaScript.
-- Store secrets only in Supabase Edge Function secrets.
-- Use PayFast Sandbox first; test payment success, failed payment, duplicate ITN, restaurant rejection, full refund, partial refund, payout reconciliation and commission math.
-- Do not accept real customer payments until provider approval, refund handling, security testing, restaurant agreements, privacy notices, and South African legal/accounting review are complete.
-- Do not describe earnings as a guaranteed salary. The owner dashboard can show earned commission; withdrawals are subject to actual settlements, fees, refunds and tax.
+- Customer portal: https://geelwolf8448-stack.github.io/takeaways/account.html
+- Restaurant portal: https://geelwolf8448-stack.github.io/takeaways/restaurant-portal.html
+- Administrator portal: https://geelwolf8448-stack.github.io/takeaways/admin.html
+- Public website: https://geelwolf8448-stack.github.io/takeaways/
