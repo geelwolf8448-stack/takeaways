@@ -62,6 +62,6 @@ if (fs.existsSync(variablesPath)) {
   fs.writeFileSync(variablesPath, variables);
   console.log("Configured Android compile/target SDK API " + compileSdk + "/" + targetSdk + ".");
 } else {
-  console.warn("Android variables.gradle not found; SDK level was not changed in this fixture.");
+  throw new Error("Android variables.gradle not found; cannot verify or enforce target SDK API " + targetSdk + ".");
 }
 console.log("Configured signed Android release " + versionName + " (" + versionCode + "). Keystore remains outside source control.");
