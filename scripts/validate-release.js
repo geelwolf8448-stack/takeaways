@@ -44,6 +44,8 @@ check("demo cards are not labelled as confirmed featured partners", !/Our featur
 check("orders are restricted to approved non-demo records", /r\.isDemo!==false/.test(publicPage.html) && /is_published=eq\.true/.test(publicPage.html));
 check("WhatsApp order request is generated", /https:\/\/wa\.me\//.test(publicPage.html) && /No payment has been made/.test(publicPage.html));
 check("public page explains WhatsApp requests are not secure in-app checkout", /Signed-in customers can submit an order request and notify the restaurant on WhatsApp/.test(publicPage.html) && /marketplace-api/.test(publicPage.html) && !/secure checkout are being prepared/.test(publicPage.html));
+check("pending checkout survives email sign-in in another browser tab", /localStorage\.setItem\("tt_pending_checkout"/.test(publicPage.html) && /Date\.now\(\)-saved\.savedAt>30\*60\*1000/.test(publicPage.html));
+check("pending checkout is cleared after order submission", /localStorage\.removeItem\("tt_pending_checkout"/.test(publicPage.html));
 check("South African customer and restaurant phone numbers are validated", /\^27\\d\{9\}\$/.test(publicPage.html));
 check("delivery address is required for delivery", /fulfilment==="Delivery"&&!address/.test(publicPage.html));
 check("partner application requires permission declaration", /rConsent/.test(publicPage.html) && /permission_confirmed:true/.test(publicPage.html));
