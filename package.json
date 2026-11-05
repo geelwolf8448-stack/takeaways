@@ -7,11 +7,13 @@
     "build:web": "node scripts/prepare-web.js",
     "android:icons": "node scripts/generate-android-icons.js",
     "android:sync": "npm run build:web && cap sync android",
-    "test": "node scripts/validate-release.js"
+    "test": "node scripts/validate-release.js",
+    "android:deeplinks": "node scripts/configure-android-deeplinks.js"
   },
   "dependencies": {
     "@capacitor/android": "^7.4.3",
-    "@capacitor/core": "^7.4.3"
+    "@capacitor/core": "^7.4.3",
+    "@capacitor/app": "^7.0.0"
   },
   "devDependencies": {
     "@capacitor/cli": "^7.4.3",
