@@ -64,7 +64,7 @@ async function sendLink(){
  if(!email.includes("@")){$("loginStatus").textContent="Please enter a valid email address.";return}
  const b=$("sendLink");b.disabled=true;$("loginStatus").textContent="Sending your secure sign-in link…";
  try{
-  const {error}=await sb.auth.signInWithOtp({email,options:{emailRedirectTo:(window.Capacitor?.isNativePlatform?.()?"takeawaystonight://auth/callback?target=account":"https://geelwolf8448-stack.github.io/takeaways/account.html"+(new URLSearchParams(location.search).get("return")==="checkout"?"?return=checkout":"")),shouldCreateUser:true,data:{full_name:name,phone}}});
+  const {error}=await sb.auth.signInWithOtp({email,options:{emailRedirectTo:(window.Capacitor?.isNativePlatform?.()?"za.co.takeawaystonight.app://auth/callback?target=account":"https://geelwolf8448-stack.github.io/takeaways/account.html"+(new URLSearchParams(location.search).get("return")==="checkout"?"?return=checkout":"")),shouldCreateUser:true,data:{full_name:name,phone}}});
   if(error)throw error;
   $("loginStatus").textContent="Check your email and open the newest Takeaways Tonight? sign-in link in this browser. The link can only be used once.";
  }catch(e){$("loginStatus").textContent=e.message||"Could not send the sign-in link."}
