@@ -14,7 +14,8 @@ const APP_FILES = [
   "./reset-password.html",
   "./account.html",
   "./restaurant-portal.html",
-  "./native-auth.js"
+  "./native-auth.js",
+  "./native-push.js"
 ];
 
 self.addEventListener("install", event => {
