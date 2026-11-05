@@ -61,6 +61,7 @@ async function loadDashboard(){
  ]);
  if(memberError||restError||reqError){$("status").textContent="Could not load your portal data. Please refresh or contact support.";return}
  memberships=memberRows||[];
+ if(profile){$("name").value=profile.full_name||"";$("phone").value=profile.phone||"";}
  $("restaurantSelect").innerHTML='<option value="">Choose a restaurant…</option>'+(restaurants||[]).map(r=>'<option value="'+esc(r.id)+'">'+esc(r.name)+' · '+esc(r.area)+'</option>').join("");
  let requestHtml=(requests||[]).map(r=>'<p class="small">'+esc(r.restaurant?.name||"Restaurant")+' — access request: <b>'+esc(r.status)+'</b></p>').join("");
  $("requestStatus").innerHTML=requestHtml;
