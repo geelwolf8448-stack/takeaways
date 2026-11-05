@@ -55,3 +55,9 @@ This is an operational checklist, not a legal opinion or a licence. The operator
 - Confirm tax, business registration and accounting treatment with a qualified South African adviser.
 - Confirm whether any additional permissions or licences apply to the actual activities the operator will perform. A website or code deployment does not itself grant a business licence.
 - Complete end-to-end testing with at least one restaurant and written owner approval.
+
+## Additional work completed 5 November 2026
+- Native Android Firebase push-notification integration code added; Firebase project configuration and real-device testing remain outstanding.
+- Restaurant portal commission display removed and commission-ledger read access restricted to platform administrators.
+- PAIA manual, POPIA processing/retention register and incident-response plan drafts added; legal review and completion remain outstanding.
+- Signed Android release workflow requires Firebase client configuration and the private Android signing secrets. API 36 targeting is configured by the release script; verify the generated bundle before submission.
