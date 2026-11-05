@@ -1,4 +1,4 @@
-const CACHE_NAME = "takeaways-tonight-v25-demo-label";
+const CACHE_NAME = "takeaways-tonight-v26-accounts-orders";
 const APP_FILES = [
   "./",
   "./index.html",
@@ -11,7 +11,9 @@ const APP_FILES = [
   "./splash.svg",
   "./config.js",
   "./admin.html",
-  "./reset-password.html"
+  "./reset-password.html",
+  "./account.html",
+  "./restaurant-portal.html"
 ];
 
 self.addEventListener("install", event => {
