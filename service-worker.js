@@ -1,4 +1,4 @@
-const CACHE_NAME = "takeaways-tonight-v27-native-auth";
+const CACHE_NAME = "takeaways-tonight-v28-native-auth-guard";
 const APP_FILES = [
   "./",
   "./index.html",
