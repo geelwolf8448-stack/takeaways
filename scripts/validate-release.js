@@ -89,6 +89,10 @@ check("restaurant portal loads native push registration module", /native-push\.j
 const nativePush = read("native-push.js");
 new vm.Script(nativePush.replace(/^import[^\n]*\n/, ""), { filename: "native-push.js" });
 check("native Android push module JavaScript compiles", true);
+const pushTapHandler = read("push-tap-handler.js");
+new vm.Script(pushTapHandler.replace(/^import[^\n]*\n/, ""), { filename: "push-tap-handler.js" });
+check("push tap handler JavaScript compiles", true);
+check("public Android app loads push tap handler", /push-tap-handler\.js/.test(publicPage.html));
 check("native push stores FCM tokens against the signed-in user", /restaurant_push_tokens/.test(nativePush) && /user_id: session\.user\.id/.test(nativePush));
 check("native push requests permission and registers the Android device", /requestPermissions/.test(nativePush) && /PushNotifications\.register/.test(nativePush));
 check("restaurant owner portal uses server-side order updates", /marketplace-api/.test(restaurantPortal.html) && /update_order/.test(restaurantPortal.html));
@@ -107,6 +111,7 @@ check("marketplace API calculates prices from the published menu", /normalizedMe
 check("marketplace API binds idempotency keys to the customer", /eq\("customer_id", user.id\)/.test(marketplaceApi));
 check("marketplace API restricts order status transitions and owner approvals", /update_order/.test(marketplaceApi) && /review_owner_request/.test(marketplaceApi));
 check("marketplace API sends FCM order notifications server-side", /sendNewOrderPush/.test(marketplaceApi) && /FIREBASE_SERVICE_ACCOUNT_JSON/.test(marketplaceApi) && /fcm\.googleapis\.com/.test(marketplaceApi));
+check("marketplace API retains private monthly commission statements", /get_commission_statement/.test(marketplaceApi));
 check("marketplace API only grants owner access to published restaurants", /restaurantRow\.is_published/.test(marketplaceApi));
 
 const worker = read("service-worker.js");
@@ -132,7 +137,9 @@ check("Android web bundle includes admin and callback pages referenced by cache"
 check("Android web bundle includes customer and restaurant portals", /"account\.html"/.test(prep) && /"restaurant-portal\.html"/.test(prep));
 check("Android web bundle includes native auth handler", /"native-auth\.js"/.test(prep));
 check("Android web bundle includes native push module", /"native-push\.js"/.test(prep));
+check("Android web bundle includes push tap handler", /"push-tap-handler\.js"/.test(prep));
 check("service worker caches native push module", /native-push\.js/.test(worker));
+check("service worker caches push tap handler", /push-tap-handler\.js/.test(worker));
 const releaseScript = read("scripts/configure-android-release.js");
 new vm.Script(releaseScript, { filename: "scripts/configure-android-release.js" });
 check("Android signing configuration script compiles", true);
