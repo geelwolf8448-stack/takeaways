@@ -19,7 +19,7 @@ The project has moved beyond the original static preview. Use the code in `index
 - Secure one-time sign-in callback page for Supabase email-link authentication.
 - PWA manifest, service worker, branding assets, privacy and terms draft pages.
 - Customer account portal with passwordless sign-in, editable contact profile and private order history.
-- Restaurant-owner portal with verified access requests, approved listing menu updates and order management.
+- Restaurant-owner portal with verified access requests, customer order management, browser pop-up notifications and 15-second polling while the portal is open. Menu, prices, specials and listing changes are managed centrally by the platform administrator.
 - Marketplace order database and authenticated Edge Function: validates live menu prices server-side, creates one-restaurant orders, supports idempotency, and enforces restaurant-authorised order status changes.
 - Commission ledger records the proposed 15% food-subtotal commission only after an order is completed and marked paid directly to the restaurant. No commission payment or PayFast split is currently collected.
 - Capacitor Android build workflow with a static release-validation test gate (`npm test`). Customer and restaurant-owner email sign-in uses a custom Android deep link to return to the installed app. Debug APK and unsigned AAB are build outputs for testing/release preparation, not Play Store-ready signed releases.
@@ -28,7 +28,7 @@ The project has moved beyond the original static preview. Use the code in `index
 - Complete a real passwordless administrator sign-in and confirm the owner account is in `public.admin_users`; a successful SQL run or deployment alone is not an end-to-end admin login test.
 - Test a real partner application from the public site and approve it in the admin portal.
 - Replace demo listings with restaurants that have given written permission and whose details, menus, prices and ordering numbers have been verified.
-- Customer and restaurant-owner portals are implemented in code; real-user sign-in, restaurant-owner verification and end-to-end testing remain outstanding.
+- Customer and restaurant-owner portals are implemented in code; real-user sign-in, restaurant-owner verification and end-to-end testing remain outstanding. Restaurant order pop-up notifications require the owner to sign in, keep the portal open and allow browser notifications on that device; they are not yet push notifications when the portal/browser is closed.
 - PayFast checkout, ITN verification, split settlement, automated refunds, delivery dispatch and commission collection are not implemented. Order status management is implemented for direct-pay orders. `supabase/marketplace-schema.sql` is an older planning reference; use the dated migration files for the live schema.
 - Android APK build success does not mean Play Store publication, signing, device testing or release approval is complete.
 
