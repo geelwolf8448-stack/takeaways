@@ -1,4 +1,4 @@
-const CACHE_NAME = "takeaways-tonight-v26-accounts-orders";
+const CACHE_NAME = "takeaways-tonight-v27-native-auth";
 const APP_FILES = [
   "./",
   "./index.html",
@@ -13,7 +13,8 @@ const APP_FILES = [
   "./admin.html",
   "./reset-password.html",
   "./account.html",
-  "./restaurant-portal.html"
+  "./restaurant-portal.html",
+  "./native-auth.js"
 ];
 
 self.addEventListener("install", event => {
