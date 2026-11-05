@@ -26,7 +26,8 @@ This document reflects the current repository implementation. Do not repeat setu
 - Supabase project and browser configuration in `config.js`.
 - Supabase schema in `supabase/schema.sql`.
 - Owner allowlist setup script in `supabase/admin-setup.sql` (owner reports it has been run).
-- Brevo SMTP configuration was completed in Supabase; a fresh password recovery flow has not yet been verified end to end.\n- Supabase Security Advisor currently reports leaked-password protection disabled. Enable it in Auth password-security settings if the current Supabase plan supports it; otherwise record the plan limitation and retain the warning.
+- Brevo SMTP configuration was completed in Supabase; a fresh password recovery flow has not yet been verified end to end.
+- Supabase Security Advisor currently reports leaked-password protection disabled. Enable it in Auth password-security settings if the current Supabase plan supports it; otherwise record the plan limitation and retain the warning.
 
 ## Next technical acceptance tests (do these once, in order)
 1. Open the live public website and confirm the directory status says the shared directory is connected (zero published restaurants is acceptable at first).
