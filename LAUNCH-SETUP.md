@@ -31,7 +31,7 @@ This document reflects the current repository implementation. Do not repeat setu
 
 ## Next technical acceptance tests (do these once, in order)
 1. Open the live public website and confirm the directory status says the shared directory is connected (zero published restaurants is acceptable at first).
-2. In Supabase Authentication → URL Configuration, confirm the Redirect URLs allow the exact customer and restaurant portal URLs: `https://geelwolf8448-stack.github.io/takeaways/account.html` and `https://geelwolf8448-stack.github.io/takeaways/restaurant-portal.html`.
+2. In Supabase Authentication → URL Configuration, allow the web portal URLs `https://geelwolf8448-stack.github.io/takeaways/account.html` and `https://geelwolf8448-stack.github.io/takeaways/restaurant-portal.html`, plus the Android callback URLs `takeawaystonight://auth/callback?target=account` and `takeawaystonight://auth/callback?target=restaurant`.
 3. Submit one clearly labelled test restaurant application using details controlled by the project owner.
 4. Sign in to `admin.html`; confirm the owner account is recognised as an administrator and the test application appears.
 5. Approve the test application and confirm it appears on the public directory.
@@ -39,7 +39,7 @@ This document reflects the current repository implementation. Do not repeat setu
 7. Create a test customer account and verify the profile appears in the account page.
 8. After a real restaurant is approved, have its authorised owner create an account and submit an access request. Approve it in the admin portal and verify that the owner can see only that restaurant.
 9. Submit a test customer order against a real approved menu, verify the saved order and WhatsApp notification, and test the full restaurant status flow including direct-payment confirmation.
-10. Verify the 15% ledger calculation on a completed test order, then remove test records if they are not genuine business transactions.
+10. Verify the 15% ledger calculation on a completed test order, then remove test records if they are not genuine business transactions.\n11. On a physical Android device, request a customer and restaurant-owner sign-in link and confirm each opens the installed app, restores the session and routes to the correct portal.
 
 Do not repeat SQL setup, SMTP setup or password recovery unless the corresponding acceptance test proves it is necessary.
 
@@ -47,7 +47,7 @@ Do not repeat SQL setup, SMTP setup or password recovery unless the correspondin
 - PayFast checkout, verified ITN notifications, split settlement, automated refunds and payout reconciliation.
 - Delivery dispatch, push/email order notifications, restaurant subscription billing and automatic commission collection.
 - Full production acceptance testing with real customer and restaurant accounts.
-- Google Play publication and signed production release. A signed build can be generated after the owner creates a private upload keystore and adds the four required GitHub Actions secrets.
+- Google Play publication and signed production release. A signed build can be generated after the owner creates a private upload keystore and adds the four required GitHub Actions secrets.\n- Physical-device testing of the new Android magic-link deep-link flow and Supabase redirect allowlist.
 
 The Android workflow has produced successful builds in GitHub Actions. Download the debug APK from the successful workflow run's Artifacts for device testing; do not treat that as a Play Store release.
 
