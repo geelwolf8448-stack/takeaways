@@ -36,6 +36,8 @@ jobs:
         run: npm run build:web
       - name: Add Android platform
         run: npx cap add android
+      - name: Configure Android email sign-in deep link
+        run: npm run android:deeplinks
       - name: Generate custom Android launcher icons
         run: npm run android:icons
       - name: Sync Android project
