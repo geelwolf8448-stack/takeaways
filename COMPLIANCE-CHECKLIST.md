@@ -61,3 +61,5 @@ This is an operational checklist, not a legal opinion or a licence. The operator
 - Restaurant portal commission display removed and commission-ledger read access restricted to platform administrators.
 - PAIA manual, POPIA processing/retention register and incident-response plan drafts added; legal review and completion remain outstanding.
 - Signed Android release workflow requires Firebase client configuration and the private Android signing secrets. API 36 targeting is configured by the release script; verify the generated bundle before submission.
+
+- [ ] Complete the Google Play Data safety form against the final signed build; the working worksheet is `PLAY-STORE-DATA-SAFETY-WORKSHEET.md`.
