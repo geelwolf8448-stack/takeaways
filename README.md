@@ -45,7 +45,9 @@ The project has moved beyond the original static preview. Use the code in `index
 - `config.js` — public Supabase URL and publishable key only. Never put service-role keys here.
 - `supabase/schema.sql` — shared directory, application and approval schema.
 - `supabase/admin-setup.sql` — adds the owner Auth account to the admin allowlist.
-- `account.html` — customer sign-in, profile and order history.\n- `native-auth.js` — restores Supabase email-link sessions when the Android app is opened through its custom URL scheme.\n- `scripts/configure-android-deeplinks.js` — configures the Android intent filter and `takeawaystonight` scheme during builds.
+- `account.html` — customer sign-in, profile and order history.
+- `native-auth.js` — restores Supabase email-link sessions when the Android app is opened through its custom URL scheme.
+- `scripts/configure-android-deeplinks.js` — configures the Android intent filter and `takeawaystonight` scheme during builds.
 - `restaurant-portal.html` — restaurant-owner access requests, menu management and order dashboard.
 - `supabase/functions/marketplace-api/index.ts` — deployed authenticated order and owner-access API.
 - `supabase/migrations/20261105151101_customer_accounts_orders_foundation.sql` — source for the deployed customer, restaurant-owner and order schema.
