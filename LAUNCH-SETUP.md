@@ -10,9 +10,15 @@ This document reflects the current repository implementation. Do not repeat setu
 - WhatsApp order-request flow for approved non-demo listings.
 - Supabase shared restaurant directory read for published restaurants.
 - Partner application submission to Supabase, with local draft fallback if the online request fails.
-- Private admin portal: sign-in, pending applications, approve/reject, owner-access review and marketplace overview.\n- Customer account portal: passwordless sign-in, profile and private order history.\n- Restaurant owner portal: passwordless sign-in, access requests, menu updates and order management for approved restaurant members.\n- Authenticated marketplace Edge Function validates live menu prices, saves orders and enforces restaurant-authorised status changes.\n- Commission ledger records the proposed 15% of food subtotal on completed orders that the restaurant has marked paid directly. It does not collect commission.
+- Private admin portal: sign-in, pending applications, approve/reject, owner-access review and marketplace overview.
+- Customer account portal: passwordless sign-in, profile and private order history.
+- Restaurant owner portal: passwordless sign-in, access requests, menu updates and order management for approved restaurant members.
+- Authenticated marketplace Edge Function validates live menu prices, saves orders and enforces restaurant-authorised status changes.
+- Commission ledger records the proposed 15% of food subtotal on completed orders that the restaurant has marked paid directly. It does not collect commission.
 - SQL approval function with an administrator allowlist.
-- PWA assets and Capacitor Android build workflow.\n- Launch-ready draft copy, restaurant onboarding checklist, customer FAQ and store listing in `LAUNCH-KIT.md`.\n- Manual signed Android release workflow prepared in `.github/workflows/android-release.yml`; secure keystore setup is documented in `ANDROID-RELEASE.md`.
+- PWA assets and Capacitor Android build workflow.
+- Launch-ready draft copy, restaurant onboarding checklist, customer FAQ and store listing in `LAUNCH-KIT.md`.
+- Manual signed Android release workflow prepared in `.github/workflows/android-release.yml`; secure keystore setup is documented in `ANDROID-RELEASE.md`.
 - Password recovery page.
 
 ## Setup already present — verify only if a real test fails
@@ -24,18 +30,22 @@ This document reflects the current repository implementation. Do not repeat setu
 
 ## Next technical acceptance tests (do these once, in order)
 1. Open the live public website and confirm the directory status says the shared directory is connected (zero published restaurants is acceptable at first).
-2. Submit one clearly labelled test restaurant application using details controlled by the project owner.
-3. Sign in to `admin.html`; confirm the owner account is recognised as an administrator and the test application appears.
-4. Approve the test application and confirm it appears on the public directory.
-5. Remove the test listing/application after verification if it is not a real partner.
-6. Create a test customer account and verify the profile appears in the account page.\n7. After a real restaurant is approved, have its authorised owner create an account and submit an access request. Approve it in the admin portal and verify that the owner can see only that restaurant.\n8. Submit a test customer order against a real approved menu, verify the saved order and WhatsApp notification, and test the full restaurant status flow including direct-payment confirmation.\n9. Verify the 15% ledger calculation on a completed test order, then remove test records if they are not genuine business transactions.
+2. In Supabase Authentication → URL Configuration, confirm the Redirect URLs allow the exact customer and restaurant portal URLs: `https://geelwolf8448-stack.github.io/takeaways/account.html` and `https://geelwolf8448-stack.github.io/takeaways/restaurant-portal.html`.
+3. Submit one clearly labelled test restaurant application using details controlled by the project owner.
+4. Sign in to `admin.html`; confirm the owner account is recognised as an administrator and the test application appears.
+5. Approve the test application and confirm it appears on the public directory.
+6. Remove the test listing/application after verification if it is not a real partner.
+7. Create a test customer account and verify the profile appears in the account page.
+8. After a real restaurant is approved, have its authorised owner create an account and submit an access request. Approve it in the admin portal and verify that the owner can see only that restaurant.
+9. Submit a test customer order against a real approved menu, verify the saved order and WhatsApp notification, and test the full restaurant status flow including direct-payment confirmation.
+10. Verify the 15% ledger calculation on a completed test order, then remove test records if they are not genuine business transactions.
 
 Do not repeat SQL setup, SMTP setup or password recovery unless the corresponding acceptance test proves it is necessary.
 
 ## Not implemented yet
-- Customer registration/login and order history.
-- Restaurant-owner accounts, menu management and restaurant dashboard.
-- Live in-app checkout, PayFast split settlement, refunds, order status management, commission ledger automation and delivery dispatch.
+- PayFast checkout, verified ITN notifications, split settlement, automated refunds and payout reconciliation.
+- Delivery dispatch, push/email order notifications, restaurant subscription billing and automatic commission collection.
+- Full production acceptance testing with real customer and restaurant accounts.
 - Google Play publication and signed production release. A signed build can be generated after the owner creates a private upload keystore and adds the four required GitHub Actions secrets.
 
 The Android workflow has produced successful builds in GitHub Actions. Download the debug APK from the successful workflow run's Artifacts for device testing; do not treat that as a Play Store release.
