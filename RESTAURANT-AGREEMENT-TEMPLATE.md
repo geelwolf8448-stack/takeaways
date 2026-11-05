@@ -19,9 +19,9 @@
 
 ## 2. Service being agreed
 
-Takeaways Tonight? provides a restaurant discovery listing and menu display. In the current pilot, a customer may prepare a basket and open a WhatsApp order-request message addressed to the restaurant.
+Takeaways Tonight? provides a restaurant discovery listing, menu display, customer accounts and an order-request workflow. A signed-in customer can submit a basket; the platform saves the order request to the customer's account and offers a WhatsApp message to notify the restaurant. Approved restaurant team members can request portal access and, once verified, manage their own menu and order statuses.
 
-The WhatsApp message is only a request. The restaurant must confirm whether it accepts the request, item availability, current prices, any delivery fee, fulfilment method and timing. The platform does not currently collect customer food payments, provide a delivery fleet, guarantee orders or act as the restaurant's food seller.
+The order and WhatsApp message are only requests. The restaurant must confirm whether it accepts the request, item availability, current prices, any delivery fee, fulfilment method and timing. The platform does not currently collect customer food payments, provide a delivery fleet, guarantee orders or act as the restaurant's food seller.
 
 ## 3. Restaurant approval and content permission
 
@@ -71,7 +71,7 @@ Select and complete the applicable offer. Do not treat any proposed price below 
 
 The currently discussed founding offer is Premium at R1,000 per month plus a once-off R250 setup fee, with a 7-day introductory trial. It is a proposal only. It becomes applicable only if entered above and accepted in writing by both parties.
 
-No food-order commission or customer food payment is active in the current pilot. Any future commission, payment split, settlement, refund or chargeback arrangement requires a separate written agreement and an approved technical/payment-provider setup.
+The database currently records a proposed 15% internal commission amount only after a completed order is marked paid directly to the restaurant. The platform does not debit, invoice or collect that amount. Any actual commission, payment split, settlement, refund or chargeback arrangement requires a separate signed agreement and an approved technical/payment-provider setup.
 
 ## 7. Privacy and information
 
