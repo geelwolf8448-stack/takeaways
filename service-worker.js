@@ -15,7 +15,8 @@ const APP_FILES = [
   "./account.html",
   "./restaurant-portal.html",
   "./native-auth.js",
-  "./native-push.js"
+  "./native-push.js",
+  "./push-tap-handler.js"
 ];
 
 self.addEventListener("install", event => {
