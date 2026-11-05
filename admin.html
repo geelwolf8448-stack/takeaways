@@ -28,6 +28,8 @@ button.reject{background:#251010;color:#ffd9d9;border:1px solid #a44}button:disa
 <section id="dashboard" class="hidden">
 <div class="panel"><div class="row"><div><h2>Pending applications</h2><div class="small" id="who"></div></div><button class="reject" onclick="signOut()">Sign out</button></div><button onclick="loadApplications()">Refresh list</button><div class="status" id="status">Signed in. Loading applications…</div></div>
 <div id="applications"></div>
+<div class="panel"><h2>Restaurant owner access requests</h2><div class="small">Only verified owners or managers should be granted access to a restaurant.</div><div id="ownerRequests">Loading requests…</div></div>
+<div class="panel"><h2>Marketplace overview</h2><button onclick="loadMarketplaceOverview()">Refresh overview</button><div id="marketplaceOverview" class="status">Loading marketplace totals…</div></div>
 </section>
 <div class="small">Security: the browser uses only the public Supabase publishable key. Review actions are checked again inside a database function; no secret key is stored here.</div>
 </main>
@@ -79,6 +81,7 @@ async function loadApplications(){
   const data=await response.json();if(!response.ok)throw new Error(data.message||data.hint||"Could not load applications. Check that the SQL upgrade was run and this account is allowlisted.");
   el("applications").innerHTML=data.length?data.map(app=>card(app)).join(""):'<div class="panel">No pending applications. New submissions will appear here.</div>';
   say(data.length+" pending application(s).");
+  await Promise.all([loadOwnerRequests(),loadMarketplaceOverview()]);
  }catch(error){say(error.message)}
 }
 function esc(value){return String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
@@ -95,6 +98,38 @@ async function review(id,decision,button){
   const data=await response.text();if(!response.ok)throw new Error(data||"Review action failed.");
   await loadApplications();
  }catch(error){alert(error.message);button.disabled=false}
+}
+
+async function loadOwnerRequests(){
+ try{
+  const response=await fetch(config.supabaseUrl+"/rest/v1/restaurant_owner_requests?select=id,applicant_name,contact_phone,role_requested,created_at,restaurant:restaurants(name,area)&status=eq.pending&order=created_at.asc",{headers:apiHeaders()});
+  const rows=await response.json();if(!response.ok)throw new Error(rows.message||"Could not load owner access requests.");
+  el("ownerRequests").innerHTML=rows.length?rows.map(r=>'<article class="application"><div class="row"><h2>'+esc(r.applicant_name)+'</h2><span class="tag">PENDING ACCESS</span></div><p><b>Restaurant:</b> '+esc(r.restaurant?.name||"Restaurant")+' · '+esc(r.restaurant?.area||"")+'</p><p><b>Requested role:</b> '+esc(r.role_requested)+' · <b>Mobile:</b> +'+esc(r.contact_phone)+'</p><p class="small">Submitted: '+esc(new Date(r.created_at).toLocaleString())+'</p><button onclick="reviewOwnerRequest(\\''+esc(r.id)+'\\',\\'approved\\',this)">Approve access</button><button class="reject" onclick="reviewOwnerRequest(\\''+esc(r.id)+'\\',\\'rejected\\',this)">Reject</button></article>').join(""):'<p class="small">No pending restaurant-owner access requests.</p>';
+ }catch(e){el("ownerRequests").textContent=e.message}
+}
+async function reviewOwnerRequest(id,decision,button){
+ const action=decision==="approved"?"grant restaurant access to":"reject";
+ if(!confirm("Are you sure you want to "+action+" this applicant?"))return;
+ button.disabled=true;
+ try{
+  const response=await fetch(config.supabaseUrl+"/functions/v1/marketplace-api",{method:"POST",headers:apiHeaders(),body:JSON.stringify({action:"review_owner_request",requestId:id,decision})});
+  const result=await response.json();if(!response.ok)throw new Error(result.error||"Could not review this request.");
+  await loadOwnerRequests();
+ }catch(e){alert(e.message);button.disabled=false}
+}
+async function loadMarketplaceOverview(){
+ try{
+  const [ordersResponse,ledgerResponse]=await Promise.all([
+   fetch(config.supabaseUrl+"/rest/v1/marketplace_orders?select=id,order_number,status,total_cents,created_at&order=created_at.desc&limit=100",{headers:apiHeaders()}),
+   fetch(config.supabaseUrl+"/rest/v1/commission_ledger?select=commission_cents,status",{headers:apiHeaders()})
+  ]);
+  const [orders,ledger]=await Promise.all([ordersResponse.json(),ledgerResponse.json()]);
+  if(!ordersResponse.ok||!ledgerResponse.ok)throw new Error("Could not load marketplace reporting data.");
+  const gross=orders.reduce((n,o)=>n+Number(o.total_cents||0),0);
+  const commission=ledger.filter(x=>x.status!=="reversed").reduce((n,x)=>n+Number(x.commission_cents||0),0);
+  const completed=orders.filter(o=>o.status==="completed").length;
+  el("marketplaceOverview").textContent=orders.length+" recent order(s) · "+completed+" completed · Order value R"+(gross/100).toFixed(2)+" · Recorded commission R"+(commission/100).toFixed(2)+". Reporting is currently limited to the latest 100 orders.";
+ }catch(e){el("marketplaceOverview").textContent=e.message}
 }
 async function signOut(){try{if(supabaseClient)await supabaseClient.auth.signOut()}finally{accessToken="";currentEmail="";currentUserId="";el("dashboard").classList.add("hidden");el("loginPanel").classList.remove("hidden");el("applications").innerHTML="";el("resetStatus").textContent="Signed out. Request a fresh one-time sign-in link when you are ready."}}
 
