@@ -142,8 +142,6 @@ create table if not exists public.marketplace_refunds (
   status text not null default 'requested' check (status in ('requested','approved','processing','complete','rejected')),
   created_at timestamptz not null default now()
 );
-create index if not exists marketplace_refunds_order_idx on public.marketplace_refunds(order_id);
-create index if not exists marketplace_refunds_payment_idx on public.marketplace_refunds(payment_id);
 create index if not exists restaurant_members_user_idx on public.restaurant_members(user_id,restaurant_id);
 
 create or replace function private.record_completed_order_commission()
