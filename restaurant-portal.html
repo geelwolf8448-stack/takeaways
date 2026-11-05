@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#080808"><title>Restaurant Portal · Takeaways Tonight?</title>
+<style>
+:root{color-scheme:dark;--gold:#ffd21a;--panel:#17100a;--muted:#d4c8bb}
+*{box-sizing:border-box}body{margin:0;background:#050505;color:#fff;font:15px/1.5 Arial,sans-serif}
+header{padding:22px 18px;border-bottom:3px solid var(--gold);background:linear-gradient(110deg,#050505,#381609,#090909)}
+.wrap{max-width:1050px;margin:auto;padding:20px}h1{margin:0;color:var(--gold);font-size:clamp(25px,5vw,38px)}h2{color:var(--gold);margin:0 0 12px}
+p{color:#eee}.small{font-size:12px;color:var(--muted)}.panel,.restaurant,.order{background:linear-gradient(145deg,#1b120b,#090909);border:1px solid #a97913;border-radius:16px;padding:18px;margin:16px 0}
+label{display:block;font-weight:bold;color:var(--gold);margin:12px 0 5px}input,select,textarea{width:100%;padding:12px;border-radius:9px;border:1px solid #b58a24;background:#050505;color:white}
+button,.linkbtn{display:inline-block;padding:10px 15px;border:1px solid #fff18a;border-radius:30px;background:linear-gradient(#fff05a,#ff9b00);color:#140d00;font-weight:900;cursor:pointer;margin:7px 7px 0 0;text-decoration:none}
+button.secondary,.linkbtn.secondary{background:#20170e;color:#ffe48a;border-color:#a97913}button.danger{background:#271010;color:#ffd9d9;border-color:#a44}button:disabled{opacity:.5;cursor:wait}
+.status{padding:10px;border-radius:9px;background:#171717;color:#ffe17b;margin:12px 0;white-space:pre-wrap}
+.hidden{display:none}.top{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}.tag{color:#ffd21a;font-weight:bold;font-size:12px}.order{background:#080808}.items{padding:10px;background:#080808;border-radius:8px;margin-top:10px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+</style>
+</head>
+<body>
+<header><div class="wrap"><h1>Takeaways Tonight? · Restaurant Portal</h1><p class="small">Manage your approved listing and customer order requests.</p><a class="linkbtn secondary" href="index.html">← Public website</a><a class="linkbtn secondary" href="account.html">My customer account</a></div></header>
+<main class="wrap">
+<section class="panel" id="loginPanel">
+<h2>Restaurant owner sign in</h2><p class="small">Use your email to receive a one-time secure sign-in link. If you are new, you can create your account here.</p>
+<label for="name">Your name</label><input id="name" autocomplete="name" placeholder="Full name">
+<label for="phone">Mobile number</label><input id="phone" type="tel" autocomplete="tel" placeholder="082 123 4567">
+<label for="email">Email address</label><input id="email" type="email" autocomplete="email" placeholder="you@example.com">
+<button id="sendLink" onclick="sendLink()">Email me a secure sign-in link</button><div class="status" id="loginStatus">Enter your details to continue.</div>
+</section>
+<section id="dashboard" class="hidden">
+<div class="panel"><div class="top"><div><h2>Restaurant dashboard</h2><div class="small" id="signedIn"></div></div><button class="secondary" onclick="signOut()">Sign out</button></div><div class="status" id="status">Loading…</div></div>
+<section class="panel"><h2>Request access to a restaurant</h2><p class="small">Choose an already approved restaurant. The platform administrator will verify your authority before granting access. If your restaurant is not listed yet, submit a partner application first.</p>
+<label for="restaurantSelect">Restaurant</label><select id="restaurantSelect"><option value="">Loading approved restaurants…</option></select>
+<label for="requestRole">Your role</label><select id="requestRole"><option value="owner">Owner</option><option value="manager">Manager</option></select>
+<label for="requestNotes">Additional details (optional)</label><textarea id="requestNotes" rows="2" placeholder="How can we verify that you manage this restaurant?"></textarea>
+<button onclick="submitOwnershipRequest()">Submit access request</button><a class="linkbtn secondary" href="index.html#owners">Apply to list a new restaurant</a>
+<div id="requestStatus" class="small"></div></section>
+<div id="restaurants"></div>
+</section>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script>
+<script>
+const cfg=window.TT_CONFIG||{};
+const sb=window.supabase&&cfg.supabaseUrl&&cfg.supabaseAnonKey?window.supabase.createClient(cfg.supabaseUrl,cfg.supabaseAnonKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}):null;
+const $=id=>document.getElementById(id);let session=null,memberships=[];
+const money=c=>"R"+(Number(c||0)/100).toFixed(2);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+async function sendLink(){
+ if(!sb)return;const email=$("email").value.trim(),name=$("name").value.trim(),raw=$("phone").value.replace(/\D/g,""),phone=raw.startsWith("0")?"27"+raw.slice(1):raw;
+ if(name.length<2||!/^27\d{9}$/.test(phone)||!email.includes("@")){$("loginStatus").textContent="Enter your name, a valid South African mobile number and email address.";return}
+ $("sendLink").disabled=true;$("loginStatus").textContent="Sending your sign-in link…";
+ try{const {error}=await sb.auth.signInWithOtp({email,options:{emailRedirectTo:"https://geelwolf8448-stack.github.io/takeaways/restaurant-portal.html",shouldCreateUser:true,data:{full_name:name,phone}}});if(error)throw error;$("loginStatus").textContent="Check your email and open the newest one-time sign-in link in this browser."}
+ catch(e){$("loginStatus").textContent=e.message||"Could not send the sign-in link."}finally{$("sendLink").disabled=false}
+}
+async function loadDashboard(){
+ if(!session)return;$("loginPanel").classList.add("hidden");$("dashboard").classList.remove("hidden");$("signedIn").textContent=session.user.email||"Signed in";$("status").textContent="Loading restaurant access…";
+ const [{data:profile},{data:memberRows,error:memberError},{data:restaurants,error:restError},{data:requests,error:reqError}]=await Promise.all([
+  sb.from("marketplace_profiles").select("full_name,phone").eq("user_id",session.user.id).maybeSingle(),
+  sb.from("restaurant_members").select("restaurant_id,member_role,restaurant:restaurants(id,name,area,category,whatsapp,description,menu)").eq("user_id",session.user.id),
+  sb.from("restaurants").select("id,name,area,category").eq("is_published",true).order("name"),
+  sb.from("restaurant_owner_requests").select("id,restaurant_id,status,created_at,restaurant:restaurants(name)").eq("user_id",session.user.id).order("created_at",{ascending:false})
+ ]);
+ if(memberError||restError||reqError){$("status").textContent="Could not load your portal data. Please refresh or contact support.";return}
+ memberships=memberRows||[];
+ $("restaurantSelect").innerHTML='<option value="">Choose a restaurant…</option>'+(restaurants||[]).map(r=>'<option value="'+esc(r.id)+'">'+esc(r.name)+' · '+esc(r.area)+'</option>').join("");
+ let requestHtml=(requests||[]).map(r=>'<p class="small">'+esc(r.restaurant?.name||"Restaurant")+' — access request: <b>'+esc(r.status)+'</b></p>').join("");
+ $("requestStatus").innerHTML=requestHtml;
+ $("status").textContent=memberships.length?("You have access to "+memberships.length+" restaurant(s)."):"You do not yet have access to a restaurant. Submit an access request above or apply to list a new restaurant.";
+ await renderRestaurants();
+}
+async function submitOwnershipRequest(){
+ const restaurantId=$("restaurantSelect").value,profileName=$("name").value.trim()||session.user.user_metadata?.full_name||"Restaurant owner";
+ const raw=$("phone").value.replace(/\D/g,""),phone=raw.startsWith("0")?"27"+raw.slice(1):raw;
+ if(!restaurantId){$("requestStatus").textContent="Please choose a restaurant.";return}
+ if(!/^27\d{9}$/.test(phone)){$("requestStatus").textContent="Please enter your mobile number in the sign-in form and sign in again.";return}
+ const {error}=await sb.from("restaurant_owner_requests").insert({user_id:session.user.id,restaurant_id:restaurantId,applicant_name:profileName,contact_phone:phone,role_requested:$("requestRole").value,notes:$("requestNotes").value.trim()});
+ $("requestStatus").textContent=error?(error.code==="23505"?"You already have a pending request for this restaurant.":error.message):"Your access request has been submitted for administrator review.";
+ if(!error)await loadDashboard();
+}
+async function api(action,extra){
+ const {data}=await sb.auth.getSession();const token=data.session?.access_token;if(!token)throw new Error("Please sign in again.");
+ const response=await fetch(cfg.supabaseUrl+"/functions/v1/marketplace-api",{method:"POST",headers:{apikey:cfg.supabaseAnonKey,Authorization:"Bearer "+token,"Content-Type":"application/json"},body:JSON.stringify({action,...extra})});
+ const result=await response.json();if(!response.ok)throw new Error(result.error||"The request could not be completed.");return result;
+}
+function menuText(menu){return (Array.isArray(menu)?menu:[]).map(i=>Array.isArray(i)?i[0]+" - "+Number(i[1]).toFixed(2):"").filter(Boolean).join("\n")}
+async function saveMenu(id){
+ const menu=$("menu-"+id).value.split("\n").map(line=>{const m=line.match(/^\s*(.+?)\s*-\s*(\d+(?:\.\d{1,2})?)\s*$/);return m?[m[1].trim(),Number(m[2])]:null}).filter(Boolean);
+ if(!menu.length){alert("Enter at least one menu item as Name - 99.00");return}
+ const {error}=await sb.from("restaurants").update({menu}).eq("id",id);
+ if(error){alert("Menu not saved: "+error.message);return}
+ alert("Menu updated.");await loadDashboard();
+}
+async function changeOrder(orderId,status,markPaid=false){
+ try{await api("update_order",{orderId,status,markPaid});await loadRestaurantsOrders()}
+ catch(e){alert(e.message)}
+}
+async function loadRestaurantsOrders(){
+ const ids=memberships.map(m=>m.restaurant_id);if(!ids.length)return;
+ const {data,error}=await sb.from("marketplace_orders").select("id,order_number,restaurant_id,status,payment_status,total_cents,created_at,customer_name,customer_phone,fulfilment_type,delivery_address,customer_notes,marketplace_order_items(item_name,quantity,unit_price_cents)").in("restaurant_id",ids).order("created_at",{ascending:false}).limit(60);
+ if(error){$("ordersArea").innerHTML='<p class="small">Could not load orders.</p>';return}
+ $("ordersArea").innerHTML=data?.length?data.map(o=>{
+  let actions="";
+  if(o.status==="submitted")actions='<button onclick="changeOrder(\''+o.id+'\',\'accepted\')">Accept</button><button class="danger" onclick="changeOrder(\''+o.id+'\',\'rejected\')">Reject</button>';
+  if(["accepted","preparing","ready"].includes(o.status)&&o.payment_status!=="paid_directly_to_restaurant")actions+='<button class="secondary" onclick="changeOrder(\''+o.id+'\',\'\',true)">Confirm paid directly to restaurant</button>';
+  if(o.status==="accepted")actions+='<button onclick="changeOrder(\''+o.id+'\',\'preparing\')">Start preparing</button>';
+  if(o.status==="preparing")actions+='<button onclick="changeOrder(\''+o.id+'\',\'ready\')">Mark ready</button>';
+  if(o.status==="ready"&&o.payment_status==="paid_directly_to_restaurant")actions+='<button onclick="changeOrder(\''+o.id+'\',\'completed\')">Complete order</button>';
+  return '<article class="order"><div class="top"><b>Order #'+esc(o.order_number)+'</b><span class="tag">'+esc(o.status.toUpperCase())+'</span></div><p><b>'+esc(o.customer_name)+'</b> · +'+esc(o.customer_phone)+'</p><p>'+esc(o.fulfilment_type)+(o.delivery_address?' · '+esc(o.delivery_address):'')+'</p><div class="items">'+(o.marketplace_order_items||[]).map(i=>esc(i.quantity)+' × '+esc(i.item_name)+' — '+money(i.unit_price_cents*i.quantity)).join('<br>')+'</div><p><b>Total: '+money(o.total_cents)+'</b> · Payment: '+esc(o.payment_status.replaceAll("_"," "))+'</p><p class="small">'+esc(o.customer_notes||"")+'</p>'+actions+'</article>';
+ }).join(""):'<p class="small">No customer orders yet.</p>';
+}
+async function renderRestaurants(){
+ const root=$("restaurants");
+ if(!memberships.length){root.innerHTML="";return}
+ root.innerHTML='<div class="panel"><h2>Your restaurants</h2><div class="grid">'+memberships.map(m=>{
+ const r=m.restaurant;return '<article class="restaurant"><div class="top"><h2>'+esc(r.name)+'</h2><span class="tag">'+esc(m.member_role.toUpperCase())+'</span></div><p>'+esc(r.area)+' · '+esc(r.category)+'</p><label>WhatsApp number</label><input id="phone-'+r.id+'" value="'+esc(r.whatsapp)+'" disabled><label>Menu (one item per line: Name - 99.00)</label><textarea id="menu-'+r.id+'" rows="5">'+esc(menuText(r.menu))+'</textarea><button onclick="saveMenu(\''+r.id+'\')">Save menu</button></article>'
+ }).join("")+'</div><h2>Customer orders</h2><div id="ordersArea"><p class="small">Loading orders…</p></div></div>';
+ await loadRestaurantsOrders();
+}
+async function signOut(){await sb.auth.signOut();session=null;$("dashboard").classList.add("hidden");$("loginPanel").classList.remove("hidden");$("loginStatus").textContent="You have signed out."}
+if(sb){sb.auth.onAuthStateChange((_e,s)=>{session=s;if(s)loadDashboard()});sb.auth.getSession().then(({data})=>{session=data.session;if(session)loadDashboard()})}
+else $("loginStatus").textContent="Account service is temporarily unavailable.";
+</script>
+</body></html>
