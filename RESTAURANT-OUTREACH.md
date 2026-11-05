@@ -9,7 +9,7 @@ We're inviting a small group of local restaurants to help us launch. The idea is
 There is no listing fee being advertised at this early stage. We would first need your permission, your current menu and prices, and the correct restaurant WhatsApp number. Nothing is published until you approve the details.
 
 You can view the preview here:
-https://geelwolf8448-stack.github.io/TAKEAWAYS-TONIGHT-/
+https://geelwolf8448-stack.github.io/takeaways/
 
 Would you be interested in chatting about becoming one of our first local restaurant partners?
 

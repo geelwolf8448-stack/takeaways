@@ -1,3 +1,3 @@
 User-agent: *
 Allow: /
-Sitemap: https://geelwolf8448-stack.github.io/TAKEAWAYS-TONIGHT-/sitemap.xml
+Sitemap: https://geelwolf8448-stack.github.io/takeaways/sitemap.xml

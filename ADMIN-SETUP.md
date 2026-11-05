@@ -1,6 +1,6 @@
 # Takeaways Tonight? — administrator portal
 
-**Admin portal:** https://geelwolf8448-stack.github.io/TAKEAWAYS-TONIGHT-/admin.html
+**Admin portal:** https://geelwolf8448-stack.github.io/takeaways/admin.html
 
 ## Current implementation
 The admin page signs in through Supabase Auth. It checks the signed-in user's UUID against `public.admin_users`, then reads pending rows from `public.partner_applications`. Approve/reject actions call the database function `public.review_partner_application`, which performs its own allowlist check.

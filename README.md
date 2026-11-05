@@ -2,7 +2,7 @@
 
 A South Coast, KwaZulu-Natal restaurant discovery and takeaway-order request platform, intended to cover Hibberdene to Port Edward.
 
-**Website:** https://geelwolf8448-stack.github.io/TAKEAWAYS-TONIGHT-/
+**Website:** https://geelwolf8448-stack.github.io/takeaways/
 
 ## Current implementation status
 

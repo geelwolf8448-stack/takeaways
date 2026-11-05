@@ -1,6 +1,6 @@
 # Takeaways Tonight? — launch materials
 
-**Public website:** https://geelwolf8448-stack.github.io/TAKEAWAYS-TONIGHT-/
+**Public website:** https://geelwolf8448-stack.github.io/takeaways/
 **Launch area planned:** Hibberdene to Port Edward, KwaZulu-Natal South Coast.
 **Current service:** Restaurant discovery, menus and direct WhatsApp order requests. No in-app checkout or delivery fleet.
 
@@ -20,7 +20,7 @@ Find a place, check the menu and send your order request straight to the restaur
 
 We're inviting local restaurants to join the pilot. Restaurant owners and managers can contact us to request a listing. Nothing goes live without the business's permission.
 
-Visit: https://geelwolf8448-stack.github.io/TAKEAWAYS-TONIGHT-/
+Visit: https://geelwolf8448-stack.github.io/takeaways/
 
 *Pilot service: restaurant confirms availability, final price and collection/delivery arrangements. WhatsApp messages are order requests, not confirmed orders. No in-app payment is available yet.*
 

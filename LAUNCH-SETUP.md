@@ -1,6 +1,6 @@
 # Takeaways Tonight? — current launch checklist
 
-**Website:** https://geelwolf8448-stack.github.io/TAKEAWAYS-TONIGHT-/
+**Website:** https://geelwolf8448-stack.github.io/takeaways/
 
 This document reflects the current repository implementation. Do not repeat setup steps that have already been completed.
 
