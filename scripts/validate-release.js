@@ -89,8 +89,8 @@ check("restaurant portal loads native push registration module", /native-push\.j
 const firebaseAndroidConfig = read("scripts/configure-firebase-android.js");
 new vm.Script(firebaseAndroidConfig, { filename: "configure-firebase-android.js" });
 check("Firebase Android Gradle configuration script compiles", true);
-check("Firebase Android setup validates the app package name", /za\\.co\\.takeawaystonight\\.app/.test(firebaseAndroidConfig));
-check("Firebase Android setup applies the Google Services Gradle plugin", /com\\.google\\.gms\\.google-services/.test(firebaseAndroidConfig));
+check("Firebase Android setup validates the app package name", /za\.co\.takeawaystonight\.app/.test(firebaseAndroidConfig));
+check("Firebase Android setup applies the Google Services Gradle plugin", /com\.google\.gms\.google-services/.test(firebaseAndroidConfig));
 const nativePush = read("native-push.js");
 new vm.Script(nativePush.replace(/^import[^\n]*\n/, ""), { filename: "native-push.js" });
 check("native Android push module JavaScript compiles", true);
