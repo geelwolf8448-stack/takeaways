@@ -312,6 +312,20 @@ dialog::backdrop{background:#3a193d99!important}
  .poster-download{min-width:0!important;width:100%!important}
 }
 
+
+.tt-contact{display:grid;grid-template-columns:minmax(0,1fr) 190px;align-items:center;gap:24px;margin:32px auto 26px;padding:clamp(18px,3vw,30px);border:2px solid #d5a71b;border-radius:20px;background:linear-gradient(125deg,#09132e,#21152d 58%,#70231d);box-shadow:0 10px 25px #0008}
+.tt-contact .tt-kicker{margin:0 0 5px;color:#ffe45b;font-size:12px;font-weight:1000;letter-spacing:1.5px}
+.tt-contact h2{margin:0 0 8px;color:#ffdf24;font-size:clamp(24px,3vw,34px)}
+.tt-contact p{margin:8px 0;color:#e2e5f0}
+.tt-contact .tt-contact-note{font-size:13px;color:#d5d9e7}
+.tt-contact-actions{display:flex;align-items:center;flex-wrap:wrap;gap:12px;margin-top:16px}
+.tt-contact-button{display:inline-flex;align-items:center;justify-content:center;padding:12px 20px;border:2px solid #fff18b;border-radius:999px;background:linear-gradient(180deg,#fff36a,#ffd000 50%,#ff8500);color:#090b13!important;text-decoration:none!important;font-weight:1000;box-shadow:0 4px 0 #8f3100,0 8px 20px #0008}
+.tt-contact-short a,.tt-contact-qr a{color:#ffe48a!important}
+.tt-contact-short{font-size:13px;overflow-wrap:anywhere}
+.tt-contact-qr{display:grid;justify-items:center;gap:6px;text-align:center}
+.tt-contact-qr img{display:block;width:160px;max-width:100%;height:auto;padding:7px;border-radius:14px;background:#fff}
+.tt-contact-qr p{margin:0;color:#fff0b0;font-size:12px}
+@media(max-width:620px){.tt-contact{grid-template-columns:1fr;text-align:center}.tt-contact-actions{justify-content:center}.tt-contact-qr{order:-1}.tt-contact-qr img{width:148px}}
 </style>
 <body>
 <header class="poster-header">
@@ -338,6 +352,24 @@ dialog::backdrop{background:#3a193d99!important}
 <div class="section-head"><div><h2>Find your food</h2><p>Choose a category and discover local favourites.</p></div></div><div class="filters" id="filters"></div>
 <div class="section-head"><div><h2>Local restaurants</h2><p id="resultCount">Browse the directory.</p><p class="notice" id="directoryStatus" role="status">Connecting to the shared restaurant directory…</p></div></div><div class="grid" id="restaurants"></div>
 <p class="notice">ORDERING — Signed-in customers can submit an order request and notify the restaurant on WhatsApp. The restaurant confirms availability, final delivery charges and payment directly. Takeaways Tonight? does not collect food-order payments yet.</p>
+
+<section id="contact" class="tt-contact" aria-labelledby="tt-contact-title">
+  <div>
+    <p class="tt-kicker">WHATSAPP BUSINESS</p>
+    <h2 id="tt-contact-title">Chat with Takeaways Tonight</h2>
+    <p>Questions about the app or restaurant listings? Message us directly.</p>
+    <p class="tt-contact-note">For food orders, use the WhatsApp button on the restaurant’s listing so its team can confirm availability, delivery and payment details.</p>
+    <div class="tt-contact-actions">
+      <a class="tt-contact-button" href="https://wa.me/27833149674?text=Hi%2C%20I%27m%20contacting%20Takeaways%20Tonight%20about%20the%20app." target="_blank" rel="noopener noreferrer">Message us on WhatsApp</a>
+      <p class="tt-contact-short">Short link: <a href="https://wa.me/27833149674" target="_blank" rel="noopener noreferrer">wa.me/27833149674</a></p>
+    </div>
+  </div>
+  <div class="tt-contact-qr">
+    <img src="./whatsapp-qr.svg" alt="Scan this QR code to chat with Takeaways Tonight on WhatsApp">
+    <a href="./whatsapp-qr.svg" download>Download the WhatsApp QR code</a>
+  </div>
+</section>
+
 </main>
 <nav class="mobile-dock" aria-label="App navigation"><a href="#"><span>⌂</span>Home</a><a href="#restaurants"><span>🍴</span>Menus</a><a href="#campaigns"><span>★</span>Specials</a><a href="#owners"><span>♥</span>Join</a></nav>
 <footer><b>Takeaways Tonight?</b><br><em>Discover local. Order direct. Support local.</em><br><br>From Hibberdene to Port Edward · Your food. Tonight.<br><br><a href="privacy.html">Privacy notice</a> · <a href="terms.html">Terms of use</a></footer>
