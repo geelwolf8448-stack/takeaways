@@ -1,4 +1,4 @@
-const CACHE_NAME = "takeaways-tonight-v28-native-auth-guard";
+const CACHE_NAME = "takeaways-tonight-v29-whatsapp-contact";
 const APP_FILES = [
   "./",
   "./index.html",
@@ -6,6 +6,7 @@ const APP_FILES = [
   "./terms.html",
   "./manifest.webmanifest",
   "./icon.svg",
+  "./whatsapp-qr.svg",
   "./logo.svg",
   "./hero-art.svg",
   "./splash.svg",
