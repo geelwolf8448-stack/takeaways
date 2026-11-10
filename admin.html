@@ -122,16 +122,12 @@ async function reviewOwnerRequest(id,decision,button){
 }
 async function loadMarketplaceOverview(){
  try{
-  const [ordersResponse,ledgerResponse]=await Promise.all([
-   fetch(config.supabaseUrl+"/rest/v1/marketplace_orders?select=id,order_number,status,total_cents,created_at&order=created_at.desc&limit=100",{headers:apiHeaders()}),
-   fetch(config.supabaseUrl+"/rest/v1/commission_ledger?select=commission_cents,status",{headers:apiHeaders()})
-  ]);
-  const [orders,ledger]=await Promise.all([ordersResponse.json(),ledgerResponse.json()]);
-  if(!ordersResponse.ok||!ledgerResponse.ok)throw new Error("Could not load marketplace reporting data.");
+  const ordersResponse=await fetch(config.supabaseUrl+"/rest/v1/marketplace_orders?select=id,order_number,status,total_cents,created_at&order=created_at.desc&limit=100",{headers:apiHeaders()});
+  const orders=await ordersResponse.json();
+  if(!ordersResponse.ok)throw new Error("Could not load marketplace reporting data.");
   const gross=orders.reduce((n,o)=>n+Number(o.total_cents||0),0);
-  const commission=ledger.filter(x=>x.status!=="reversed").reduce((n,x)=>n+Number(x.commission_cents||0),0);
   const completed=orders.filter(o=>o.status==="completed").length;
-  el("marketplaceOverview").textContent=orders.length+" recent order(s) · "+completed+" completed · Order value R"+(gross/100).toFixed(2)+" · Recorded commission R"+(commission/100).toFixed(2)+". Reporting is currently limited to the latest 100 orders.";
+  el("marketplaceOverview").textContent=orders.length+" recent order(s) · "+completed+" completed · Order value R"+(gross/100).toFixed(2)+". Reporting is currently limited to the latest 100 orders.";
  }catch(e){el("marketplaceOverview").textContent=e.message}
 }
 async function signOut(){try{if(supabaseClient)await supabaseClient.auth.signOut()}finally{accessToken="";currentEmail="";currentUserId="";el("dashboard").classList.add("hidden");el("loginPanel").classList.remove("hidden");el("applications").innerHTML="";el("resetStatus").textContent="Signed out. Request a fresh one-time sign-in link when you are ready."}}

@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-11-10 — no order deductions for the restaurant pilot
+
+- Removed the planned order-percentage calculation, reporting and database records.
+- Confirmed the direct-payment model: customers pay restaurants directly and restaurants retain all food-sale revenue.
+- Kept the free 14-day pilot and the existing proposed listing subscription terms unchanged; no charge applies automatically.
+
 ## 2026-11-04 — pilot launch and Android release preparation
 
 ### Website and customer journey
@@ -18,7 +24,7 @@
 ### Launch materials
 - Added public launch copy, restaurant invitation, customer FAQ, onboarding checklist and Google Play listing draft.
 - Added a restaurant listing permission and commercial-terms agreement template for legal review.
-- Kept all proposed fees and any future order commission explicitly labelled as proposals/not active.
+- Kept the proposed listing subscription subject to written agreement before any charge.
 
 ### Android release preparation
 - Added a manual signed APK/AAB workflow that uses private GitHub Actions secrets and does not commit the keystore.

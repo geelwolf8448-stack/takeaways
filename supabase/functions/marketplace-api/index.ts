@@ -305,61 +305,6 @@ Deno.serve(async (req: Request) => {
       return reply(200, { request: data });
     }
 
-    if (action === "get_commission_statement") {
-      const { data: adminRow } = await admin.from("platform_admins")
-        .select("user_id").eq("user_id", user.id).maybeSingle();
-      if (!adminRow) return reply(403, { error: "Platform administrator access is required." });
-
-      const period = String(body.period ?? "");
-      if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(period)) {
-        return reply(400, { error: "Choose a valid statement month." });
-      }
-      const [year, month] = period.split("-").map(Number);
-      const start = new Date(Date.UTC(year, month - 1, 1)).toISOString();
-      const end = new Date(Date.UTC(year, month, 1)).toISOString();
-
-      const { data: entries, error: ledgerError } = await admin.from("commission_ledger")
-        .select("id,order_id,restaurant_id,food_subtotal_cents,commission_rate_bps,commission_cents,status,created_at")
-        .gte("created_at", start).lt("created_at", end).neq("status", "reversed")
-        .order("created_at", { ascending: true });
-      if (ledgerError) {
-        console.error("Commission statement query failed", ledgerError);
-        return reply(500, { error: "Could not load the commission statement." });
-      }
-
-      const restaurantIds = [...new Set((entries ?? []).map((x: any) => x.restaurant_id))];
-      const orderIds = [...new Set((entries ?? []).map((x: any) => x.order_id))];
-      const [{ data: restaurants }, { data: orders }] = await Promise.all([
-        restaurantIds.length ? admin.from("restaurants").select("id,name,area").in("id", restaurantIds) : Promise.resolve({ data: [] }),
-        orderIds.length ? admin.from("marketplace_orders").select("id,order_number,status,completed_at").in("id", orderIds) : Promise.resolve({ data: [] }),
-      ]);
-      const restaurantMap = new Map((restaurants ?? []).map((x: any) => [x.id, x]));
-      const orderMap = new Map((orders ?? []).map((x: any) => [x.id, x]));
-      const rows = (entries ?? []).map((entry: any) => ({
-        ...entry,
-        restaurant_name: restaurantMap.get(entry.restaurant_id)?.name ?? "Restaurant",
-        restaurant_area: restaurantMap.get(entry.restaurant_id)?.area ?? "",
-        order_number: orderMap.get(entry.order_id)?.order_number ?? null,
-        order_status: orderMap.get(entry.order_id)?.status ?? "unknown",
-      }));
-      const totals = rows.reduce((acc: any, row: any) => {
-        const key = row.restaurant_id;
-        if (!acc[key]) acc[key] = { restaurant_id: key, restaurant_name: row.restaurant_name, restaurant_area: row.restaurant_area, order_count: 0, food_subtotal_cents: 0, commission_cents: 0 };
-        acc[key].order_count += 1;
-        acc[key].food_subtotal_cents += Number(row.food_subtotal_cents || 0);
-        acc[key].commission_cents += Number(row.commission_cents || 0);
-        return acc;
-      }, {});
-      return reply(200, {
-        period,
-        entry_count: rows.length,
-        food_subtotal_cents: rows.reduce((n: number, x: any) => n + Number(x.food_subtotal_cents || 0), 0),
-        commission_cents: rows.reduce((n: number, x: any) => n + Number(x.commission_cents || 0), 0),
-        restaurants: Object.values(totals),
-        rows,
-      });
-    }
-
     return reply(400, { error: "Unknown marketplace action." });
   } catch (error) {
     console.error("Marketplace API error", error);

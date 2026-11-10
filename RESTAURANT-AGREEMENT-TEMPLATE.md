@@ -71,7 +71,7 @@ Select and complete the applicable offer. Do not treat any proposed price below 
 
 The currently discussed founding offer is Premium at R1,000 per month plus a once-off R250 setup fee, with a 14-day introductory trial. It is a proposal only. It becomes applicable only if entered above and accepted in writing by both parties.
 
-The database currently records a proposed 15% internal commission amount only after a completed order is marked paid directly to the restaurant. The platform does not debit, invoice or collect that amount. Any actual commission, payment split, settlement, refund or chargeback arrangement requires a separate signed agreement and an approved technical/payment-provider setup.
+Takeaways Tonight does not deduct any percentage from restaurant food sales. The restaurant retains 100% of its food-sale revenue. Any future change to this arrangement must be disclosed in advance and agreed in a written amendment signed by both parties.
 
 ## 7. Privacy and information
 

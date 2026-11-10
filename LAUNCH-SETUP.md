@@ -14,7 +14,7 @@ This document reflects the current repository implementation. Do not repeat setu
 - Customer account portal: passwordless sign-in, profile and private order history.
 - Restaurant owner portal: passwordless sign-in, access requests, menu updates and order management for approved restaurant members.
 - Authenticated marketplace Edge Function validates live menu prices, saves orders and enforces restaurant-authorised status changes.
-- Commission ledger records the proposed 15% of food subtotal on completed orders that the restaurant has marked paid directly. It does not collect commission.
+- Restaurants retain 100% of their food-sale revenue; the platform does not calculate or deduct an order-based percentage.
 - SQL approval function with an administrator allowlist.
 - PWA assets and Capacitor Android build workflow.
 - Launch-ready draft copy, restaurant onboarding checklist, customer FAQ and store listing in `LAUNCH-KIT.md`.
@@ -46,7 +46,7 @@ Do not repeat SQL setup, SMTP setup or password recovery unless the correspondin
 
 ## Not implemented yet
 - PayFast checkout, verified ITN notifications, split settlement, automated refunds and payout reconciliation.
-- Delivery dispatch, push/email order notifications, restaurant subscription billing and automatic commission collection.
+- Delivery dispatch, push/email order notifications and restaurant subscription billing.
 - Full production acceptance testing with real customer and restaurant accounts.
 - Google Play publication and signed production release. A signed build can be generated after the owner creates a private upload keystore and adds the four required GitHub Actions secrets.
 - Physical-device testing of the new Android magic-link deep-link flow and Supabase redirect allowlist.
@@ -58,4 +58,4 @@ The Android workflow has produced successful builds in GitHub Actions. Download 
 - Replace/remove demo restaurants before public launch.
 - Complete operator identity/contact details, privacy notice, terms, POPIA/PAIA processes and appropriate South African legal/accounting review.
 - Agree restaurant subscription terms in writing before billing.
-- Keep customer food payments outside the platform until PayFast approves the merchant/split model and a secure, approved and tested payment integration is genuinely deployed. Do not invoice or collect the proposed 15% commission until written restaurant agreements and legal/accounting review are complete.
+- Keep customer food payments outside the platform until PayFast approves the merchant/split model and a secure, approved and tested payment integration is genuinely deployed. No percentage is deducted from restaurant food sales.

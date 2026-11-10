@@ -62,7 +62,7 @@ check("admin portal inline JavaScript compiles", admin.count > 0);
 check("admin uses passwordless email sign-in", /signInWithOtp/.test(admin.html) && /shouldCreateUser:false/.test(admin.html));
 check("admin checks explicit allowlist", /admin_users/.test(admin.html) && /review_partner_application/.test(admin.html));
 check("admin can review restaurant owner access requests", /review_owner_request/.test(admin.html) && /ownerRequests/.test(admin.html));
-check("admin has marketplace reporting", /commission_ledger/.test(admin.html) && /marketplaceOverview/.test(admin.html));
+check("admin has order-only marketplace reporting", /marketplace_orders/.test(admin.html) && /marketplaceOverview/.test(admin.html));
 check("admin has no password field", !/<input[^>]+type=["']password["']/i.test(admin.html));
 
 check("admin shows SMTP troubleshooting for delivery errors", /Supabase Dashboard → Logs → Auth Logs/.test(admin.html));
@@ -102,7 +102,7 @@ check("native push stores FCM tokens against the signed-in user", /restaurant_pu
 check("native push requests permission and registers the Android device", /requestPermissions/.test(nativePush) && /PushNotifications\.register/.test(nativePush));
 check("restaurant owner portal uses server-side order updates", /marketplace-api/.test(restaurantPortal.html) && /update_order/.test(restaurantPortal.html));
 check("restaurant menu and listing changes are centrally managed", /managed centrally by Takeaways Tonight/.test(restaurantPortal.html) && !/saveListing/.test(restaurantPortal.html));
-check("restaurant portal does not expose commission ledger data", !/commission_ledger|commissionArea/.test(restaurantPortal.html));
+check("restaurant portal does not expose internal fee reporting", !/feeLedger|feeArea/.test(restaurantPortal.html));
 check("web and native pages load the shared auth deep-link handler", /native-auth\.js/.test(publicPage.html) && /native-auth\.js/.test(account.html) && /native-auth\.js/.test(restaurantPortal.html));
 const nativeAuth = read("native-auth.js");
 check("native auth handler restores Supabase sessions from app links", /App\.addListener\("appUrlOpen"/.test(nativeAuth) && /App\.getLaunchUrl\(\)/.test(nativeAuth) && /client\.auth\.setSession/.test(nativeAuth));
@@ -116,7 +116,7 @@ check("marketplace API calculates prices from the published menu", /normalizedMe
 check("marketplace API binds idempotency keys to the customer", /eq\("customer_id", user.id\)/.test(marketplaceApi));
 check("marketplace API restricts order status transitions and owner approvals", /update_order/.test(marketplaceApi) && /review_owner_request/.test(marketplaceApi));
 check("marketplace API sends FCM order notifications server-side", /sendNewOrderPush/.test(marketplaceApi) && /FIREBASE_SERVICE_ACCOUNT_JSON/.test(marketplaceApi) && /fcm\.googleapis\.com/.test(marketplaceApi));
-check("marketplace API retains private monthly commission statements", /get_commission_statement/.test(marketplaceApi));
+check("marketplace API has no order-percentage statement endpoint", !/get_order_fee_statement|order_percentage_ledger/.test(marketplaceApi));
 check("marketplace API only grants owner access to published restaurants", /restaurantRow\.is_published/.test(marketplaceApi));
 
 const worker = read("service-worker.js");
