@@ -1,4 +1,4 @@
-const CACHE_NAME = "takeaways-tonight-v29-whatsapp-contact";
+const CACHE_NAME = "takeaways-tonight-v30-trial-14-days";
 const APP_FILES = [
   "./",
   "./index.html",
