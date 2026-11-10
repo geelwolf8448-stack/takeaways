@@ -1,4 +1,4 @@
-const CACHE_NAME = "takeaways-tonight-v30-trial-14-days";
+const CACHE_NAME = "takeaways-tonight-v31-hide-public-account-links";
 const APP_FILES = [
   "./",
   "./index.html",
