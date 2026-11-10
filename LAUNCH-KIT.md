@@ -41,7 +41,7 @@ Takeaways Tonight?
 
 ### Optional commercial offer — discuss, do not assume acceptance
 
-The current proposed founding offer is a 7-day introductory trial, then R1,000/month for a Premium listing plus a once-off R250 setup fee. This is not an active subscription or payment request. Agree the price, deliverables, start date, cancellation and billing terms in a signed agreement before charging any business. Do not promise orders, customer reach or sales.
+The current proposed founding offer is a 14-day introductory trial, then R1,000/month for a Premium listing plus a once-off R250 setup fee. This is not an active subscription or payment request. Agree the price, deliverables, start date, cancellation and billing terms in a signed agreement before charging any business. Do not promise orders, customer reach or sales.
 
 ## 4. Restaurant onboarding information request
 
