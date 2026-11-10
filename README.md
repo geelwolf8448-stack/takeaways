@@ -37,7 +37,7 @@ The project has moved beyond the original static preview. Use the code in `index
 - The platform does not currently collect customer food-order payments.
 - Do not present demo cards as participating restaurants.
 - Do not promise delivery, sales, payments or commission automation that is not active.
-- The proposed Premium listing price (R1,000/month plus R250 setup and a 7-day introductory trial) must be agreed in writing with each restaurant before being charged.
+- The proposed Premium listing price (R1,000/month plus R250 setup and a 14-day introductory trial) must be agreed in writing with each restaurant before being charged.
 
 ## Key files
 - `index.html` — public restaurant directory and partner application.
