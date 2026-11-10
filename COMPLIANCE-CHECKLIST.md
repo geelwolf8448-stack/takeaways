@@ -26,8 +26,8 @@ This is an operational checklist, not a legal opinion or a licence. The operator
 - A submitted order is not restaurant acceptance. The restaurant confirms availability, final price, delivery/collection arrangements and timing.
 - Customers pay the restaurant directly using payment details verified with that restaurant. Takeaways Tonight? does not currently collect, hold, transfer or refund customer food-order funds.
 - The restaurant portal can record that direct payment was received. Do not mark an order completed until the restaurant has confirmed payment.
-- The platform currently records a proposed 15% commission in an internal ledger only when a paid order is completed. This is not an automatic debit, invoice or collection. Do not charge or invoice commission until signed restaurant terms and South African legal/accounting review are complete.
-- The proposed PayFast split-payment model is not live. Do not activate it until PayFast approves the merchant/split arrangement, refunds and settlement rules are tested, and the commercial model is reconciled with the completion-based commission ledger.
+- Takeaways Tonight does not deduct any percentage or order-based fee from restaurant food sales. Restaurants retain 100% of their food-sale revenue. Any future change must be disclosed in advance and agreed in writing before implementation.
+- PayFast checkout and split settlement are not live. Do not activate online payments until PayFast approves the merchant arrangement and checkout, verification, refund and settlement processes are implemented and tested.
 - Do not display an order as paid unless the restaurant confirms direct payment or a future verified payment-provider notification confirms it.
 - Restaurant subscriptions/setup fees are separate platform-to-business payments. Do not activate recurring billing until the subscription contract, invoices, cancellation/refund rules and a compliant payment method are ready.
 
@@ -58,7 +58,7 @@ This is an operational checklist, not a legal opinion or a licence. The operator
 
 ## Additional work completed 5 November 2026
 - Native Android Firebase push-notification integration code added; Firebase project configuration and real-device testing remain outstanding.
-- Restaurant portal commission display removed and commission-ledger read access restricted to platform administrators.
+- Removed the planned order-percentage calculation, admin reporting and related database records from the active platform.
 - PAIA manual, POPIA processing/retention register and incident-response plan drafts added; legal review and completion remain outstanding.
 - Signed Android release workflow requires Firebase client configuration and the private Android signing secrets. API 36 targeting is configured by the release script; verify the generated bundle before submission.
 
