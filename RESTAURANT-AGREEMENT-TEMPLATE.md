@@ -60,7 +60,7 @@ The platform operator will:
 Select and complete the applicable offer. Do not treat any proposed price below as accepted until both parties sign.
 
 - Listing tier: [Free / Premium / other]
-- Once-off setup fee: R[amount] / Not applicable
+- Once-off admin fee: R250 / Not applicable
 - Monthly listing fee: R[amount] / Not applicable
 - Trial period: [start date] to [end date] / No trial
 - First invoice date: [date]
