@@ -13,8 +13,8 @@ Last updated: 11 November 2026
 
 ## Commercial model — confirmed, do not change without owner instruction
 - 14-day free pilot for restaurants and takeaway shops.
-- R250 once-off joining/setup fee after the pilot.
-- R1,000 monthly subscription.
+- R250 once-off admin fee after the pilot.
+- R500 monthly subscription after the pilot.
 - No commission on food orders. Restaurants keep 100% of food sales.
 - Food-order payments must go directly to the restaurant; platform subscriptions are separate and intended to be collected through the platform PayFast account linked to TymeBank.
 
@@ -61,7 +61,7 @@ Implementation details:
 4. Place a test order and verify the chosen method is stored, displayed in the restaurant portal, and included in the WhatsApp notification.
 5. Test with at least two restaurants using different payment settings.
 6. Add PayFast online card payment only after each restaurant's merchant-account arrangement is confirmed and the secure payment flow is implemented.
-7. Complete separate PayFast subscription collection for the R250 joining fee and R1,000 monthly subscription.
+7. Complete separate PayFast subscription collection for the R250 once-off admin fee and R500 monthly subscription.
 8. Test the full customer-to-restaurant order journey in a real browser and on mobile.
 
 ## Latest relevant GitHub commits
