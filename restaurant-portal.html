@@ -188,11 +188,51 @@ async function renderRestaurants(){
  if(missing.length){const diagnostic="Memberships found: "+memberships.length+"; restaurant records returned: "+memberships.filter(m=>m.restaurant).length+"; missing restaurant records: "+missing.length+". Roles: "+missing.map(m=>m.member_role||"unknown").join(", ")+". This indicates the signed-in session can read the membership but cannot retrieve the matching restaurant row.";$("status").textContent="ACCESS FOUND, LISTING NOT VISIBLE — "+diagnostic;root.innerHTML='<div class="panel"><h2>Your restaurants</h2><div class="status">We found your restaurant access, but the restaurant listing did not load.</div><p>'+esc(diagnostic)+'</p></div>';return;}
  root.innerHTML='<div class="panel"><h2>Your restaurants</h2><p class="small">Restaurant owners and managers can edit their menu items and upload a menu PDF or image. Saved changes appear in the public directory.</p><div class="grid">'+memberships.map(m=>{
  const r=m.restaurant,canEdit=["owner","manager"].includes(m.member_role);
- return '<article class="restaurant"><div class="top"><h2>'+esc(r.name)+'</h2><span class="tag">'+esc(m.member_role.toUpperCase())+'</span></div><p>'+esc(r.area)+' · '+esc(r.province||"KwaZulu-Natal")+' · '+esc(r.category)+'</p><p><b>WhatsApp:</b> '+esc(r.whatsapp)+'</p><p><b>Current menu:</b></p><div class="items">'+esc(menuText(r.menu)||"Menu details are being prepared.").replace(/\n/g,"<br>")+'</div><div id="menuFileLink-'+esc(r.id)+'">'+(r.menu_file_url?'<p><a class="linkbtn secondary" href="'+esc(r.menu_file_url)+'" target="_blank" rel="noopener">View uploaded menu file</a></p>':'')+'</div>'+(canEdit?'<div class="panel"><h3>Update your menu items</h3><p class="small">One item per line: Item name - 99.00</p><textarea id="menuEditor-'+esc(r.id)+'" rows="7">'+esc(menuText(r.menu))+'</textarea><button id="saveMenu-'+esc(r.id)+'" onclick="saveRestaurantMenu(\''+esc(r.id)+'\')">Save menu & publish changes</button><div class="small" id="menuSaveStatus-'+esc(r.id)+'"></div><hr><h3>Upload full menu</h3><p class="small">PDF, JPG, PNG or WEBP · maximum 10 MB</p><input id="menuFile-'+esc(r.id)+'" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp,application/pdf,image/jpeg,image/png,image/webp"><button id="uploadMenu-'+esc(r.id)+'" onclick="uploadRestaurantMenu(\''+esc(r.id)+'\')">Upload menu PDF / image</button><div class="small" id="menuFileStatus-'+esc(r.id)+'"></div></div>':'<p class="small">Contact your restaurant owner to update this menu.</p>')+'</article>';
+ return '<article class="restaurant"><div class="top"><h2>'+esc(r.name)+'</h2><span class="tag">'+esc(m.member_role.toUpperCase())+'</span></div><p>'+esc(r.area)+' · '+esc(r.province||"KwaZulu-Natal")+' · '+esc(r.category)+'</p><p><b>WhatsApp:</b> '+esc(r.whatsapp)+'</p><p><b>Current menu:</b></p><div class="items">'+esc(menuText(r.menu)||"Menu details are being prepared.").replace(/\n/g,"<br>")+'</div><div id="menuFileLink-'+esc(r.id)+'">'+(r.menu_file_url?'<p><a class="linkbtn secondary" href="'+esc(r.menu_file_url)+'" target="_blank" rel="noopener">View uploaded menu file</a></p>':'')+'</div>'+(canEdit?'<div class="panel"><h3>Update your menu items</h3><p class="small">One item per line: Item name - 99.00</p><textarea id="menuEditor-'+esc(r.id)+'" rows="7">'+esc(menuText(r.menu))+'</textarea><button id="saveMenu-'+esc(r.id)+'" onclick="saveRestaurantMenu(\''+esc(r.id)+'\')">Save menu & publish changes</button><div class="small" id="menuSaveStatus-'+esc(r.id)+'"></div><hr><h3>Upload full menu</h3><p class="small">PDF, JPG, PNG or WEBP · maximum 10 MB</p><input id="menuFile-'+esc(r.id)+'" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp,application/pdf,image/jpeg,image/png,image/webp"><button id="uploadMenu-'+esc(r.id)+'" onclick="uploadRestaurantMenu(\''+esc(r.id)+'\')">Upload menu PDF / image</button><div class="small" id="menuFileStatus-'+esc(r.id)+'"></div></div>':'<p class="small">Contact your restaurant owner to update this menu.</p>')+advertSection(r.id,canEdit)+'</article>';
  }).join("")+'</div><h2>Customer orders</h2><div id="ordersArea"><p class="small">Loading orders…</p></div></div>';
  await loadRestaurantsOrders();
  startOrderPolling();
 }
+
+const advertProvinces=["All South Africa","Eastern Cape","Free State","Gauteng","KwaZulu-Natal","Limpopo","Mpumalanga","Northern Cape","North West","Western Cape"];
+function advertSection(id,canEdit){
+ if(!canEdit)return '<div class="panel"><h3>Advertising</h3><p class="small">Only restaurant owners and managers can manage adverts.</p><div id="adList-'+esc(id)+'"></div></div>';
+ return '<div class="panel"><h3>Promote your restaurant</h3><p class="small">Create and manage your own special offers and adverts. Basic advert publishing is included in your Takeaways Tonight? subscription. No commission is charged on food orders.</p><label>Advert heading</label><input id="adTitle-'+esc(id)+'" maxlength="90" placeholder="e.g. Tuesday burger special"><label>Offer details</label><textarea id="adDesc-'+esc(id)+'" rows="3" maxlength="500" placeholder="Tell customers about your special offer"></textarea><label>Show this advert to customers in</label><select id="adProvince-'+esc(id)+'">'+advertProvinces.map(p=>'<option value="'+esc(p)+'">'+esc(p)+'</option>').join("")+'</select><label>Advert starts</label><input id="adStart-'+esc(id)+'" type="date" value="'+new Date().toISOString().slice(0,10)+'"><label>Advert ends</label><input id="adEnd-'+esc(id)+'" type="date" value="'+new Date(Date.now()+30*86400000).toISOString().slice(0,10)+'"><label>Advert image (JPG, PNG or WEBP · max 5 MB)</label><input id="adImage-'+esc(id)+'" type="file" accept="image/jpeg,image/png,image/webp"><label><input id="adPublish-'+esc(id)+'" type="checkbox" checked style="width:auto"> Publish advert immediately</label><button onclick="saveRestaurantAdvert(\''+esc(id)+'\')">Save and publish advert</button><div class="small" id="adStatus-'+esc(id)+'" role="status"></div><hr><h3>Your adverts</h3><div id="adList-'+esc(id)+'">Loading adverts…</div></div>';
+}
+async function loadRestaurantAdverts(){
+ for(const m of memberships){
+  const root=$("adList-"+m.restaurant_id);if(!root)continue;
+  const {data,error}=await sb.from("restaurant_adverts").select("*").eq("restaurant_id",m.restaurant_id).order("created_at",{ascending:false});
+  if(error){root.textContent="Could not load adverts: "+error.message;continue;}
+  root.innerHTML=(data||[]).length?(data||[]).map(a=>'<article class="order"><div class="top"><b>'+esc(a.title)+'</b><span class="tag">'+(a.is_published?'PUBLISHED':'PAUSED')+'</span></div><p>'+esc(a.description||'')+'</p><p class="small">'+esc(a.target_province)+' · '+esc(a.starts_on)+' to '+esc(a.ends_on)+'</p>'+(a.image_url?'<img src="'+esc(a.image_url)+'" alt="" style="width:100%;max-width:300px;border-radius:10px">':'')+'<div><button class="secondary" onclick="setAdvertPublished(\''+a.id+'\','+(!a.is_published)+',\''+m.restaurant_id+'\')">'+(a.is_published?'Pause advert':'Publish advert')+'</button><button class="danger" onclick="deleteRestaurantAdvert(\''+a.id+'\',\''+m.restaurant_id+'\')">Delete advert</button></div></article>').join(""):'<p class="small">You have not created any adverts yet.</p>';
+ }
+}
+async function saveRestaurantAdvert(id){
+ const member=memberships.find(m=>m.restaurant_id===id);if(!member||!["owner","manager"].includes(member.member_role))return;
+ const title=$("adTitle-"+id).value.trim(),description=$("adDesc-"+id).value.trim(),province=$("adProvince-"+id).value,starts=$("adStart-"+id).value,ends=$("adEnd-"+id).value,file=$("adImage-"+id).files?.[0];
+ const status=$("adStatus-"+id);if(title.length<3||!starts||!ends||ends<starts){status.textContent="Enter an advert heading and valid start/end dates.";return;}
+ if(file&&(!["image/jpeg","image/png","image/webp"].includes(file.type)||file.size>5*1024*1024)){status.textContent="Choose a JPG, PNG or WEBP image no larger than 5 MB.";return;}
+ status.textContent="Saving advert…";
+ try{
+  let imageUrl=null;
+  if(file){const ext=file.name.split(".").pop().toLowerCase().replace(/[^a-z0-9]/g,"")||"jpg",path=id+"/"+Date.now()+"."+ext;const {error:uploadError}=await sb.storage.from("restaurant-adverts").upload(path,file,{contentType:file.type,upsert:false});if(uploadError)throw uploadError;imageUrl=sb.storage.from("restaurant-adverts").getPublicUrl(path).data.publicUrl;}
+  const {error}=await sb.from("restaurant_adverts").insert({restaurant_id:id,created_by:session.user.id,title,description,image_url:imageUrl,target_province:province,starts_on:starts,ends_on:ends,is_published:$("adPublish-"+id).checked});
+  if(error)throw error;
+  status.textContent="Advert saved. "+($("adPublish-"+id).checked?"It will appear to customers during the selected dates.":"It is saved as a draft.");
+  $("adTitle-"+id).value="";$("adDesc-"+id).value="";$("adImage-"+id).value="";
+  await loadRestaurantAdverts();
+ }catch(e){status.textContent="Could not save advert: "+(e.message||"Please try again.");}
+}
+async function setAdvertPublished(adId,published,restaurantId){
+ const {error}=await sb.from("restaurant_adverts").update({is_published:published,updated_at:new Date().toISOString()}).eq("id",adId);
+ if(error){alert("Could not update advert: "+error.message);return;}await loadRestaurantAdverts();
+}
+async function deleteRestaurantAdvert(adId,restaurantId){
+ if(!confirm("Delete this advert? This cannot be undone."))return;
+ const {error}=await sb.from("restaurant_adverts").delete().eq("id",adId);
+ if(error){alert("Could not delete advert: "+error.message);return;}await loadRestaurantAdverts();
+}
+
 async function signOut(){if(session?.user?.id){await sb.from("restaurant_push_tokens").delete().eq("user_id",session.user.id);}if(window.Capacitor?.isNativePlatform?.()&&window.TT_NATIVE_PUSH){await window.TT_NATIVE_PUSH.unregister().catch(()=>{});}await sb.auth.signOut();session=null;$("dashboard").classList.add("hidden");$("loginPanel").classList.remove("hidden");$("loginStatus").textContent="You have signed out."}
 if(sb){sb.auth.onAuthStateChange((_e,s)=>{session=s;if(s)loadDashboard()});sb.auth.getSession().then(({data})=>{session=data.session;if(session)loadDashboard()})}
 else $("loginStatus").textContent="Account service is temporarily unavailable.";
