@@ -104,7 +104,7 @@ async function saveRestaurantMenu(id){
  if(!menu.length){alert("Enter at least one menu item as Item name - 99.00");return;}
  const button=$("saveMenu-"+id);button.disabled=true;button.textContent="Saving menu…";
  try{
-  const {error}=await sb.from("restaurants").update({menu,updated_at:new Date().toISOString()}).eq("id",id);
+  const {error}=await sb.rpc("update_restaurant_menu",{p_restaurant_id:id,p_menu:menu});
   if(error)throw error;
   member.restaurant.menu=menu;
   $("menuSaveStatus-"+id).textContent="Menu saved and live on the public directory.";
@@ -124,7 +124,7 @@ async function uploadRestaurantMenu(id){
   const {error:uploadError}=await sb.storage.from("restaurant-menus").upload(path,file,{contentType:file.type,upsert:true});
   if(uploadError)throw uploadError;
   const {data}=sb.storage.from("restaurant-menus").getPublicUrl(path);
-  const {error:updateError}=await sb.from("restaurants").update({menu_file_url:data.publicUrl,updated_at:new Date().toISOString()}).eq("id",id);
+  const {error:updateError}=await sb.rpc("set_restaurant_menu_file",{p_restaurant_id:id,p_menu_file_url:data.publicUrl});
   if(updateError)throw updateError;
   member.restaurant.menu_file_url=data.publicUrl;
   $("menuFileLink-"+id).innerHTML='<a class="linkbtn secondary" href="'+esc(data.publicUrl)+'" target="_blank" rel="noopener">View uploaded menu</a>';
