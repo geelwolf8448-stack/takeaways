@@ -66,7 +66,7 @@ async function loadDashboard(){
  const memberIds=(memberRows||[]).map(m=>m.restaurant_id);
  let ownedRestaurants=[];
  if(memberIds.length){
-  const {data:ownedRows,error:ownedError}=await sb.from("restaurants").select("id,name,area,category,whatsapp,description,menu").in("id",memberIds);
+  const {data:ownedRows,error:ownedError}=await sb.from("restaurants").select("id,name,area,province,category,whatsapp,description,menu,menu_file_url").in("id",memberIds);
   if(ownedError){$("status").textContent="Your restaurant access was found, but the listing could not be loaded: "+ownedError.message;return;}
   ownedRestaurants=ownedRows||[];
  }
@@ -95,6 +95,43 @@ async function api(action,extra){
  const result=await response.json();if(!response.ok)throw new Error(result.error||"The request could not be completed.");return result;
 }
 function menuText(menu){return (Array.isArray(menu)?menu:[]).map(i=>Array.isArray(i)?i[0]+" - "+Number(i[1]).toFixed(2):"").filter(Boolean).join("\n")}
+function parseMenuText(raw){
+ return raw.split("\\n").map(line=>{const m=line.match(/^\\s*(.+?)\\s*-\\s*(\\d+(?:\\.\\d{1,2})?)\\s*$/);return m?[m[1].trim(),Number(m[2])]:null}).filter(Boolean);
+}
+async function saveRestaurantMenu(id){
+ const member=memberships.find(m=>m.restaurant_id===id);if(!member||!["owner","manager"].includes(member.member_role)){alert("Only restaurant owners and managers can update this menu.");return;}
+ const raw=$("menuEditor-"+id).value,menu=parseMenuText(raw);
+ if(!menu.length){alert("Enter at least one menu item as Item name - 99.00");return;}
+ const button=$("saveMenu-"+id);button.disabled=true;button.textContent="Saving menu…";
+ try{
+  const {error}=await sb.from("restaurants").update({menu,updated_at:new Date().toISOString()}).eq("id",id);
+  if(error)throw error;
+  member.restaurant.menu=menu;
+  $("menuSaveStatus-"+id).textContent="Menu saved and live on the public directory.";
+ }catch(e){$("menuSaveStatus-"+id).textContent="Could not save menu: "+(e.message||"Please try again.");}
+ finally{button.disabled=false;button.textContent="Save menu & publish changes";}
+}
+async function uploadRestaurantMenu(id){
+ const member=memberships.find(m=>m.restaurant_id===id);if(!member||!["owner","manager"].includes(member.member_role)){alert("Only restaurant owners and managers can upload menus.");return;}
+ const input=$("menuFile-"+id),file=input.files?.[0];if(!file)return;
+ const allowed=["application/pdf","image/jpeg","image/png","image/webp"];
+ if(!allowed.includes(file.type)){alert("Please upload a PDF, JPG, PNG or WEBP menu.");input.value="";return;}
+ if(file.size>10*1024*1024){alert("The menu file must be 10 MB or smaller.");input.value="";return;}
+ const button=$("uploadMenu-"+id);button.disabled=true;button.textContent="Uploading…";
+ try{
+  const ext=(file.name.split(".").pop()||"pdf").toLowerCase().replace(/[^a-z0-9]/g,"");
+  const path=id+"/menu-"+Date.now()+"."+ext;
+  const {error:uploadError}=await sb.storage.from("restaurant-menus").upload(path,file,{contentType:file.type,upsert:true});
+  if(uploadError)throw uploadError;
+  const {data}=sb.storage.from("restaurant-menus").getPublicUrl(path);
+  const {error:updateError}=await sb.from("restaurants").update({menu_file_url:data.publicUrl,updated_at:new Date().toISOString()}).eq("id",id);
+  if(updateError)throw updateError;
+  member.restaurant.menu_file_url=data.publicUrl;
+  $("menuFileLink-"+id).innerHTML='<a class="linkbtn secondary" href="'+esc(data.publicUrl)+'" target="_blank" rel="noopener">View uploaded menu</a>';
+  $("menuFileStatus-"+id).textContent="Menu file uploaded and linked to your public listing.";
+ }catch(e){$("menuFileStatus-"+id).textContent="Upload failed: "+(e.message||"Please try again.");}
+ finally{button.disabled=false;button.textContent="Upload menu PDF / image";}
+}
 async function enableOrderNotifications(){
  try{
   if(window.Capacitor?.isNativePlatform?.()){
