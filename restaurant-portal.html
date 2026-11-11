@@ -194,17 +194,18 @@ async function renderRestaurants(){
  startOrderPolling();
 }
 
+let editingAdvertId=null,editingAdvertRestaurantId=null;
 const advertProvinces=["All South Africa","Eastern Cape","Free State","Gauteng","KwaZulu-Natal","Limpopo","Mpumalanga","Northern Cape","North West","Western Cape"];
 function advertSection(id,canEdit){
  if(!canEdit)return '<div class="panel"><h3>Advertising</h3><p class="small">Only restaurant owners and managers can manage adverts.</p><div id="adList-'+esc(id)+'"></div></div>';
- return '<div class="panel"><h3>Promote your restaurant</h3><p class="small">Create and manage your own special offers and adverts. Basic advert publishing is included in your Takeaways Tonight? subscription. No commission is charged on food orders.</p><label>Advert heading</label><input id="adTitle-'+esc(id)+'" maxlength="90" placeholder="e.g. Tuesday burger special"><label>Offer details</label><textarea id="adDesc-'+esc(id)+'" rows="3" maxlength="500" placeholder="Tell customers about your special offer"></textarea><label>Show this advert to customers in</label><select id="adProvince-'+esc(id)+'">'+advertProvinces.map(p=>'<option value="'+esc(p)+'">'+esc(p)+'</option>').join("")+'</select><label>Advert starts</label><input id="adStart-'+esc(id)+'" type="date" value="'+new Date().toISOString().slice(0,10)+'"><label>Advert ends</label><input id="adEnd-'+esc(id)+'" type="date" value="'+new Date(Date.now()+30*86400000).toISOString().slice(0,10)+'"><label>Advert image (JPG, PNG or WEBP · max 5 MB)</label><input id="adImage-'+esc(id)+'" type="file" accept="image/jpeg,image/png,image/webp"><label><input id="adPublish-'+esc(id)+'" type="checkbox" checked style="width:auto"> Publish advert immediately</label><button onclick="saveRestaurantAdvert(\''+esc(id)+'\')">Save and publish advert</button><div class="small" id="adStatus-'+esc(id)+'" role="status"></div><hr><h3>Your adverts</h3><div id="adList-'+esc(id)+'">Loading adverts…</div></div>';
+ return '<div class="panel"><h3>Promote your restaurant</h3><p class="small">Create and manage your own special offers and adverts. Basic advert publishing is included in your Takeaways Tonight? subscription. No commission is charged on food orders.</p><label>Advert heading</label><input id="adTitle-'+esc(id)+'" maxlength="90" placeholder="e.g. Tuesday burger special"><label>Offer details</label><textarea id="adDesc-'+esc(id)+'" rows="3" maxlength="500" placeholder="Tell customers about your special offer"></textarea><label>Show this advert to customers in</label><select id="adProvince-'+esc(id)+'">'+advertProvinces.map(p=>'<option value="'+esc(p)+'">'+esc(p)+'</option>').join("")+'</select><label>Advert starts</label><input id="adStart-'+esc(id)+'" type="date" value="'+new Date().toISOString().slice(0,10)+'"><label>Advert ends</label><input id="adEnd-'+esc(id)+'" type="date" value="'+new Date(Date.now()+30*86400000).toISOString().slice(0,10)+'"><label>Advert image (JPG, PNG or WEBP · max 5 MB)</label><input id="adImage-'+esc(id)+'" type="file" accept="image/jpeg,image/png,image/webp"><label><input id="adPublish-'+esc(id)+'" type="checkbox" checked style="width:auto"> Publish advert immediately</label><button id="adSave-'+esc(id)+'" onclick="saveRestaurantAdvert(\''+esc(id)+'\')">Save and publish advert</button><div class="small" id="adStatus-'+esc(id)+'" role="status"></div><hr><h3>Your adverts</h3><div id="adList-'+esc(id)+'">Loading adverts…</div></div>';
 }
 async function loadRestaurantAdverts(){
  for(const m of memberships){
   const root=$("adList-"+m.restaurant_id);if(!root)continue;
   const {data,error}=await sb.from("restaurant_adverts").select("*").eq("restaurant_id",m.restaurant_id).order("created_at",{ascending:false});
   if(error){root.textContent="Could not load adverts: "+error.message;continue;}
-  root.innerHTML=(data||[]).length?(data||[]).map(a=>'<article class="order"><div class="top"><b>'+esc(a.title)+'</b><span class="tag">'+(a.is_published?'PUBLISHED':'PAUSED')+'</span></div><p>'+esc(a.description||'')+'</p><p class="small">'+esc(a.target_province)+' · '+esc(a.starts_on)+' to '+esc(a.ends_on)+'</p>'+(a.image_url?'<img src="'+esc(a.image_url)+'" alt="" style="width:100%;max-width:300px;border-radius:10px">':'')+'<div><button class="secondary" onclick="setAdvertPublished(\''+a.id+'\','+(!a.is_published)+',\''+m.restaurant_id+'\')">'+(a.is_published?'Pause advert':'Publish advert')+'</button><button class="danger" onclick="deleteRestaurantAdvert(\''+a.id+'\',\''+m.restaurant_id+'\')">Delete advert</button></div></article>').join(""):'<p class="small">You have not created any adverts yet.</p>';
+  root.innerHTML=(data||[]).length?(data||[]).map(a=>'<article class="order"><div class="top"><b>'+esc(a.title)+'</b><span class="tag">'+(a.is_published?'PUBLISHED':'PAUSED')+'</span></div><p>'+esc(a.description||'')+'</p><p class="small">'+esc(a.target_province)+' · '+esc(a.starts_on)+' to '+esc(a.ends_on)+'</p>'+(a.image_url?'<img src="'+esc(a.image_url)+'" alt="" style="width:100%;max-width:300px;border-radius:10px">':'')+'<div><button class="secondary" onclick="editRestaurantAdvert(\''+a.id+'\',\''+m.restaurant_id+'\')">Edit advert</button><button class="secondary" onclick="setAdvertPublished(\''+a.id+'\','+(!a.is_published)+',\''+m.restaurant_id+'\')">'+(a.is_published?'Pause advert':'Publish advert')+'</button><button class="danger" onclick="deleteRestaurantAdvert(\''+a.id+'\',\''+m.restaurant_id+'\')">Delete advert</button></div></article>').join(""):'<p class="small">You have not created any adverts yet.</p>';
  }
 }
 async function saveRestaurantAdvert(id){
@@ -216,12 +217,28 @@ async function saveRestaurantAdvert(id){
  try{
   let imageUrl=null;
   if(file){const ext=file.name.split(".").pop().toLowerCase().replace(/[^a-z0-9]/g,"")||"jpg",path=id+"/"+Date.now()+"."+ext;const {error:uploadError}=await sb.storage.from("restaurant-adverts").upload(path,file,{contentType:file.type,upsert:false});if(uploadError)throw uploadError;imageUrl=sb.storage.from("restaurant-adverts").getPublicUrl(path).data.publicUrl;}
-  const {error}=await sb.from("restaurant_adverts").insert({restaurant_id:id,created_by:session.user.id,title,description,image_url:imageUrl,target_province:province,starts_on:starts,ends_on:ends,is_published:$("adPublish-"+id).checked});
-  if(error)throw error;
+  const payload={restaurant_id:id,created_by:session.user.id,title,description,target_province:province,starts_on:starts,ends_on:ends,is_published:$("adPublish-"+id).checked,updated_at:new Date().toISOString()};
+  if(imageUrl)payload.image_url=imageUrl;
+  let saveError;
+  if(editingAdvertId&&editingAdvertRestaurantId===id){const result=await sb.from("restaurant_adverts").update(payload).eq("id",editingAdvertId);saveError=result.error;}
+  else{payload.image_url=imageUrl;const result=await sb.from("restaurant_adverts").insert(payload);saveError=result.error;}
+  if(saveError)throw saveError;
   status.textContent="Advert saved. "+($("adPublish-"+id).checked?"It will appear to customers during the selected dates.":"It is saved as a draft.");
+  editingAdvertId=null;editingAdvertRestaurantId=null;$("adSave-"+id).textContent="Save and publish advert";
   $("adTitle-"+id).value="";$("adDesc-"+id).value="";$("adImage-"+id).value="";
   await loadRestaurantAdverts();
  }catch(e){status.textContent="Could not save advert: "+(e.message||"Please try again.");}
+}
+async function editRestaurantAdvert(adId,restaurantId){
+ const {data,error}=await sb.from("restaurant_adverts").select("*").eq("id",adId).single();
+ if(error||!data){alert("Could not load this advert for editing.");return;}
+ $("adTitle-"+restaurantId).value=data.title;$("adDesc-"+restaurantId).value=data.description||"";
+ $("adProvince-"+restaurantId).value=data.target_province;$("adStart-"+restaurantId).value=data.starts_on;
+ $("adEnd-"+restaurantId).value=data.ends_on;$("adPublish-"+restaurantId).checked=data.is_published;
+ editingAdvertId=adId;editingAdvertRestaurantId=restaurantId;
+ $("adSave-"+restaurantId).textContent="Save advert changes";
+ $("adStatus-"+restaurantId).textContent="Editing advert. Choose a new image only if you want to replace the current image.";
+ $("adTitle-"+restaurantId).scrollIntoView({behavior:"smooth",block:"center"});
 }
 async function setAdvertPublished(adId,published,restaurantId){
  const {error}=await sb.from("restaurant_adverts").update({is_published:published,updated_at:new Date().toISOString()}).eq("id",adId);
