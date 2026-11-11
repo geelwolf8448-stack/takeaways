@@ -196,7 +196,7 @@ async function savePaymentMethods(id){
  try{const result=await api("set_restaurant_payment_methods",{restaurantId:id,methods});member.restaurant.accepted_payment_methods=result.acceptedPaymentMethods;status.textContent="Payment methods saved. Customers will now see these options.";}
  catch(e){status.textContent="Could not save payment methods: "+e.message;}
 }
-function renderRestaurants(){
+async function renderRestaurants(){
  const root=$("restaurants");
  if(!memberships.length){root.innerHTML="";return}
  const missing=memberships.filter(m=>!m.restaurant);
