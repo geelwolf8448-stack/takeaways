@@ -37,7 +37,7 @@ The project has moved beyond the original static preview. Use the code in `index
 - The platform does not currently collect customer food-order payments.
 - Do not present demo cards as participating restaurants.
 - Do not promise delivery, sales or platform payment processing that is not active.
-- The current offer is a 14-day free pilot, followed by a once-off R250 admin fee and R500 monthly subscription. Agree the terms in writing with each restaurant before billing.
+- Every restaurant, takeaway shop, home-based takeaway, inyama shop and coffee shop receives a 14-day free pilot, followed by a once-off R250 admin fee and R500 monthly subscription. Agree the terms in writing with each restaurant before billing.
 
 ## Key files
 - `index.html` — public restaurant directory and partner application.
