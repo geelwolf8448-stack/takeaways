@@ -37,8 +37,31 @@ Implementation details:
 - WhatsApp order notification includes the customer's selected payment method.
 - Supabase Edge Function `marketplace-api` deployed as version 9 with JWT verification enabled.
 - Public website and restaurant portal inline scripts passed JavaScript syntax checks.
-- Service-worker cache name bumped to `takeaways-tonight-v34-payment-method-choices`.
+- Service-worker cache name bumped to `takeaways-tonight-v36-all-food-business-pilot` after the pricing and pilot-eligibility copy updates.
 
+## Latest saved progress — pricing and pilot eligibility (11 November 2026)
+The owner confirmed the updated commercial offer:
+- Every restaurant, takeaway shop, home-based takeaway, inyama shop and coffee shop receives the same 14-day free pilot.
+- After the pilot: R250 once-off admin fee, then R500 per month.
+- No commission on food orders; food businesses retain 100% of their food sales.
+
+Updated customer-facing and project materials:
+- Public website food-business section welcomes all five business categories and states the 14-day free pilot and updated fees.
+- Public application/admin note states the same eligibility and pricing.
+- WhatsApp invitation message names all five categories and the updated offer.
+- Restaurant portal sign-in message confirms all five categories qualify for the free pilot.
+- Updated launch kit, restaurant agreement template, README and this project status file.
+- Service-worker cache version updated to `takeaways-tonight-v36-all-food-business-pilot`.
+
+Relevant commits for this update:
+- Public website and invitation wording: `5f5e1c4bbeba2525e4e0b4a986455c7b834e3c82`, with final public pricing correction in `7201783dd8ed7222b722338f179588fbe73130dd`.
+- Restaurant portal eligibility wording: `d5c65bfc4a7d3187dd379400ac8dfea609419ff2`.
+- Launch kit: `6263437e5336817a80e2c8b7d2cce8b66c122a27`.
+- README: `10cb5a1ce4e0c9fd523bda137ab1b5d34e692fb0`.
+- Restaurant agreement: `5a3cc33bff5d02d4100f04a503fdb914dd35287a`.
+- Service-worker cache: `408179f601c9fe2d1549ea9032181e0997fbe4cd`.
+
+Important: These updates change the published wording and project documentation. They do not activate automatic PayFast subscription billing. Online card payment through restaurants' own PayFast accounts also remains unimplemented. Browser-based end-to-end testing of the customer ordering journey remains outstanding.
 ## Other existing capabilities retained
 - South African province filter across all nine provinces.
 - Restaurant partner applications and owner/manager portal.
