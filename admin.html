@@ -78,7 +78,7 @@ async function loadApplications(){
   const admins=await access.json();
   if(!admins.length)throw new Error("You are signed in, but this account is not on the administrator allowlist yet. The admin user must be added to public.admin_users in Supabase.");
   say("Administrator verified. Loading pending applications…");
-  const response=await fetch(config.supabaseUrl+"/rest/v1/partner_applications?select=id,restaurant_name,area,category,whatsapp,menu,created_at,status,permission_confirmed,permission_confirmed_at&status=eq.pending&order=created_at.asc",{headers:apiHeaders()});
+  const response=await fetch(config.supabaseUrl+"/rest/v1/partner_applications?select=id,restaurant_name,area,province,category,whatsapp,menu,created_at,status,permission_confirmed,permission_confirmed_at&status=eq.pending&order=created_at.asc",{headers:apiHeaders()});
   const data=await response.json();if(!response.ok)throw new Error(data.message||data.hint||"Could not load applications. Check that the SQL upgrade was run and this account is allowlisted.");
   el("applications").innerHTML=data.length?data.map(app=>card(app)).join(""):'<div class="panel">No pending applications. New submissions will appear here.</div>';
   say(data.length+" pending application(s).");
