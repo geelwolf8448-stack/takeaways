@@ -12,7 +12,7 @@ Last updated: 11 November 2026
 - Supabase project: xsrmtokfrqdyfbrqljsm
 
 ## Commercial model — confirmed, do not change without owner instruction
-- 14-day free pilot for restaurants and takeaway shops.
+- 14-day free pilot for every restaurant, takeaway shop, home-based takeaway, inyama shop and coffee shop.
 - R250 once-off admin fee after the pilot.
 - R500 monthly subscription after the pilot.
 - No commission on food orders. Restaurants keep 100% of food sales.
