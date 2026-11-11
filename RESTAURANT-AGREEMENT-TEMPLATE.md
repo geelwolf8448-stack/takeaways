@@ -69,7 +69,7 @@ Select and complete the applicable offer. Do not treat any proposed price below 
 - Refund/credit terms: [complete]
 - Included services and exclusions: [complete]
 
-The current offer is a 14-day free pilot, followed by a once-off R250 admin fee and R500 monthly subscription. Complete the fee fields above and obtain written acceptance from both parties before billing.
+The offer applies to restaurants, takeaway shops, home-based takeaways, inyama shops and coffee shops: a 14-day free pilot, followed by a once-off R250 admin fee and R500 monthly subscription. Complete the fee fields above and obtain written acceptance from both parties before billing.
 
 Takeaways Tonight does not deduct any percentage from restaurant food sales. The restaurant retains 100% of its food-sale revenue. Any future change to this arrangement must be disclosed in advance and agreed in a written amendment signed by both parties.
 
