@@ -422,13 +422,13 @@ function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",
 function renderLiveAdverts(){
  const root=document.getElementById("liveAdverts");if(!root)return;
  const rows=liveAdverts.filter(a=>a.target_province==="All South Africa"||activeProvince==="All"||a.target_province===activeProvince);
- root.innerHTML=rows.length?rows.map(a=>'<article class="deal" style="overflow:hidden">'+(a.image_url?'<img src="'+esc(a.image_url)+'" alt="'+esc(a.title)+'" loading="lazy" style="width:100%;max-height:190px;object-fit:cover;border-radius:12px;margin-bottom:10px">':'<div style="font-size:34px">🍽️</div>')+'<small>RESTAURANT SPECIAL · '+esc(a.target_province)+'</small><h3>'+esc(a.title)+'</h3><p>'+esc(a.description||'Special offer from a local restaurant')+'</p><b>'+esc(a.restaurant?.name||'Local restaurant')+'</b><p style="font-size:12px">'+esc(a.restaurant?.area||'')+'</p></article>').join(""):'<div class="empty">No current restaurant specials for this province yet. Check back soon.</div>';
+ root.innerHTML=rows.length?rows.map(a=>'<article class="deal" style="overflow:hidden">'+(a.image_url?'<img src="'+esc(a.image_url)+'" alt="'+esc(a.title)+'" loading="lazy" style="width:100%;max-height:190px;object-fit:cover;border-radius:12px;margin-bottom:10px">':'<div style="font-size:34px">🍽️</div>')+'<small>RESTAURANT SPECIAL · '+esc(a.target_province)+'</small><h3>'+esc(a.title)+'</h3><p>'+esc(a.description||'Special offer from a local restaurant')+'</p><b>'+esc(a.restaurant?.name||'Local restaurant')+'</b><p style="font-size:12px">'+esc(a.restaurant?.area||'')+'</p>'+(a.restaurant?.id?'<button onclick="openMenu(\'shared-'+esc(a.restaurant.id)+'\')">View menu & order</button>':'')+'</article>').join(""):'<div class="empty">No current restaurant specials for this province yet. Check back soon.</div>';
 }
 async function loadLiveAdverts(){
  const cfg=window.TT_CONFIG||{};if(!cfg.supabaseUrl||!cfg.supabaseAnonKey)return;
  const today=new Date().toISOString().slice(0,10);
  try{
-  const url=cfg.supabaseUrl+"/rest/v1/restaurant_adverts?select=id,title,description,image_url,target_province,starts_on,ends_on,restaurant:restaurants(name,area)&is_published=eq.true&starts_on=lte."+today+"&ends_on=gte."+today+"&order=created_at.desc&limit=40";
+  const url=cfg.supabaseUrl+"/rest/v1/restaurant_adverts?select=id,title,description,image_url,target_province,starts_on,ends_on,restaurant:restaurants(id,name,area)&is_published=eq.true&starts_on=lte."+today+"&ends_on=gte."+today+"&order=created_at.desc&limit=40";
   const response=await fetch(url,{headers:{apikey:cfg.supabaseAnonKey}});
   if(!response.ok)throw new Error("Advert directory unavailable");
   liveAdverts=await response.json();renderLiveAdverts();
