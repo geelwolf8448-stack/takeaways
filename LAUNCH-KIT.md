@@ -20,7 +20,7 @@ Not sure what to eat tonight? We're building a simple way to discover local rest
 
 Find a place, check the menu, create your customer account and submit an order request. The restaurant is notified through WhatsApp and confirms the order directly.
 
-We're inviting local restaurants to join the pilot. Restaurant owners and managers can contact us to request a listing. Nothing goes live without the business's permission.
+We're inviting restaurants, takeaway shops, home-based takeaways, inyama shops and coffee shops to join the pilot. Every business in these categories receives a free 14-day pilot. Owners and managers can request a listing. Nothing goes live without the business's permission.
 
 Visit: https://geelwolf8448-stack.github.io/takeaways/
 
@@ -41,7 +41,7 @@ Takeaways Tonight?
 
 ### Optional commercial offer — discuss, do not assume acceptance
 
-The current offer is a 14-day free pilot, followed by a once-off R250 admin fee and R500 per month. Subscription billing is not yet active. Agree the deliverables, start date, cancellation and billing terms in a signed agreement before charging any business. Do not promise orders, customer reach or sales.
+Every restaurant, takeaway shop, home-based takeaway, inyama shop and coffee shop receives a 14-day free pilot, followed by a once-off R250 admin fee and R500 per month. Subscription billing is not yet active. Agree the deliverables, start date, cancellation and billing terms in a signed agreement before charging any business. Do not promise orders, customer reach or sales.
 
 ## 4. Restaurant onboarding information request
 
