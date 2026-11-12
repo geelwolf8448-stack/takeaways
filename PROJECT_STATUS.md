@@ -195,3 +195,13 @@ Safety rule: never send merchant keys or passphrases through chat, email, GitHub
 - If the panel says configuration is present in sandbox mode, proceed to review the PayFast ITN implementation and current official PayFast requirements before sandbox transaction testing. If it reports missing settings or an access error, stop and diagnose; do not recreate or expose secrets unnecessarily.
 - Live payments remain disabled. No customer food-order payments, split payments, or commission deductions are routed through the platform.
 
+## PayFast Sandbox configuration readiness verified (12 November 2026)
+
+- Owner opened the admin dashboard and confirmed it displays: `PayFast configuration present (sandbox)`.
+- Dashboard also correctly warns that payment checkout and webhook testing are still required and live payments remain disabled.
+- The dashboard reports one business record in the subscription panel.
+- Reviewed the deployed `payfast-itn` function against PayFast's published ITN documentation. The configured IPv4 allowlist matches the IP ranges currently published by PayFast. The handler also performs signature verification, server-side query validation, merchant/reference/amount checks, and event idempotency before settling an invoice.
+- This source review is not an end-to-end test. No sandbox transaction has been run and no invoice has been settled.
+- Next engineering task: complete and security-review a safe server-side PayFast checkout handoff for the R250 once-off admin-fee invoice. Do not expose credentials in static frontend code. Then run a sandbox transaction and verify the PayFast ITN reaches Supabase and updates only the matching invoice.
+- Monthly R500 recurring checkout and lifecycle automation remain unimplemented. Keep all payments in sandbox until tests pass and the owner explicitly approves any move to live.
+
