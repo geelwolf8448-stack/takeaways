@@ -1,4 +1,4 @@
-const CACHE_NAME = "takeaways-tonight-v37-instant-business-registration";
+const CACHE_NAME = "takeaways-tonight-v38-location-aware-directory";
 const APP_FILES = [
   "./",
   "./index.html",
