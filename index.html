@@ -534,6 +534,46 @@ function populatePaymentMethods(){
 }
 function openBasket(){closeDialog("menuDialog");let content=document.getElementById("basketContent");if(!basket.length)content.innerHTML='<div class="empty">Your basket is empty. Browse a menu to add something delicious.</div>';else content.innerHTML=basket.map((b,i)=>`<div class="basket-item"><div><b>${esc(b.name)}</b><br><small>${money(b.price)} each</small></div><div class="qty"><button class="secondary" onclick="changeQty(${i},-1)">−</button>${b.qty}<button onclick="changeQty(${i},1)">+</button></div></div>`).join("");document.getElementById("basketTotal").textContent="Total: "+money(basket.reduce((a,b)=>a+b.price*b.qty,0));document.getElementById("sendOrder").disabled=!basket.length;fulfilmentChanged();document.getElementById("basketDialog").showModal()}
 function changeQty(i,d){sessionStorage.removeItem("tt_order_idempotency");basket[i].qty+=d;if(basket[i].qty<=0)basket.splice(i,1);openBasket();render()}
+let customerPaymentChannel=null;
+function showCustomerPaymentNotice(orderNumber,paid=false,receivedAt=null){
+ let notice=document.getElementById("customerPaymentNotice");
+ if(!notice){
+  notice=document.createElement("div");notice.id="customerPaymentNotice";notice.setAttribute("role","status");notice.setAttribute("aria-live","polite");
+  notice.style.cssText="position:sticky;top:0;z-index:9999;padding:14px 18px;background:#153b22;color:#fff;border:2px solid #5bc477;text-align:center;font-weight:700;box-shadow:0 3px 14px #0008";
+  document.body.prepend(notice);
+ }
+ if(paid){
+  notice.textContent="PAYMENT RECEIVED — The restaurant has confirmed payment for order #"+orderNumber+(receivedAt?" at "+new Date(receivedAt).toLocaleString():"")+". Thank you!";
+  if("Notification" in window&&Notification.permission==="granted"){
+   try{new Notification("Takeaways Tonight? · Payment received",{body:"The restaurant confirmed payment for order #"+orderNumber+"."});}catch(e){}
+  }
+ }else{
+  notice.innerHTML="Order #"+orderNumber+" submitted. Keep this page open for the restaurant's payment confirmation. ";
+  if("Notification" in window&&Notification.permission!=="granted"){
+   const button=document.createElement("button");button.type="button";button.textContent="Enable browser notifications";button.style.cssText="margin-left:8px;padding:7px 12px;border-radius:20px;border:1px solid #fff;background:#fff;color:#123;font-weight:700;cursor:pointer";
+   button.onclick=enableCustomerPaymentNotifications;notice.appendChild(button);
+  }
+ }
+}
+async function enableCustomerPaymentNotifications(){
+ if(!("Notification" in window)){alert("Browser notifications are not supported on this device. Keep this page open to see the payment confirmation.");return;}
+ const permission=await Notification.requestPermission();
+ const notice=document.getElementById("customerPaymentNotice");
+ if(notice&&permission==="granted")notice.textContent="Browser notifications enabled. We will notify you here when the restaurant confirms payment.";
+ else if(notice)notice.textContent="Browser notifications were not enabled. Keep this page open to see the payment confirmation.";
+}
+function watchCustomerPayment(orderId,orderNumber){
+ if(!homeSupabase||!orderId)return;
+ if(customerPaymentChannel)homeSupabase.removeChannel(customerPaymentChannel);
+ customerPaymentChannel=homeSupabase.channel("customer-payment-"+orderId)
+  .on("postgres_changes",{event:"UPDATE",schema:"public",table:"marketplace_orders",filter:"id=eq."+orderId},payload=>{
+   const row=payload.new||{};
+   if(["paid","paid_directly_to_restaurant"].includes(row.payment_status)){
+    showCustomerPaymentNotice(orderNumber,true,row.payment_received_at||row.updated_at);
+    if(customerPaymentChannel){homeSupabase.removeChannel(customerPaymentChannel);customerPaymentChannel=null;}
+   }
+  }).subscribe();
+}
 async function sendOrder(){
  if(!basket.length){alert("Your basket is empty.");return;}
  const restaurant=restaurants.find(r=>r.id===basket[0].restaurantId);
@@ -585,6 +625,7 @@ async function sendOrder(){
   const message=["ORDER REQUEST — Takeaways Tonight?","Order reference: #"+order.order_number,"Restaurant: "+restaurant.name,"Customer: "+customerName,"Customer mobile: +"+phone,"Fulfilment: "+fulfilment,...(fulfilment==="Delivery"?["Delivery address: "+address]:[]),"","Items:",...lines,"Food subtotal: "+money(basket.reduce((sum,item)=>sum+item.price*item.qty,0)),...(notes?["Notes: "+notes]:[]),"","Please confirm availability, any delivery charge and final total. Customer payment method selected: "+(document.getElementById("customerPaymentMethod").selectedOptions[0]?.textContent||paymentMethod)+". Payment is made directly to the restaurant. No payment has been made through Takeaways Tonight?"].join("\n");
   localStorage.removeItem("tt_pending_checkout");sessionStorage.removeItem("tt_order_idempotency");
   basket=[];render();closeDialog("basketDialog");
+  showCustomerPaymentNotice(order.order_number,false);watchCustomerPayment(order.id,order.order_number);
   alert("Thank you, "+customerName+". Your order request #"+order.order_number+" has been submitted. WhatsApp will open with the order details for you to send to the restaurant. IMPORTANT: Your order is NOT confirmed yet. The restaurant must accept it and confirm availability, the final total and collection or delivery arrangements.");
   const waUrl="https://wa.me/"+whatsapp+"?text="+encodeURIComponent(message);
   if(waWindow)waWindow.location.href=waUrl;else window.location.href=waUrl;
