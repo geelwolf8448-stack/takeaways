@@ -231,7 +231,7 @@ function startOrderPolling(){
  window.setInterval(()=>{if(session&&memberships.length)loadRestaurantsOrders();},15000);
 }
 async function changeOrder(orderId,status,markPaid=false){
- try{await api("update_order",{orderId,status,markPaid});await loadRestaurantsOrders()}
+ try{await api("update_order",{orderId,status,markPaid});if(markPaid){$("status").textContent="Payment confirmation recorded. Takeaways Tonight? admin will see the confirmation in its dashboard.";}await loadRestaurantsOrders()}
  catch(e){alert(e.message)}
 }
 async function loadRestaurantsOrders(){
@@ -242,7 +242,7 @@ async function loadRestaurantsOrders(){
  $("ordersArea").innerHTML=data?.length?data.map(o=>{
   let actions="";
   if(o.status==="submitted")actions='<button onclick="changeOrder(\''+o.id+'\',\'accepted\')">Accept</button><button class="danger" onclick="changeOrder(\''+o.id+'\',\'rejected\')">Reject</button>';
-  if(["accepted","preparing","ready"].includes(o.status)&&o.payment_status!=="paid_directly_to_restaurant")actions+='<button class="secondary" onclick="changeOrder(\''+o.id+'\',\'\',true)">Confirm paid directly to restaurant</button>';
+  if(["accepted","preparing","ready"].includes(o.status)&&o.payment_status!=="paid_directly_to_restaurant")actions+='<button class="secondary" onclick="changeOrder(\''+o.id+'\',\'\',true)">Confirm payment received</button>';
   if(o.status==="accepted")actions+='<button onclick="changeOrder(\''+o.id+'\',\'preparing\')">Start preparing</button>';
   if(o.status==="preparing")actions+='<button onclick="changeOrder(\''+o.id+'\',\'ready\')">Mark ready</button>';
   if(o.status==="ready"&&o.payment_status==="paid_directly_to_restaurant")actions+='<button onclick="changeOrder(\''+o.id+'\',\'completed\')">Complete order</button>';
