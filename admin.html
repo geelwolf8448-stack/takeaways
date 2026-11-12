@@ -39,7 +39,7 @@ button.reject{background:#251010;color:#ffd9d9;border:1px solid #a44}button:disa
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
 <script>
-let accessToken="",currentEmail="",currentUserId="",paymentChannel=null;const paymentNoticeRows=[];
+let accessToken="",currentEmail="",currentUserId="",paymentChannel=null;const paymentNoticeRows=[],seenPaymentIds=new Set();
 const config=window.TT_CONFIG||{};
 const supabaseClient=(window.supabase&&config.supabaseUrl&&config.supabaseAnonKey)?window.supabase.createClient(config.supabaseUrl,config.supabaseAnonKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}}):null;
 const el=id=>document.getElementById(id);
@@ -132,6 +132,7 @@ async function loadMarketplaceOverview(){
   const completed=orders.filter(o=>o.status==="completed").length;
   el("marketplaceOverview").textContent=orders.length+" recent order(s) · "+completed+" completed · Order value R"+(gross/100).toFixed(2)+". Reporting is currently limited to the latest 100 orders.";
   paymentNoticeRows.splice(0,paymentNoticeRows.length,...orders.filter(o=>o.payment_status==="paid_directly_to_restaurant").slice(0,10));
+  paymentNoticeRows.forEach(o=>seenPaymentIds.add(o.id));
   renderPaymentNotifications();
  }catch(e){el("marketplaceOverview").textContent=e.message}
 }
@@ -144,7 +145,8 @@ function startPaymentNotifications(){
  paymentChannel=supabaseClient.channel("admin-payment-confirmations-"+currentUserId)
   .on("postgres_changes",{event:"UPDATE",schema:"public",table:"marketplace_orders"},payload=>{
    const oldRow=payload.old||{},newRow=payload.new||{};
-   if(newRow.payment_status==="paid_directly_to_restaurant"&&oldRow.payment_status!=="paid_directly_to_restaurant"){
+   if(newRow.payment_status==="paid_directly_to_restaurant"&&!seenPaymentIds.has(newRow.id)){
+    seenPaymentIds.add(newRow.id);
     paymentNoticeRows.unshift(newRow);paymentNoticeRows.splice(10);renderPaymentNotifications();
     el("marketplaceOverview").textContent="Payment received confirmed for order #"+newRow.order_number+". The restaurant recorded payment directly to its own account.";
     if("Notification" in window&&Notification.permission==="granted")new Notification("Takeaways Tonight? · Payment received",{body:"Restaurant confirmed payment for order #"+newRow.order_number+"."});
