@@ -1,4 +1,4 @@
-const CACHE_NAME = "takeaways-tonight-v47-force-refresh-demo-basket";
+const CACHE_NAME = "takeaways-tonight-v48-real-restaurants-payments";
 const APP_FILES = [
   "./",
   "./index.html",
