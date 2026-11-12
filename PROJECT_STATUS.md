@@ -176,3 +176,13 @@ Safety rule: never send merchant keys or passphrases through chat, email, GitHub
 - Required values: `PAYFAST_MERCHANT_ID`, `PAYFAST_MERCHANT_KEY`, `PAYFAST_PASSPHRASE`, `PAYFAST_MODE=sandbox`, `PAYFAST_RETURN_URL=https://geelwolf8448-stack.github.io/takeaways/`, `PAYFAST_CANCEL_URL=https://geelwolf8448-stack.github.io/takeaways/`, and `PAYFAST_NOTIFY_URL=https://xsrmtokfrqdyfbrqljsm.supabase.co/functions/v1/payfast-itn`.
 - Credentials have NOT been confirmed as saved in Supabase yet. The configuration readiness check and sandbox payment tests remain pending.
 - Live payments remain disabled. No food-order payment routing, split payments, or platform commission deductions are to be enabled.
+
+## PayFast Supabase secrets entry checkpoint (12 November 2026, latest)
+
+- Owner reports entering all seven required PayFast Sandbox secret entries in the Supabase Dashboard → Edge Functions → Secrets form.
+- Entries are: `PAYFAST_MERCHANT_ID`, `PAYFAST_MERCHANT_KEY`, `PAYFAST_PASSPHRASE`, `PAYFAST_MODE`, `PAYFAST_RETURN_URL`, `PAYFAST_CANCEL_URL`, and `PAYFAST_NOTIFY_URL`.
+- The owner has not yet confirmed that the final page-level **Save** action was clicked successfully or that Supabase displayed a saved confirmation. Treat the entries as entered but not yet verified/persisted.
+- The assistant cannot operate the owner's open Supabase browser page or save the secret values directly. The owner must click the final **Save** button in Supabase and confirm success. Never request the secret values in chat.
+- After save confirmation, check `payment_config_status` from the authenticated admin billing panel/function. Then review the PayFast ITN implementation and current official PayFast source-IP/signature requirements before any sandbox end-to-end payment test.
+- Keep `PAYFAST_MODE=sandbox`. Live payments remain disabled; do not enable platform checkout or recurring charges until the implementation is reviewed and sandbox-tested.
+
