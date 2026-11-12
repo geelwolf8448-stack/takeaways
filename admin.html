@@ -125,31 +125,31 @@ async function reviewOwnerRequest(id,decision,button){
 }
 async function loadMarketplaceOverview(){
  try{
-  const ordersResponse=await fetch(config.supabaseUrl+"/rest/v1/marketplace_orders?select=id,order_number,status,payment_status,total_cents,created_at,updated_at&order=created_at.desc&limit=100",{headers:apiHeaders()});
+  const ordersResponse=await fetch(config.supabaseUrl+"/rest/v1/marketplace_orders?select=id,order_number,status,payment_status,payment_received_at,payment_received_by,total_cents,created_at,updated_at&order=created_at.desc&limit=100",{headers:apiHeaders()});
   const orders=await ordersResponse.json();
   if(!ordersResponse.ok)throw new Error("Could not load marketplace reporting data.");
   const gross=orders.reduce((n,o)=>n+Number(o.total_cents||0),0);
   const completed=orders.filter(o=>o.status==="completed").length;
   el("marketplaceOverview").textContent=orders.length+" recent order(s) · "+completed+" completed · Order value R"+(gross/100).toFixed(2)+". Reporting is currently limited to the latest 100 orders.";
-  paymentNoticeRows.splice(0,paymentNoticeRows.length,...orders.filter(o=>o.payment_status==="paid_directly_to_restaurant").slice(0,10));
+  paymentNoticeRows.splice(0,paymentNoticeRows.length,...orders.filter(o=>["paid","paid_directly_to_restaurant"].includes(o.payment_status)).slice(0,10));
   paymentNoticeRows.forEach(o=>seenPaymentIds.add(o.id));
   renderPaymentNotifications();
  }catch(e){el("marketplaceOverview").textContent=e.message}
 }
 function renderPaymentNotifications(){
  const root=el("paymentNotifications");if(!root)return;
- root.innerHTML=paymentNoticeRows.length?paymentNoticeRows.map(o=>"<div><b>Payment received · Order #"+esc(o.order_number)+"</b><br><span class=\"small\">Recorded "+esc(new Date(o.updated_at||o.created_at).toLocaleString())+"</span></div>").join("<hr>"):"No restaurant payment confirmations recorded yet.";
+ root.innerHTML=paymentNoticeRows.length?paymentNoticeRows.map(o=>"<div><b>Payment received · Order #"+esc(o.order_number)+"</b><br><span class=\"small\">Recorded "+esc(new Date(o.payment_received_at||o.updated_at||o.created_at).toLocaleString())+"</span></div>").join("<hr>"):"No restaurant payment confirmations recorded yet.";
 }
 function startPaymentNotifications(){
  if(!supabaseClient||!currentUserId||paymentChannel)return;
  paymentChannel=supabaseClient.channel("admin-payment-confirmations-"+currentUserId)
   .on("postgres_changes",{event:"UPDATE",schema:"public",table:"marketplace_orders"},payload=>{
    const oldRow=payload.old||{},newRow=payload.new||{};
-   if(newRow.payment_status==="paid_directly_to_restaurant"&&!seenPaymentIds.has(newRow.id)){
+   if(["paid","paid_directly_to_restaurant"].includes(newRow.payment_status)&&!seenPaymentIds.has(newRow.id)){
     seenPaymentIds.add(newRow.id);
     paymentNoticeRows.unshift(newRow);paymentNoticeRows.splice(10);renderPaymentNotifications();
     el("marketplaceOverview").textContent="Payment received confirmed for order #"+newRow.order_number+". The restaurant recorded payment directly to its own account.";
-    if("Notification" in window&&Notification.permission==="granted")new Notification("Takeaways Tonight? · Payment received",{body:"Restaurant confirmed payment for order #"+newRow.order_number+"."});
+    if("Notification" in window&&Notification.permission==="granted")new Notification("Takeaways Tonight? · Payment received",{body:"Restaurant confirmed payment for order #"+newRow.order_number+" at "+new Date(newRow.payment_received_at||Date.now()).toLocaleString()+"."});
    }
   }).subscribe();
 }
