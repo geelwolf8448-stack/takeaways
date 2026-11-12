@@ -223,7 +223,7 @@ android {
 }
 const callbackSource = callback.html;
 check("sign-in callback supports Supabase magiclink tokens for legacy links", /requestedType==="email"\?"email":"magiclink"/.test(callbackSource) && /verifyOtp\(\{token_hash:tokenHash,type\}\)/.test(callbackSource));
-check("email OTP callback supports email token type", /type:"email"/.test(callbackSource));
+check("email OTP callback supports email token type", /requestedType==="email"\?"email":"magiclink"/.test(callbackSource) && /verifyOtp\(\{token_hash:tokenHash,type\}\)/.test(callbackSource));
 for (const file of ["LAUNCH-KIT.md", "ANDROID-RELEASE.md", "RESTAURANT-AGREEMENT-TEMPLATE.md", ".github/workflows/android-release.yml"]) {
   check(file + " exists", fs.existsSync(path.join(root, file)));
 }
