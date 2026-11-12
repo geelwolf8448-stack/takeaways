@@ -108,7 +108,7 @@ check("public Android app loads push tap handler", /push-tap-handler\.js/.test(p
 check("native push stores FCM tokens against the signed-in user", /restaurant_push_tokens/.test(nativePush) && /user_id: session\.user\.id/.test(nativePush));
 check("native push requests permission and registers the Android device", /requestPermissions/.test(nativePush) && /PushNotifications\.register/.test(nativePush));
 check("restaurant owner portal uses server-side order updates", /marketplace-api/.test(restaurantPortal.html) && /update_order/.test(restaurantPortal.html));
-check("restaurant menu and listing changes are centrally managed", /managed centrally by Takeaways Tonight/.test(restaurantPortal.html) && !/saveListing/.test(restaurantPortal.html));
+check("restaurant owners can manage menus, business images and accepted payment methods", /saveRestaurantMenu/.test(restaurantPortal.html) && /uploadBusinessImage/.test(restaurantPortal.html) && /savePaymentMethods/.test(restaurantPortal.html) && /data-payment-method/.test(restaurantPortal.html));
 check("restaurant portal does not expose internal fee reporting", !/feeLedger|feeArea/.test(restaurantPortal.html));
 check("web and native pages load the shared auth deep-link handler", /native-auth\.js/.test(publicPage.html) && /native-auth\.js/.test(account.html) && /native-auth\.js/.test(restaurantPortal.html));
 const nativeAuth = read("native-auth.js");
