@@ -21,11 +21,13 @@ button.secondary,.linkbtn.secondary{background:#20170e;color:#ffe48a;border-colo
 <header><div class="wrap"><h1>Takeaways Tonight? · Restaurant Portal</h1><p class="small">Manage your approved listing and customer order requests.</p><a class="linkbtn secondary" href="#restaurants">Manage adverts & specials</a><a class="linkbtn secondary" href="index.html">← Public website</a></div></header>
 <main class="wrap">
 <section class="panel" id="loginPanel">
-<h2>Restaurant owner sign in</h2><div class="status"><b>14-DAY FREE PILOT</b><br>Every restaurant, takeaway shop, home-based takeaway, inyama shop and coffee shop gets a free 14-day pilot. If you choose to continue, the once-off admin fee is R250, followed by R500 per month. No commission is charged on orders — you keep 100% of your food sales. Subscription billing is arranged separately; online payments are not active yet.</div><p class="small">Use your email to receive a one-time secure sign-in link. If you are new, you can create your account here.</p>
-<label for="name">Your name</label><input id="name" autocomplete="name" placeholder="Full name">
-<label for="phone">Mobile number</label><input id="phone" type="tel" autocomplete="tel" placeholder="082 123 4567">
+<h2>Restaurant owner sign in</h2><div class="status"><b>14-DAY FREE PILOT</b><br>Every restaurant, takeaway shop, home-based takeaway, inyama shop and coffee shop gets a free 14-day pilot. If you choose to continue, the once-off admin fee is R250, followed by R500 per month. No commission is charged on orders — you keep 100% of your food sales. Subscription billing is arranged separately; online payments are not active yet.</div><p class="small">Sign in with the email address and password you created when registering your business. You can also request a one-time secure sign-in link.</p>
+<label for="name">Your name (for a sign-in link)</label><input id="name" autocomplete="name" placeholder="Full name">
+<label for="phone">Mobile number (for a sign-in link)</label><input id="phone" type="tel" autocomplete="tel" placeholder="082 123 4567">
 <label for="email">Email address</label><input id="email" type="email" autocomplete="email" placeholder="you@example.com">
-<button id="sendLink" onclick="sendLink()">Email me a secure sign-in link</button><div class="status" id="loginStatus">Enter your details to continue.</div>
+<label for="portalPassword">Password</label><input id="portalPassword" type="password" autocomplete="current-password" placeholder="Your account password">
+<button id="passwordSignIn" onclick="signInWithPassword()">Sign in with password</button>
+<button id="sendLink" class="secondary" onclick="sendLink()">Email me a secure sign-in link</button><div class="status" id="loginStatus">Enter your email and password to continue.</div>
 </section>
 <section id="dashboard" class="hidden">
 <div class="panel"><div class="top"><div><h2>Restaurant dashboard</h2><div class="small" id="signedIn"></div></div><button class="secondary" onclick="signOut()">Sign out</button></div><div class="status" id="status">Loading…</div><div class="status" id="orderAlert" role="status" aria-live="polite">Enable push notifications to receive new orders even when the app is closed.</div><button id="enableNotifications" onclick="enableOrderNotifications()">Enable background order notifications</button><span class="small" id="notificationStatus">For Android background alerts, enable push notifications once on this device.</span></div>
@@ -47,6 +49,15 @@ const $=id=>document.getElementById(id);let session=null,memberships=[];
 window.TT_PUSH_CONTEXT=()=>({sb,session,memberships});let knownOrderIds=new Set();let orderPollStarted=false;let notificationsEnabled=false;
 const money=c=>"R"+(Number(c||0)/100).toFixed(2);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+async function signInWithPassword(){
+ if(!sb)return;
+ const email=$("email").value.trim(),password=$("portalPassword").value;
+ if(!email.includes("@")||!password){$("loginStatus").textContent="Enter your email address and password.";return;}
+ $("passwordSignIn").disabled=true;$("loginStatus").textContent="Signing in…";
+ try{const {error}=await sb.auth.signInWithPassword({email,password});if(error)throw error;$("loginStatus").textContent="Signed in. Loading your restaurant dashboard…";}
+ catch(e){$("loginStatus").textContent=e.message||"Could not sign in. Check your email and password.";}
+ finally{$("passwordSignIn").disabled=false;}
+}
 async function sendLink(){
  if(!sb)return;const email=$("email").value.trim(),name=$("name").value.trim(),raw=$("phone").value.replace(/\D/g,""),phone=raw.startsWith("0")?"27"+raw.slice(1):raw;
  if(name.length<2||!/^27\d{9}$/.test(phone)||!email.includes("@")){$("loginStatus").textContent="Enter your name, a valid South African mobile number and email address.";return}
