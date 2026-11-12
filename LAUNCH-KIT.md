@@ -2,7 +2,7 @@
 
 **Public website:** https://geelwolf8448-stack.github.io/takeaways/
 **Launch area planned:** Hibberdene to Port Edward, KwaZulu-Natal South Coast.
-**Current service:** Restaurant discovery, customer accounts, saved order requests and WhatsApp restaurant notifications. Customers pay restaurants directly; no in-app payment or delivery fleet is active.
+**Current service:** Restaurant discovery, customer accounts, saved order requests and WhatsApp restaurant notifications. Customers pay restaurants directly; no in-app food-order payment or delivery fleet is active.
 
 > Business structure: Takeaways Tonight? is operated by an individual sole proprietor in their own name, trading as Takeaways Tonight?. The legal proprietor's full name is confirmed as Antione Els. Verified public contact details and the business/service address must still be supplied before publication.
 
@@ -20,7 +20,7 @@ Not sure what to eat tonight? We're building a simple way to discover local rest
 
 Find a place, check the menu, create your customer account and submit an order request. The restaurant is notified through WhatsApp and confirms the order directly.
 
-We're inviting restaurants, takeaway shops, home-based takeaways, inyama shops and coffee shops to join the pilot. Every business in these categories receives a free 14-day pilot. Owners and managers can request a listing. Nothing goes live without the business's permission.
+We're inviting restaurants, takeaway shops, home-based takeaways, inyama shops and coffee shops to join the pilot. Every business in these categories receives a free 14-day pilot. Owners and managers can request a listing. Businesses register and are published automatically after confirming that they are authorised and have permission to publish their details, menus, images and contact information.
 
 Visit: https://geelwolf8448-stack.github.io/takeaways/
 
@@ -96,7 +96,7 @@ Features:
 - Send your order request directly to the restaurant.
 - Install the app for quick access.
 
-Please note: a submitted order and WhatsApp message are requests, not confirmation. The restaurant confirms availability, final prices and collection or delivery. The app does not currently process payments or provide its own delivery service. Customers pay the restaurant directly. Restaurant participation and listing information are subject to owner approval.
+Please note: a submitted order and WhatsApp message are requests, not confirmation. The restaurant confirms availability, final prices and collection or delivery. The app does not currently process payments or provide its own delivery service. Customers pay the restaurant directly. A business must be authorised to register and approve the accuracy of its listing, menu, images and contact information.
 
 **Store listing assets still required:** final approved app icon, phone screenshots from the actual running app, feature graphic, support email/website, privacy policy URL, developer identity and content-rating questionnaire.
 
@@ -117,7 +117,7 @@ Please note: a submitted order and WhatsApp message are requests, not confirmati
 - Legal operator name and status: **Antione Els — individual sole proprietor trading as Takeaways Tonight?**
 - Business/registered address: **[ADD VERIFIED DETAILS]**
 - Customer and restaurant support email: **[ADD MONITORED EMAIL]**
-- Support telephone/WhatsApp: **[ADD VERIFIED NUMBER]**
+- Support WhatsApp currently published on the website: **+27 83 314 9674 — reconfirm before wider launch**
 - Privacy / Information Officer contact: **[ADD VERIFIED CONTACT]**
 - Company registration number, if applicable: **[ADD OR MARK NOT APPLICABLE]**
 
