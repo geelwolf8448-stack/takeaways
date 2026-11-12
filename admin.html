@@ -31,6 +31,7 @@ button.reject{background:#251010;color:#ffd9d9;border:1px solid #a44}button:disa
 <div id="applications"></div>
 <div class="panel"><h2>Restaurant owner access requests</h2><div class="small">Only verified owners or managers should be granted access to a restaurant.</div><div id="ownerRequests">Loading requests…</div></div>
 <div class="panel"><h2>Marketplace overview</h2><button onclick="loadMarketplaceOverview()">Refresh overview</button><div id="marketplaceOverview" class="status">Loading marketplace totals…</div></div>
+<div class="panel"><h2>Restaurant payment confirmations</h2><p class="small">When a restaurant owner or manager confirms that payment has reached the restaurant, the confirmation appears here.</p><div id="paymentNotifications" class="status" aria-live="polite">Waiting for payment confirmations…</div></div>
 <div class="panel"><div class="row"><div><h2>Business subscriptions &amp; pilot periods</h2><div class="small">14-day pilot · R250 once-off admin fee · R500 monthly · no food-order commission</div></div><button onclick="loadBilling()">Refresh billing</button></div><div class="status" id="billingStatus">Loading subscription records…</div><div class="status" id="payfastConfigStatus">Checking secure PayFast configuration…</div><div id="billingList"></div></div>
 </section>
 <div class="small">Security: the browser uses only the public Supabase publishable key. Review actions are checked again inside a database function; no secret key is stored here.</div>
@@ -38,7 +39,7 @@ button.reject{background:#251010;color:#ffd9d9;border:1px solid #a44}button:disa
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
 <script>
-let accessToken="",currentEmail="",currentUserId="";
+let accessToken="",currentEmail="",currentUserId="",paymentChannel=null;const paymentNoticeRows=[];
 const config=window.TT_CONFIG||{};
 const supabaseClient=(window.supabase&&config.supabaseUrl&&config.supabaseAnonKey)?window.supabase.createClient(config.supabaseUrl,config.supabaseAnonKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}}):null;
 const el=id=>document.getElementById(id);
@@ -84,6 +85,7 @@ async function loadApplications(){
   el("applications").innerHTML=data.length?data.map(app=>card(app)).join(""):'<div class="panel">No pending applications. New submissions will appear here.</div>';
   say(data.length+" pending application(s).");
   await Promise.all([loadOwnerRequests(),loadMarketplaceOverview(),loadBilling()]);
+  startPaymentNotifications();
  }catch(error){say(error.message)}
 }
 function esc(value){return String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
@@ -123,13 +125,31 @@ async function reviewOwnerRequest(id,decision,button){
 }
 async function loadMarketplaceOverview(){
  try{
-  const ordersResponse=await fetch(config.supabaseUrl+"/rest/v1/marketplace_orders?select=id,order_number,status,total_cents,created_at&order=created_at.desc&limit=100",{headers:apiHeaders()});
+  const ordersResponse=await fetch(config.supabaseUrl+"/rest/v1/marketplace_orders?select=id,order_number,status,payment_status,total_cents,created_at,updated_at&order=created_at.desc&limit=100",{headers:apiHeaders()});
   const orders=await ordersResponse.json();
   if(!ordersResponse.ok)throw new Error("Could not load marketplace reporting data.");
   const gross=orders.reduce((n,o)=>n+Number(o.total_cents||0),0);
   const completed=orders.filter(o=>o.status==="completed").length;
   el("marketplaceOverview").textContent=orders.length+" recent order(s) · "+completed+" completed · Order value R"+(gross/100).toFixed(2)+". Reporting is currently limited to the latest 100 orders.";
+  paymentNoticeRows.splice(0,paymentNoticeRows.length,...orders.filter(o=>o.payment_status==="paid_directly_to_restaurant").slice(0,10));
+  renderPaymentNotifications();
  }catch(e){el("marketplaceOverview").textContent=e.message}
+}
+function renderPaymentNotifications(){
+ const root=el("paymentNotifications");if(!root)return;
+ root.innerHTML=paymentNoticeRows.length?paymentNoticeRows.map(o=>"<div><b>Payment received · Order #"+esc(o.order_number)+"</b><br><span class=\"small\">Recorded "+esc(new Date(o.updated_at||o.created_at).toLocaleString())+"</span></div>").join("<hr>"):"No restaurant payment confirmations recorded yet.";
+}
+function startPaymentNotifications(){
+ if(!supabaseClient||!currentUserId||paymentChannel)return;
+ paymentChannel=supabaseClient.channel("admin-payment-confirmations-"+currentUserId)
+  .on("postgres_changes",{event:"UPDATE",schema:"public",table:"marketplace_orders"},payload=>{
+   const oldRow=payload.old||{},newRow=payload.new||{};
+   if(newRow.payment_status==="paid_directly_to_restaurant"&&oldRow.payment_status!=="paid_directly_to_restaurant"){
+    paymentNoticeRows.unshift(newRow);paymentNoticeRows.splice(10);renderPaymentNotifications();
+    el("marketplaceOverview").textContent="Payment received confirmed for order #"+newRow.order_number+". The restaurant recorded payment directly to its own account.";
+    if("Notification" in window&&Notification.permission==="granted")new Notification("Takeaways Tonight? · Payment received",{body:"Restaurant confirmed payment for order #"+newRow.order_number+"."});
+   }
+  }).subscribe();
 }
  
 async function loadBilling(){
@@ -197,7 +217,7 @@ async function startPilot(restaurantId,button){
  }catch(error){alert(error.message);button.disabled=false}
 }
 
-async function signOut(){try{if(supabaseClient)await supabaseClient.auth.signOut()}finally{accessToken="";currentEmail="";currentUserId="";el("dashboard").classList.add("hidden");el("loginPanel").classList.remove("hidden");el("applications").innerHTML="";el("resetStatus").textContent="Signed out. Request a fresh one-time sign-in link when you are ready."}}
+async function signOut(){try{if(paymentChannel&&supabaseClient){await supabaseClient.removeChannel(paymentChannel);paymentChannel=null;}if(supabaseClient)await supabaseClient.auth.signOut()}finally{accessToken="";currentEmail="";currentUserId="";el("dashboard").classList.add("hidden");el("loginPanel").classList.remove("hidden");el("applications").innerHTML="";el("resetStatus").textContent="Signed out. Request a fresh one-time sign-in link when you are ready."}}
 
 // Restore a valid Supabase session whenever the admin page is opened or revisited.
 // This is essential after the one-time email callback redirects back to this page.
