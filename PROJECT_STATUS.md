@@ -230,3 +230,31 @@ Not yet verified:
 
 Safety: Checkout is hard-locked to `PAYFAST_MODE=sandbox`; live mode is rejected by the new checkout action. Do not enable live payments or R500 recurring billing until Sandbox end-to-end testing is successful and the owner explicitly approves the move to live.
 
+
+
+## Automatic food-business registration — implementation checkpoint (12 November 2026)
+
+The owner confirmed the desired onboarding journey: a food business must go live immediately after it completes its own registration, without a manual admin approval step. Business owners create an account with their name, South African mobile number, email address and password.
+
+Implemented:
+- Added a public register-food-business Supabase Edge Function (ACTIVE, version 1; JWT verification disabled because it is a public registration endpoint).
+- The function validates owner details, business type, province, WhatsApp number and menu entries; creates the owner Auth account; and calls a restricted database function to create the listing and related records.
+- Added restaurants.business_type with supported types: restaurant, takeaway shop, home-based takeaway, inyama shop and coffee shop.
+- Added a transactional database function register_food_business, executable only by the Supabase service role. It creates the published restaurant listing, owner membership, owner profile, 14-day trial subscription, and R250 administration-fee invoice due at the end of the pilot.
+- Updated the public Apply to Join form to collect the owner account details, business type, listing details and initial menu. It explains immediate publication and the pilot terms.
+- On successful registration, the website signs the owner in and sends them to the Restaurant Portal.
+- Added password sign-in to the Restaurant Portal; the existing email magic-link sign-in remains available.
+- Updated the service-worker cache to takeaways-tonight-v37-instant-business-registration.
+
+Important:
+- No business registration was created during implementation and no pilot or invoice was started for an existing business.
+- The one existing restaurant database row was not modified.
+- New registrations will be published automatically and will start the 14-day pilot immediately.
+- The R250 invoice is scheduled for the end of the pilot. The R500 monthly billing lifecycle and automatic recurring payment collection still require further implementation and testing.
+- PayFast remains in Sandbox; live payments remain disabled. No food-order commission or platform collection of restaurant food sales is introduced.
+- Public automatic registration can be abused with false or inaccurate details. The form requires the registrant to confirm they are authorised and that the information is accurate. Email address is confirmed by account creation as an active login, but there is no separate manual identity/business verification step, consistent with the owner's instruction for immediate publication.
+- Before promoting this publicly, complete an end-to-end test using a dedicated test email/business, confirm listing visibility, owner login, portal editing, customer order flow, and trial/invoice creation. Do not use a real partner's details for testing without permission.
+
+Relevant deployment:
+- register-food-business Supabase Edge Function version 1.
+- register_food_business database function and restaurants.business_type migration.
