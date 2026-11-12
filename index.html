@@ -538,6 +538,8 @@ async function sendOrder(){
  if(!basket.length){alert("Your basket is empty.");return;}
  const restaurant=restaurants.find(r=>r.id===basket[0].restaurantId);
  if(!restaurant||restaurant.isDemo!==false){alert("Orders are available only for approved restaurant partners.");return;}
+ const whatsapp=String(restaurant.phone||"").replace(/\D/g,"");
+ if(!/^27\d{9}$/.test(whatsapp)){alert("This restaurant has not completed WhatsApp verification and cannot receive orders yet.");return;}
  const name=document.getElementById("customerName").value.trim();
  const rawPhone=document.getElementById("customerPhone").value.replace(/\D/g,"");
  const customerPhone=rawPhone.startsWith("0")?"27"+rawPhone.slice(1):rawPhone;
@@ -578,7 +580,7 @@ async function sendOrder(){
    body:JSON.stringify({action:"create_order",restaurantId,customerName,customerPhone:phone,fulfilmentType:fulfilment.toLowerCase(),deliveryAddress:address,notes,paymentMethod,items:basket.map(i=>({name:i.name,quantity:i.qty,priceCents:Math.round(i.price*100)})),idempotencyKey})
   });
   const result=await response.json();if(!response.ok)throw new Error(result.error||"Your order could not be submitted.");
-  const order=result.order,whatsapp=String(restaurant.phone||"").replace(/\D/g,"");
+  const order=result.order;
   const lines=basket.map(item=>item.qty+" x "+item.name+" — "+money(item.price*item.qty));
   const message=["ORDER REQUEST — Takeaways Tonight?","Order reference: #"+order.order_number,"Restaurant: "+restaurant.name,"Customer: "+customerName,"Customer mobile: +"+phone,"Fulfilment: "+fulfilment,...(fulfilment==="Delivery"?["Delivery address: "+address]:[]),"","Items:",...lines,"Food subtotal: "+money(basket.reduce((sum,item)=>sum+item.price*item.qty,0)),...(notes?["Notes: "+notes]:[]),"","Please confirm availability, any delivery charge and final total. Customer payment method selected: "+(document.getElementById("customerPaymentMethod").selectedOptions[0]?.textContent||paymentMethod)+". Payment is made directly to the restaurant. No payment has been made through Takeaways Tonight?"].join("\n");
   localStorage.removeItem("tt_pending_checkout");sessionStorage.removeItem("tt_order_idempotency");
@@ -605,7 +607,7 @@ async function loadSharedRestaurants(){
    const response=await fetch(c.supabaseUrl+'/rest/v1/restaurants?select=id,name,area,province,category,whatsapp,description,menu,menu_file_url,business_image_url,accepted_payment_methods,latitude,longitude&is_published=eq.true&order=name.asc',{headers:{apikey:c.supabaseAnonKey}});
    if(!response.ok)throw new Error('Directory request failed ('+response.status+').');rows=await response.json();
   }
-  const shared=rows.map(r=>({id:'shared-'+r.id,name:r.name,area:r.area,province:r.province||'KwaZulu-Natal',category:r.category,phone:r.whatsapp,desc:r.description||'Local food business',items:Array.isArray(r.menu)?r.menu:[],menuFileUrl:r.menu_file_url||'',businessImageUrl:r.business_image_url||'',acceptedPaymentMethods:Array.isArray(r.accepted_payment_methods)?r.accepted_payment_methods:[],emoji:'🍽️',isDemo:false,distanceKm:r.distance_km==null?null:Number(r.distance_km)}));
+  const shared=rows.map(r=>({id:'shared-'+r.id,name:r.name,area:r.area,province:r.province||'KwaZulu-Natal',category:r.category,phone:r.whatsapp,desc:r.description||'Local food business',items:Array.isArray(r.menu)?r.menu.map(entry=>Array.isArray(entry)?entry:[String(entry?.name??entry?.title??""),Number(entry?.price)]).filter(entry=>entry[0]&&Number.isFinite(entry[1])):[],menuFileUrl:r.menu_file_url||'',businessImageUrl:r.business_image_url||'',acceptedPaymentMethods:Array.isArray(r.accepted_payment_methods)?r.accepted_payment_methods:[],emoji:'🍽️',isDemo:false,distanceKm:r.distance_km==null?null:Number(r.distance_km)}));
   restaurants=[...restaurants.filter(r=>!String(r.id).startsWith('shared-')),...shared];render();
   if(status)status.textContent=shared.length?(customerLocation?'Location-based directory connected · Nearest businesses shown first':'Directory connected · Enable location to sort by distance'):'No published restaurant partners yet. Businesses can apply to join.';
  }catch(error){console.warn('Could not load location-aware shared directory.',error);restaurants=[];render();if(status)status.textContent='Could not connect to the restaurant directory. Please try again later.';}
