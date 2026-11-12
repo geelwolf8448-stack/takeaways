@@ -98,3 +98,33 @@ Important: These updates change the published wording and project documentation.
 - Never place Supabase service-role keys, PayFast merchant keys, or other secrets in public HTML/JavaScript.
 - Keep payment creation and PayFast notification verification server-side.
 - Preserve row-level security and authenticated owner/manager authorization.
+
+
+## Separate platform billing — groundwork deployed (12 November 2026)
+
+The platform billing system is separate from customer food-order payments and restaurant payouts.
+
+Confirmed pricing:
+- Every approved restaurant, takeaway shop, home-based takeaway, inyama shop and coffee shop receives one 14-day free pilot.
+- R250 once-off administration fee, due at the end of the pilot.
+- R500 monthly subscription, to begin after the once-off admin fee is settled.
+- No food-order commission; businesses keep 100% of food sales.
+
+Completed technical groundwork:
+- Created `billing_subscriptions` to track each approved food business, pilot start/end dates, status, once-off admin fee, monthly fee, and next billing date.
+- Created `billing_invoices` with separate invoice types for the R250 admin fee and R500 monthly subscription.
+- Created `billing_payment_events` for idempotent payment-notification records.
+- Enforced fixed ZAR prices in database constraints: 25,000 cents admin fee and 50,000 cents monthly subscription.
+- Enabled row-level security; billing records are readable only by platform administrators. No public browser write access.
+- Deployed Supabase Edge Function `platform-billing` version 1 with JWT verification. It checks administrator access server-side, lists food businesses and billing records, and starts a one-time 14-day pilot for an approved/published business.
+- Updated `admin.html` with a Business Subscriptions & Pilot Periods panel. Administrators can view each business, see pilot/billing status, and start its 14-day pilot. Starting a pilot creates the R250 admin-fee invoice due at the end of the 14 days.
+- The monthly R500 charge is deliberately not invoiced or collected until the R250 admin fee has been settled.
+
+Not yet live:
+- PayFast checkout for the R250 administration invoice.
+- PayFast recurring subscription/token billing for R500 monthly.
+- PayFast ITN signature/amount verification and idempotent invoice settlement.
+- Automated overdue reminders, retry handling, cancellation and suspension rules.
+- End-to-end test using a real/sandbox PayFast merchant account.
+
+Important: The deployed billing function currently manages pilot dates and billing records only. It does not collect money, mark invoices paid, or start automatic recurring charges. Do not tell businesses that PayFast billing is active until the payment integration has been configured and tested. Keep all PayFast merchant credentials and passphrases in server-side Supabase secrets only; never put them in public HTML or GitHub.
