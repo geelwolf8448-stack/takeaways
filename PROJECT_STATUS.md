@@ -167,3 +167,12 @@ Safety rule: never send merchant keys or passphrases through chat, email, GitHub
 - These credentials have not yet been added to Supabase Edge Function secrets. The available connected Supabase tools do not expose a secrets-management action, so the owner must add them through the Supabase Dashboard's Edge Function Secrets settings.
 - Keep `PAYFAST_MODE=sandbox`. Do not enable live payments. After credentials are added, verify the configuration readiness indicator and complete sandbox payment testing.
 - ITN notification URL: `https://xsrmtokfrqdyfbrqljsm.supabase.co/functions/v1/payfast-itn`.
+
+## PayFast setup checkpoint (12 November 2026, latest)
+
+- Owner confirms the Supabase Edge Functions area is open and has authorised saving the current project progress.
+- PayFast Sandbox dashboard access is available; sandbox Merchant ID and Merchant Key are visible to the owner; sandbox Security/Salt Passphrase has been created and saved in PayFast.
+- Next manual step: add the seven `PAYFAST_*` values in Supabase Dashboard → Edge Functions → Secrets. Do not paste credentials into ChatGPT, GitHub, or public website files.
+- Required values: `PAYFAST_MERCHANT_ID`, `PAYFAST_MERCHANT_KEY`, `PAYFAST_PASSPHRASE`, `PAYFAST_MODE=sandbox`, `PAYFAST_RETURN_URL=https://geelwolf8448-stack.github.io/takeaways/`, `PAYFAST_CANCEL_URL=https://geelwolf8448-stack.github.io/takeaways/`, and `PAYFAST_NOTIFY_URL=https://xsrmtokfrqdyfbrqljsm.supabase.co/functions/v1/payfast-itn`.
+- Credentials have NOT been confirmed as saved in Supabase yet. The configuration readiness check and sandbox payment tests remain pending.
+- Live payments remain disabled. No food-order payment routing, split payments, or platform commission deductions are to be enabled.
