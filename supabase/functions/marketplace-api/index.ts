@@ -63,7 +63,7 @@ async function sendNewOrderPush(restaurantId: string, orderId: string, orderNumb
   try {
     const serviceAccount = JSON.parse(rawCredentials);
     const { data: members, error: memberError } = await admin.from("restaurant_members")
-      .select("user_id").eq("restaurant_id", restaurantId);
+      .select("user_id,member_role").eq("restaurant_id", restaurantId).in("member_role", ["owner", "manager"]);
     if (memberError || !members?.length) return;
     const userIds = [...new Set(members.map((member: { user_id: string }) => member.user_id))];
     const { data: devices, error: deviceError } = await admin.from("restaurant_push_tokens")
@@ -118,12 +118,39 @@ Deno.serve(async (req: Request) => {
     const body = await req.json();
     const action = String(body.action ?? "");
 
+    if (action === "set_restaurant_payment_methods") {
+      const restaurantId = String(body.restaurantId ?? "");
+      const methods = body.methods;
+      const allowed = ["cash_collection", "cash_delivery", "eft", "card_machine"];
+      if (!/^[0-9a-f-]{36}$/i.test(restaurantId) || !Array.isArray(methods) ||
+          methods.length < 1 || methods.some((method: unknown) => !allowed.includes(String(method))) ||
+          new Set(methods).size !== methods.length) {
+        return reply(400, { error: "Choose at least one valid payment method." });
+      }
+      const [{ data: membership }, { data: adminRow }] = await Promise.all([
+        admin.from("restaurant_members").select("member_role")
+          .eq("restaurant_id", restaurantId).eq("user_id", user.id).maybeSingle(),
+        admin.from("platform_admins").select("user_id").eq("user_id", user.id).maybeSingle(),
+      ]);
+      if ((!membership || !["owner", "manager"].includes(membership.member_role)) && !adminRow) {
+        return reply(403, { error: "Only this restaurant's owner or manager can change payment methods." });
+      }
+      const { error } = await admin.from("restaurants")
+        .update({ accepted_payment_methods: methods }).eq("id", restaurantId);
+      if (error) {
+        console.error("Restaurant payment method update failed", error);
+        return reply(500, { error: "Could not save payment methods." });
+      }
+      return reply(200, { acceptedPaymentMethods: methods });
+    }
+
     if (action === "create_order") {
       const restaurantId = String(body.restaurantId ?? "");
       const customerName = String(body.customerName ?? "").trim();
       const phoneInput = String(body.customerPhone ?? "").replace(/\D/g, "");
       const customerPhone = phoneInput.startsWith("0") ? "27" + phoneInput.slice(1) : phoneInput;
       const fulfilmentType = String(body.fulfilmentType ?? "");
+      const paymentMethod = String(body.paymentMethod ?? "");
       const deliveryAddress = String(body.deliveryAddress ?? "").trim();
       const customerNotes = String(body.notes ?? "").trim().slice(0, 1000);
       const idempotencyKey = String(body.idempotencyKey ?? "");
@@ -145,9 +172,20 @@ Deno.serve(async (req: Request) => {
       if (existing) return reply(200, { order: existing, reused: true });
 
       const { data: restaurant, error: restaurantError } = await admin.from("restaurants")
-        .select("id,name,menu,is_published")
+        .select("id,name,menu,is_published,accepted_payment_methods")
         .eq("id", restaurantId).eq("is_published", true).maybeSingle();
       if (restaurantError || !restaurant) return reply(404, { error: "This restaurant is not currently accepting orders through the directory." });
+      const acceptedMethods = Array.isArray(restaurant.accepted_payment_methods)
+        ? restaurant.accepted_payment_methods : [];
+      if (!acceptedMethods.includes(paymentMethod)) {
+        return reply(400, { error: "Please choose one of this restaurant's available payment methods." });
+      }
+      if (paymentMethod === "cash_collection" && fulfilmentType !== "collection") {
+        return reply(400, { error: "Cash on collection is only available for collection orders." });
+      }
+      if (paymentMethod === "cash_delivery" && fulfilmentType !== "delivery") {
+        return reply(400, { error: "Cash on delivery is only available for delivery orders." });
+      }
 
       const menu = Array.isArray(restaurant.menu) ? restaurant.menu : [];
       const normalizedMenu = menu.map((entry: unknown) => {
@@ -184,7 +222,7 @@ Deno.serve(async (req: Request) => {
         customer_id: user.id,
         restaurant_id: restaurant.id,
         status: "submitted",
-        payment_method: "pay_restaurant_directly",
+        payment_method: paymentMethod,
         payment_status: "not_paid",
         food_subtotal_cents: subtotalCents,
         delivery_fee_cents: 0,
@@ -218,7 +256,7 @@ Deno.serve(async (req: Request) => {
       return reply(201, {
         order,
         restaurantName: restaurant.name,
-        paymentNotice: "No payment has been taken by Takeaways Tonight. The restaurant must confirm availability, delivery charges and payment directly with you.",
+        paymentNotice: "No payment has been taken by Takeaways Tonight. Pay the restaurant using the payment method you selected.",
       });
     }
 
@@ -229,7 +267,7 @@ Deno.serve(async (req: Request) => {
       if (!/^[0-9a-f-]{36}$/i.test(orderId)) return reply(400, { error: "Invalid order." });
 
       const { data: order, error: orderError } = await admin.from("marketplace_orders")
-        .select("id,restaurant_id,status,payment_status")
+        .select("id,restaurant_id,status,payment_status,payment_received_at")
         .eq("id", orderId).maybeSingle();
       if (orderError || !order) return reply(404, { error: "Order not found." });
 
@@ -238,15 +276,19 @@ Deno.serve(async (req: Request) => {
           .eq("restaurant_id", order.restaurant_id).eq("user_id", user.id).maybeSingle(),
         admin.from("platform_admins").select("user_id").eq("user_id", user.id).maybeSingle(),
       ]);
-      if (!membership && !adminRow) return reply(403, { error: "You are not authorised to manage this restaurant's orders." });
+      if ((!membership || !["owner", "manager"].includes(membership.member_role)) && !adminRow) return reply(403, { error: "Only this restaurant's owner or manager can manage orders." });
 
       if (markPaid) {
-        if (!["accepted", "preparing", "ready"].includes(order.status)) return reply(409, { error: "The restaurant can only confirm direct payment after accepting the order." });
+        if (order.status !== "ready") return reply(409, { error: "Payment can only be confirmed after the restaurant has marked the order ready for collection or delivery." });
+        if (["paid", "paid_directly_to_restaurant"].includes(order.payment_status)) return reply(409, { error: "Payment has already been confirmed for this order." });
         const { data, error } = await admin.from("marketplace_orders")
-          .update({ payment_status: "paid_directly_to_restaurant" })
-          .eq("id", orderId).select("id,order_number,status,payment_status").single();
-        if (error) return reply(400, { error: "Could not update the payment status." });
-        return reply(200, { order: data });
+          .update({ payment_status: "paid", payment_received_at: new Date().toISOString(), payment_received_by: user.id })
+          .eq("id", orderId).select("id,order_number,status,payment_status,payment_received_at,payment_received_by").single();
+        if (error) {
+          console.error("Restaurant payment confirmation failed", error);
+          return reply(400, { error: "Could not record payment confirmation." });
+        }
+        return reply(200, { order: data, message: "Payment confirmed by the restaurant and recorded." });
       }
 
       const transitions: Record<string, string[]> = {
@@ -256,7 +298,7 @@ Deno.serve(async (req: Request) => {
         ready: ["completed", "cancelled"],
       };
       if (!transitions[order.status]?.includes(nextStatus)) return reply(409, { error: "That order-status change is not allowed." });
-      if (nextStatus === "completed" && order.payment_status !== "paid_directly_to_restaurant") {
+      if (nextStatus === "completed" && !["paid", "paid_directly_to_restaurant"].includes(order.payment_status)) {
         return reply(409, { error: "Confirm that the customer paid the restaurant before completing the order." });
       }
       const { data, error } = await admin.from("marketplace_orders")
