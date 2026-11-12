@@ -114,6 +114,7 @@ Completed technical groundwork:
 - Created `billing_subscriptions` to track each approved food business, pilot start/end dates, status, once-off admin fee, monthly fee, and next billing date.
 - Created `billing_invoices` with separate invoice types for the R250 admin fee and R500 monthly subscription.
 - Created `billing_payment_events` for idempotent payment-notification records.
+- Prepared secure server-side fields for the PayFast recurring subscription token/status and last payment result; unique indexes prevent duplicate provider tokens/payment references.
 - Enforced fixed ZAR prices in database constraints: 25,000 cents admin fee and 50,000 cents monthly subscription.
 - Enabled row-level security; billing records are readable only by platform administrators. No public browser write access.
 - Deployed Supabase Edge Function `platform-billing` version 1 with JWT verification. It checks administrator access server-side, lists food businesses and billing records, and starts a one-time 14-day pilot for an approved/published business.
