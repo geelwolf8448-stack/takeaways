@@ -31,7 +31,7 @@ button.reject{background:#251010;color:#ffd9d9;border:1px solid #a44}button:disa
 <div id="applications"></div>
 <div class="panel"><h2>Restaurant owner access requests</h2><div class="small">Only verified owners or managers should be granted access to a restaurant.</div><div id="ownerRequests">Loading requests…</div></div>
 <div class="panel"><h2>Marketplace overview</h2><button onclick="loadMarketplaceOverview()">Refresh overview</button><div id="marketplaceOverview" class="status">Loading marketplace totals…</div></div>
-<div class="panel"><div class="row"><div><h2>Business subscriptions &amp; pilot periods</h2><div class="small">14-day pilot · R250 once-off admin fee · R500 monthly · no food-order commission</div></div><button onclick="loadBilling()">Refresh billing</button></div><div class="status" id="billingStatus">Loading subscription records…</div><div id="billingList"></div></div>
+<div class="panel"><div class="row"><div><h2>Business subscriptions &amp; pilot periods</h2><div class="small">14-day pilot · R250 once-off admin fee · R500 monthly · no food-order commission</div></div><button onclick="loadBilling()">Refresh billing</button></div><div class="status" id="billingStatus">Loading subscription records…</div><div class="status" id="payfastConfigStatus">Checking secure PayFast configuration…</div><div id="billingList"></div></div>
 </section>
 <div class="small">Security: the browser uses only the public Supabase publishable key. Review actions are checked again inside a database function; no secret key is stored here.</div>
 </main>
@@ -139,6 +139,12 @@ async function loadBilling(){
  try{
   const response=await fetch(config.supabaseUrl+"/functions/v1/platform-billing",{method:"POST",headers:apiHeaders(),body:JSON.stringify({action:"list_billing"})});
   const result=await response.json();if(!response.ok)throw new Error(result.error||"Could not load billing records.");
+  const configResponse=await fetch(config.supabaseUrl+"/functions/v1/platform-billing",{method:"POST",headers:apiHeaders(),body:JSON.stringify({action:"payment_config_status"})});
+  const configResult=await configResponse.json();
+  const readiness=el("payfastConfigStatus");
+  if(configResponse.ok&&readiness){
+   readiness.textContent=configResult.configured?"PayFast configuration present ("+configResult.mode+"). Payment checkout and webhook testing are still required; live payments remain disabled.":"PayFast is not connected yet. Missing secure settings: "+["merchant ID","merchant key","passphrase","return URL","cancel URL","notification URL","payment mode"].filter((label,index)=>![configResult.merchantIdPresent,configResult.merchantKeyPresent,configResult.passphrasePresent,configResult.returnUrlPresent,configResult.cancelUrlPresent,configResult.notifyUrlPresent,configResult.mode!=="not_configured"][index]).join(", ")+". No payments can be collected yet.";
+  }else if(readiness){readiness.textContent="Could not check PayFast configuration. No payment action was taken."}
   const rows=result.restaurants||[];
   list.innerHTML=rows.length?rows.map(r=>{
    const s=r.subscription;
