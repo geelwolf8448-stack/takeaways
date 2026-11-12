@@ -186,3 +186,12 @@ Safety rule: never send merchant keys or passphrases through chat, email, GitHub
 - After save confirmation, check `payment_config_status` from the authenticated admin billing panel/function. Then review the PayFast ITN implementation and current official PayFast source-IP/signature requirements before any sandbox end-to-end payment test.
 - Keep `PAYFAST_MODE=sandbox`. Live payments remain disabled; do not enable platform checkout or recurring charges until the implementation is reviewed and sandbox-tested.
 
+## PayFast Supabase secrets confirmed saved (12 November 2026)
+
+- Owner supplied the Supabase Custom secrets listing showing all seven required PayFast settings present: `PAYFAST_MERCHANT_ID`, `PAYFAST_MERCHANT_KEY`, `PAYFAST_PASSPHRASE`, `PAYFAST_MODE`, `PAYFAST_RETURN_URL`, `PAYFAST_CANCEL_URL`, and `PAYFAST_NOTIFY_URL`.
+- Supabase displayed SHA-256 digests and updated timestamps for all seven entries dated 12 November 2026. Secret values are not recorded here.
+- Supabase Edge Functions were checked directly: `platform-billing` is ACTIVE with JWT verification enabled; `payfast-itn` is ACTIVE with JWT verification disabled for the PayFast callback. Their configuration and payment handling are not yet proven by an end-to-end transaction.
+- The next owner-facing verification is to sign in to the admin dashboard at `https://geelwolf8448-stack.github.io/takeaways/admin.html` using the authorized platform administrator account and read the PayFast configuration status in the “Business subscriptions & pilot periods” panel. The check reports presence flags only and does not reveal credentials or create a payment.
+- If the panel says configuration is present in sandbox mode, proceed to review the PayFast ITN implementation and current official PayFast requirements before sandbox transaction testing. If it reports missing settings or an access error, stop and diagnose; do not recreate or expose secrets unnecessarily.
+- Live payments remain disabled. No customer food-order payments, split payments, or commission deductions are routed through the platform.
+
