@@ -258,3 +258,21 @@ Important:
 Relevant deployment:
 - register-food-business Supabase Edge Function version 1.
 - register_food_business database function and restaurants.business_type migration.
+
+
+## Public website, registration location and demo separation update (12 November 2026)
+
+- Fixed the business registration page so it submits the captured GPS coordinates with the registration request and then explicitly saves and reads back the coordinates through the authenticated owner location RPC after sign-in.
+- The registration page now verifies that the saved latitude/longitude match the captured coordinates. If the save or verification fails, it displays a retry action instead of silently continuing.
+- Added a recovery control to the Restaurant Portal so an owner/manager can capture and save the business location again from the business premises. The portal now loads the saved latitude/longitude to show whether a location is present.
+- Separated illustrative demo listings into their own clearly labelled “Preview example menus” section. The real participating-business section now contains only published shared business records. Demo examples remain disabled for ordering and are clearly labelled “DEMO EXAMPLE”.
+- Updated public footer with the known operator identity (Antione Els, sole proprietor trading as Takeaways Tonight?) and the WhatsApp support number already displayed on the site (+27 83 314 9674).
+- Updated the terms to use the current R250 once-off fee and R500 monthly subscription, and aligned privacy/terms/launch wording with automatic business registration and the current direct-payment model.
+- The public business/service address and monitored support email remain outstanding; they were not invented or filled with placeholders on the live site. Confirm these details with the owner before public commercial launch.
+- No restaurant testing was performed and no new business, pilot, order, subscription or invoice was created as part of this work.
+
+Remaining owner information required:
+- Verified physical/business or service address to publish.
+- Monitored support email and privacy contact email.
+- Confirmation that +27 83 314 9674 remains the correct public WhatsApp support number.
+
