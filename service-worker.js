@@ -1,4 +1,4 @@
-const CACHE_NAME = "takeaways-tonight-v50-complete-restaurant-profiles";
+const CACHE_NAME = "takeaways-tonight-v51-guest-order-copy";
 const APP_FILES = [
   "./",
   "./index.html",
