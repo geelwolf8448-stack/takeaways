@@ -343,6 +343,7 @@ dialog::backdrop{background:#3a193d99!important}
 <div class="hero-actions"><a class="primary" href="#restaurants">🛵 ORDER NOW</a><button class="primary" id="installAppButton" type="button" onclick="installTakeawaysApp()">⬇ DOWNLOAD OUR APP</button></div>
 <section id="installAppCard" class="install-panel"><div class="install-copy"><img src="icon.svg" alt="Takeaways Tonight app icon"><div><b>Get Takeaways Tonight? on your phone</b><div id="installHint" class="notice">Install the app for quick access from your home screen.</div></div></div></section>
 <div class="searchbar"><input id="search" placeholder="Search restaurants, meals or areas…" oninput="render()"><button onclick="render()">Search</button></div>
+<div class="notice" style="display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap"><span id="customerLocationStatus" role="status" aria-live="polite">📍 Finding restaurants near your current location…</span><button type="button" class="secondary" onclick="refreshCustomerLocation()">Refresh my location</button></div>
 <section class="promo-panel" id="provinceDirectory">
  <div class="section-head"><div><h2>Choose your province</h2><p>Explore restaurants and takeaway menus from anywhere in South Africa.</p></div></div>
  <div class="filters" id="provinceFilters" aria-label="Filter restaurants by province"></div>
@@ -397,6 +398,7 @@ dialog::backdrop{background:#3a193d99!important}
 <div class="field"><label>Business WhatsApp number (country code, digits only)</label><input id="rPhone" placeholder="e.g. 27821234567"></div>
 <div class="field"><label>Menu items (one per line: Name - price)</label><textarea id="rMenu" rows="4" placeholder="Classic burger - 89&#10;Chips - 35"></textarea><small>You can upload a full menu PDF or image from your Restaurant Portal after registration.</small></div>
 <div style="position:absolute;left:-10000px" aria-hidden="true"><label>Website</label><input id="rWebsite" tabindex="-1" autocomplete="off"></div>
+<div class="field"><label>Business location</label><p class="notice" id="businessLocationStatus">Set the exact location of your business so nearby customers can find it.</p><button type="button" class="secondary" id="captureBusinessLocationButton" onclick="captureBusinessLocation()">📍 Use this device to set business location</button></div>
 <label class="consent-row" style="display:flex;gap:10px;align-items:flex-start;font-weight:normal"><input id="rConsent" type="checkbox" style="width:auto;margin-top:4px" required><span>I confirm that I own or am authorised to register this business, that the business details and menu are accurate, and that I agree to the Takeaways Tonight? terms and privacy notice. I understand that the listing will be published immediately and the 14-day free pilot will start as soon as registration succeeds. Please read our <a href="privacy.html" target="_blank" rel="noopener">privacy notice</a>.</span></label>
 <button id="registerBusinessButton" style="width:100%" onclick="addRestaurant()">Register business and go live</button><p class="notice">Your business will appear in the public directory immediately after successful registration. You can sign in to the Restaurant Portal to manage your menu and orders.</p><div id="registrationStatus" class="notice" role="status"></div>
 </div></dialog>
@@ -422,6 +424,23 @@ async function installTakeawaysApp(){
  else if(isAndroid){hint.textContent="In Chrome, open the ⋮ menu and choose Install app. If it is not listed, choose Add to Home screen.";}
  else{hint.textContent="Use your browser menu to choose Install app or Add to Home Screen.";}
 }
+let customerLocation=null;
+let businessLocation=null;
+let locationAttempted=false;
+function setLocationStatus(message){const el=document.getElementById('customerLocationStatus');if(el)el.textContent=message;}
+function captureBusinessLocation(){
+ const status=document.getElementById('businessLocationStatus'),button=document.getElementById('captureBusinessLocationButton');
+ if(!navigator.geolocation){status.textContent='Location is not available on this device.';return;}
+ button.disabled=true;status.textContent='Finding your business location…';
+ navigator.geolocation.getCurrentPosition(pos=>{businessLocation={latitude:pos.coords.latitude,longitude:pos.coords.longitude};status.textContent='Business location captured successfully.';button.textContent='✓ Business location captured';button.disabled=false;},err=>{status.textContent=err.code===1?'Location permission was declined. Allow location access and try again.':'Could not detect location. Check device location services and try again.';button.disabled=false;},{enableHighAccuracy:true,timeout:15000,maximumAge:0});
+}
+function detectCustomerLocation(){
+ if(locationAttempted)return Promise.resolve(customerLocation);locationAttempted=true;
+ if(!navigator.geolocation){setLocationStatus('Location unavailable. Search by town or choose a province.');return Promise.resolve(null);}
+ setLocationStatus('📍 Finding restaurants near your current location…');
+ return new Promise(resolve=>navigator.geolocation.getCurrentPosition(pos=>{customerLocation={latitude:pos.coords.latitude,longitude:pos.coords.longitude};setLocationStatus('📍 Location found. Showing food businesses nearest to you first.');resolve(customerLocation);},err=>{setLocationStatus(err.code===1?'Location permission declined. Search by town or choose a province instead.':'Could not detect location. Check device location services or search by town.');resolve(null);},{enableHighAccuracy:true,timeout:12000,maximumAge:300000}));
+}
+async function refreshCustomerLocation(){locationAttempted=false;customerLocation=null;setLocationStatus('Refreshing your location…');await detectCustomerLocation();await loadSharedRestaurants();}
 const categories=["All","Burgers","Pizza","Fish & chips","Chicken","Seafood","Takeaways","Bars & experiences","Other"];
 function save(){localStorage.setItem("tt_restaurants",JSON.stringify(restaurants))}
 function money(n){return "R"+Number(n).toFixed(2).replace(".00","")}
