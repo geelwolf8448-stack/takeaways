@@ -147,18 +147,44 @@ async function loadBilling(){
   }else if(readiness){readiness.textContent="Could not check PayFast configuration. No payment action was taken."}
   const rows=result.restaurants||[];
   list.innerHTML=rows.length?rows.map(r=>{
-   const s=r.subscription;
-   const state=s?esc(s.status.replaceAll("_"," ").toUpperCase()):"PILOT NOT STARTED";
-   const dates=s&&s.pilot_started_at?"Pilot: "+new Date(s.pilot_started_at).toLocaleDateString()+" to "+new Date(s.pilot_ends_at).toLocaleDateString():"";
-   const next=s&&s.next_billing_at?"Next billing date: "+new Date(s.next_billing_at).toLocaleDateString():"";
-   const fee=s&&s.admin_fee_paid_at?"R250 admin fee paid":"R250 admin fee due after pilot";
-   const monthly=s&&s.subscription_started_at?"R500 monthly subscription started":"R500 monthly starts after admin fee settlement";
-   const action=!s||!s.pilot_started_at?(r.is_published?'<button data-start-pilot="'+esc(r.id)+'">Start 14-day pilot</button>':'<span class="small">Publish the business before starting its pilot.</span>'):"";
-   return '<article class="application"><div class="row"><h2>'+esc(r.name)+'</h2><span class="tag">'+state+'</span></div><p>'+esc(r.category)+' · '+esc(r.area)+' · '+esc(r.province||"")+'</p><p><b>Commercial terms:</b> R250 once-off admin fee · R500 monthly · no commission</p>'+(dates?'<p>'+esc(dates)+'</p>':'')+(next?'<p>'+esc(next)+'</p>':'')+(s?'<p>'+esc(fee)+' · '+esc(monthly)+'</p>':'<p class="small">No pilot or billing record has been started yet.</p>')+action+'</article>';
+   const sub=r.subscription,inv=r.admin_fee_invoice;
+   const state=sub?esc(sub.status.replaceAll("_"," ").toUpperCase()):"PILOT NOT STARTED";
+   const dates=sub&&sub.pilot_started_at?"Pilot: "+new Date(sub.pilot_started_at).toLocaleDateString()+" to "+new Date(sub.pilot_ends_at).toLocaleDateString():"";
+   const next=sub&&sub.next_billing_at?"Next billing date: "+new Date(sub.next_billing_at).toLocaleDateString():"";
+   const fee=sub&&sub.admin_fee_paid_at?"R250 admin fee paid":"R250 admin fee due after pilot";
+   const monthly=sub&&sub.subscription_started_at?"R500 monthly subscription started":"R500 monthly starts after admin fee settlement";
+   const startAction=!sub||!sub.pilot_started_at?(r.is_published?'<button data-start-pilot="'+esc(r.id)+'">Start 14-day pilot</button>':'<span class="small">Publish the business before starting its pilot.</span>'):"";
+   const invoiceLine=inv?'<p><b>R250 invoice:</b> '+esc(String(inv.status).toUpperCase())+' · due '+esc(new Date(inv.due_at).toLocaleDateString())+'</p>':"";
+   const dueNow=inv&&inv.status==="pending"&&new Date(inv.due_at).getTime()<=Date.now();
+   const checkoutAction=dueNow?'<button data-pay-admin-fee="'+esc(inv.id)+'" data-business="'+esc(r.name)+'">Pay R250 admin fee (Sandbox)</button>':(inv&&inv.status==="pending"?'<p class="small">Sandbox checkout becomes available when the 14-day pilot ends.</p>':"");
+   return '<article class="application"><div class="row"><h2>'+esc(r.name)+'</h2><span class="tag">'+state+'</span></div><p>'+esc(r.category)+' · '+esc(r.area)+' · '+esc(r.province||"")+'</p><p><b>Commercial terms:</b> R250 once-off admin fee · R500 monthly · no commission</p>'+(dates?'<p>'+esc(dates)+'</p>':"")+(next?'<p>'+esc(next)+'</p>':"")+(sub?'<p>'+esc(fee)+' · '+esc(monthly)+'</p>':'<p class="small">No pilot or billing record has been started yet.</p>')+invoiceLine+startAction+checkoutAction+'</article>';
   }).join(""):'<p class="small">No food businesses found.</p>';
   list.querySelectorAll("button[data-start-pilot]").forEach(button=>button.addEventListener("click",()=>startPilot(button.dataset.startPilot,button)));
-  status.textContent=rows.length+" business record(s). Starting a pilot records its exact 14-day dates and schedules the once-off R250 admin fee for the pilot end.";
+  list.querySelectorAll("button[data-pay-admin-fee]").forEach(button=>button.addEventListener("click",()=>startAdminFeeCheckout(button.dataset.payAdminFee,button.dataset.business,button)));
+  status.textContent=rows.length+" business record(s). R250 checkout is available only after the 14-day pilot ends. R500 monthly billing is not enabled.";
  }catch(error){status.textContent=error.message}
+}
+async function startAdminFeeCheckout(invoiceId,businessName,button){
+ const payerEmail=prompt("Enter the billing contact email for "+businessName+". This is sent to PayFast for the Sandbox checkout.");
+ if(!payerEmail)return;
+ if(!confirm("Open PayFast SANDBOX for the R250 once-off administration fee for "+businessName+"? No live money will be collected."))return;
+ button.disabled=true;
+ try{
+  const response=await fetch(config.supabaseUrl+"/functions/v1/platform-billing",{method:"POST",headers:apiHeaders(),body:JSON.stringify({action:"create_admin_fee_checkout",invoiceId,payerEmail})});
+  const result=await response.json();
+  if(!response.ok)throw new Error(result.error||"Could not create the PayFast Sandbox checkout.");
+  if(!result.uuid)throw new Error("PayFast did not return a checkout session.");
+  if(typeof window.payfast_do_onsite_payment!=="function"){
+   await new Promise((resolve,reject)=>{
+    let script=document.querySelector("script[data-payfast-onsite]");
+    if(!script){script=document.createElement("script");script.src="https://www.payfast.co.za/onsite/engine.js";script.async=true;script.dataset.payfastOnsite="true";document.head.appendChild(script);}
+    script.addEventListener("load",resolve,{once:true});
+    script.addEventListener("error",reject,{once:true});
+   });
+  }
+  if(typeof window.payfast_do_onsite_payment!=="function")throw new Error("PayFast checkout could not be opened. No payment was confirmed.");
+  window.payfast_do_onsite_payment({uuid:result.uuid});
+ }catch(error){alert(error.message);button.disabled=false}
 }
 async function startPilot(restaurantId,button){
  if(!confirm("Start this business's 14-day free pilot now? The R250 once-off admin fee will be due at the end of the pilot. The R500 monthly subscription starts after the admin fee is settled."))return;
