@@ -39,13 +39,16 @@ const requiredIds = [
 for (const id of requiredIds) {
   check("public page has #" + id, (publicPage.html.includes('id="'+id+'"') || publicPage.html.includes("id='"+id+"'")));
 }
-check("demo listings are not treated as order-enabled", /Demo only/.test(publicPage.html) && /r\.isDemo!==false/.test(publicPage.html));
+check("public directory contains no demo listings and refuses demo baskets", !/Demo Burger Kitchen|Demo Pizza Corner|Demo Fish Shack/.test(publicPage.html) && /r=>r.id===id&&r.isDemo===false/.test(publicPage.html) && /x=>x.id===id&&x.isDemo===false/.test(publicPage.html));
 check("demo cards are not labelled as confirmed featured partners", !/Our featured restaurants/.test(publicPage.html));
-check("orders are restricted to approved non-demo records", /r\.isDemo!==false/.test(publicPage.html) && /is_published=eq\.true/.test(publicPage.html));
+check("orders are restricted to published real restaurant records", /r\.isDemo===false/.test(publicPage.html) && /is_published=eq\.true/.test(publicPage.html));
+check("customer order receives live payment confirmation updates", /watchCustomerPayment\(order\.id,order\.order_number\)/.test(publicPage.html) && /postgres_changes/.test(publicPage.html) && /PAYMENT RECEIVED/.test(publicPage.html));
+check("customer can enable browser payment notifications", /enableCustomerPaymentNotifications/.test(publicPage.html) && /Notification\.requestPermission\(\)/.test(publicPage.html));
+check("checkout only shows payment methods configured by the restaurant", /acceptedPaymentMethods:Array\.isArray\(r\.accepted_payment_methods\)\?r\.accepted_payment_methods:\[\]/.test(publicPage.html) && /const methods=restaurant\?\.acceptedPaymentMethods\|\|\[\]/.test(publicPage.html));
 check("WhatsApp order request is generated", /https:\/\/wa\.me\//.test(publicPage.html) && /No payment has been made/.test(publicPage.html));
-check("public page explains WhatsApp requests are not secure in-app checkout", /Signed-in customers can submit an order request and notify the restaurant on WhatsApp/.test(publicPage.html) && /marketplace-api/.test(publicPage.html) && !/secure checkout are being prepared/.test(publicPage.html));
-check("pending checkout survives email sign-in in another browser tab", /localStorage\.setItem\("tt_pending_checkout"/.test(publicPage.html) && /Date\.now\(\)-saved\.savedAt>30\*60\*1000/.test(publicPage.html));
-check("pending checkout is cleared after order submission", /localStorage\.removeItem\("tt_pending_checkout"/.test(publicPage.html));
+check("customer guest checkout needs no email or account", /No customer account or email address is needed/.test(publicPage.html) && /signInAnonymously/.test(publicPage.html) && /marketplace-api/.test(publicPage.html));
+check("customer checkout does not request an email sign-in", /signInAnonymously/.test(publicPage.html) && !/signInWithOtp/.test(publicPage.html));
+check("order idempotency key is cleared after successful submission", /sessionStorage\.removeItem\("tt_order_idempotency"/.test(publicPage.html));
 check("South African customer and restaurant phone numbers are validated", /\^27\\d\{9\}\$/.test(publicPage.html));
 check("delivery address is required for delivery", /fulfilment==="Delivery"&&!address/.test(publicPage.html));
 check("partner application requires permission declaration", /rConsent/.test(publicPage.html) && /permission_confirmed:true/.test(publicPage.html));
@@ -62,6 +65,7 @@ check("admin portal inline JavaScript compiles", admin.count > 0);
 check("admin uses passwordless email sign-in", /signInWithOtp/.test(admin.html) && /shouldCreateUser:false/.test(admin.html));
 check("admin checks explicit allowlist", /admin_users/.test(admin.html) && /review_partner_application/.test(admin.html));
 check("admin can review restaurant owner access requests", /review_owner_request/.test(admin.html) && /ownerRequests/.test(admin.html));
+check("admin dashboard lists and receives realtime restaurant payment confirmations", /paymentNotifications/.test(admin.html) && /payment_received_at/.test(admin.html) && /postgres_changes/.test(admin.html) && /enablePaymentNotifications/.test(admin.html));
 check("admin has order-only marketplace reporting", /marketplace_orders/.test(admin.html) && /marketplaceOverview/.test(admin.html));
 check("admin has no password field", !/<input[^>]+type=["']password["']/i.test(admin.html));
 
@@ -85,6 +89,9 @@ check("restaurant portal polls for new orders while signed in", /window\.setInte
 check("new submitted orders trigger an in-dashboard alert and browser notification", /announceNewOrders\(data\|\|\[\]\)/.test(restaurantPortal.html) && /new Notification\("New Takeaways Tonight\? order"/.test(restaurantPortal.html));
 check("restaurant owners request verified access", /restaurant_owner_requests/.test(restaurantPortal.html));
 check("restaurant-owner magic links route back into native Android app", /za.co.takeawaystonight.app:\/\/auth\/callback\?target=restaurant/.test(restaurantPortal.html));
+check("restaurant payment confirmation is only offered after the order is ready", /o\.status==="ready"&&!\["paid","paid_directly_to_restaurant"\]/.test(restaurantPortal.html));
+check("restaurant portal warns that proof of payment alone is not confirmation", /A proof of payment alone is not confirmation/.test(restaurantPortal.html) && /PAYMENT RECEIVED/.test(restaurantPortal.html));
+check("restaurant portal displays payment confirmation timestamp", /payment_received_at/.test(restaurantPortal.html));
 check("restaurant portal loads native push registration module", /native-push\.js/.test(restaurantPortal.html));
 const firebaseAndroidConfig = read("scripts/configure-firebase-android.js");
 new vm.Script(firebaseAndroidConfig, { filename: "configure-firebase-android.js" });
@@ -114,6 +121,9 @@ const marketplaceApi = read("supabase/functions/marketplace-api/index.ts");
 check("marketplace API validates the signed-in customer", /auth.getUser\(token\)/.test(marketplaceApi));
 check("marketplace API calculates prices from the published menu", /normalizedMenu/.test(marketplaceApi) && /suppliedPriceCents !== unitPriceCents/.test(marketplaceApi));
 check("marketplace API binds idempotency keys to the customer", /eq\("customer_id", user.id\)/.test(marketplaceApi));
+check("marketplace API records verified payment time and confirming restaurant user", /payment_status: "paid"/.test(marketplaceApi) && /payment_received_at: new Date\(\)\.toISOString\(\)/.test(marketplaceApi) && /payment_received_by: user\.id/.test(marketplaceApi));
+check("marketplace API only permits payment confirmation once order is ready", /order\.status !== "ready"/.test(marketplaceApi));
+check("marketplace API does not default missing restaurant payment methods to all options", /restaurant\.accepted_payment_methods : \[\]/.test(marketplaceApi));
 check("marketplace API restricts order status transitions and owner approvals", /update_order/.test(marketplaceApi) && /review_owner_request/.test(marketplaceApi));
 check("marketplace API sends FCM order notifications server-side", /sendNewOrderPush/.test(marketplaceApi) && /FIREBASE_SERVICE_ACCOUNT_JSON/.test(marketplaceApi) && /fcm\.googleapis\.com/.test(marketplaceApi));
 const orderChargePattern = new RegExp(["commis", "sion"].join("") + "(?:_ledger|_cents|_statement)|1500");
