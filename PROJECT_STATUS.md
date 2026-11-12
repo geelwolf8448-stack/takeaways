@@ -205,3 +205,28 @@ Safety rule: never send merchant keys or passphrases through chat, email, GitHub
 - Next engineering task: complete and security-review a safe server-side PayFast checkout handoff for the R250 once-off admin-fee invoice. Do not expose credentials in static frontend code. Then run a sandbox transaction and verify the PayFast ITN reaches Supabase and updates only the matching invoice.
 - Monthly R500 recurring checkout and lifecycle automation remain unimplemented. Keep all payments in sandbox until tests pass and the owner explicitly approves any move to live.
 
+## PayFast R250 Sandbox checkout handoff implemented (12 November 2026)
+
+- Deployed `platform-billing` Edge Function version 13 with a new authenticated `create_admin_fee_checkout` action.
+- Checkout uses PayFast's Onsite integration: Supabase creates the payment identifier server-to-server at the PayFast Sandbox `/onsite/process` endpoint and returns only the short-lived UUID to the browser. The merchant key and passphrase are not returned to the browser or embedded in public HTML/JavaScript.
+- Server validates administrator authentication, invoice UUID, invoice type, fixed R250 amount, ZAR currency, pending status, due date, payer email format, and Sandbox-only mode before requesting a PayFast identifier.
+- The admin dashboard now displays the R250 invoice status and only offers a Sandbox checkout button once the invoice is pending and its 14-day pilot due date has arrived. The business billing contact email is requested at checkout and is not persisted by this flow.
+- PayFast Onsite checkout opens using the PayFast-hosted modal with the UUID. A browser return or modal completion is not treated as proof of payment; only the verified ITN can settle the invoice.
+- Added `admin_fee_paid` as a distinct subscription status. The ITN handler now uses this status after a verified R250 admin-fee payment, rather than incorrectly retaining `admin_fee_due`.
+- Deployed `payfast-itn` version 10 and `platform-billing` version 13. The ITN allowlist matches the IPv4 ranges currently published in PayFast developer documentation.
+- Admin dashboard JavaScript checkout changes passed a Node syntax check.
+
+Current database state at the time of this update:
+- 1 food business record.
+- 0 billing subscription records.
+- 0 billing invoices.
+- No pilot was started and no payment was created or collected.
+
+Not yet verified:
+- PayFast Onsite Sandbox identifier creation against the owner's actual sandbox credentials.
+- A full R250 Sandbox payment and delivery of its ITN to Supabase.
+- Verified invoice settlement and retry/idempotency behavior under a real Sandbox callback.
+- Monthly R500 recurring subscription creation, recurring invoice handling, and lifecycle management.
+
+Safety: Checkout is hard-locked to `PAYFAST_MODE=sandbox`; live mode is rejected by the new checkout action. Do not enable live payments or R500 recurring billing until Sandbox end-to-end testing is successful and the owner explicitly approves the move to live.
+
