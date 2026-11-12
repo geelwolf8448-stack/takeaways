@@ -31,7 +31,7 @@ button.reject{background:#251010;color:#ffd9d9;border:1px solid #a44}button:disa
 <div id="applications"></div>
 <div class="panel"><h2>Restaurant owner access requests</h2><div class="small">Only verified owners or managers should be granted access to a restaurant.</div><div id="ownerRequests">Loading requests…</div></div>
 <div class="panel"><h2>Marketplace overview</h2><button onclick="loadMarketplaceOverview()">Refresh overview</button><div id="marketplaceOverview" class="status">Loading marketplace totals…</div></div>
-<div class="panel"><h2>Restaurant payment confirmations</h2><p class="small">When a restaurant owner or manager confirms that payment has reached the restaurant, the confirmation appears here.</p><div id="paymentNotifications" class="status" aria-live="polite">Waiting for payment confirmations…</div></div>
+<div class="panel"><h2>Restaurant payment confirmations</h2><p class="small">When a restaurant owner or manager confirms that payment has reached the restaurant, the confirmation appears here.</p><button class="secondary" onclick="enablePaymentNotifications()">Enable browser payment alerts</button><div id="paymentNotifications" class="status" aria-live="polite">Waiting for payment confirmations…</div></div>
 <div class="panel"><div class="row"><div><h2>Business subscriptions &amp; pilot periods</h2><div class="small">14-day pilot · R250 once-off admin fee · R500 monthly · no food-order commission</div></div><button onclick="loadBilling()">Refresh billing</button></div><div class="status" id="billingStatus">Loading subscription records…</div><div class="status" id="payfastConfigStatus">Checking secure PayFast configuration…</div><div id="billingList"></div></div>
 </section>
 <div class="small">Security: the browser uses only the public Supabase publishable key. Review actions are checked again inside a database function; no secret key is stored here.</div>
@@ -135,6 +135,11 @@ async function loadMarketplaceOverview(){
   paymentNoticeRows.forEach(o=>seenPaymentIds.add(o.id));
   renderPaymentNotifications();
  }catch(e){el("marketplaceOverview").textContent=e.message}
+}
+async function enablePaymentNotifications(){
+ if(!("Notification" in window)){el("paymentNotifications").textContent="Browser notifications are not supported on this device. Keep the admin dashboard open to receive live payment alerts.";return;}
+ const permission=await Notification.requestPermission();
+ el("paymentNotifications").textContent=permission==="granted"?"Browser payment alerts enabled.":"Browser payment alerts were not enabled. The dashboard will still show confirmations when open.";
 }
 function renderPaymentNotifications(){
  const root=el("paymentNotifications");if(!root)return;
