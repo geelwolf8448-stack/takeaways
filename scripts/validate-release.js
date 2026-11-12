@@ -52,7 +52,7 @@ check("order idempotency key is cleared after successful submission", /sessionSt
 check("South African customer and restaurant phone numbers are validated", /\^27\\d\{9\}\$/.test(publicPage.html));
 check("delivery address is required for delivery", /fulfilment==="Delivery"&&!address/.test(publicPage.html));
 check("business registration requires explicit owner authorisation", /rConsent/.test(publicPage.html) && /if\(!document\.getElementById\("rConsent"\)\.checked\)/.test(publicPage.html));
-check("partner applications remain pending until admin approval", /status:"pending"/.test(publicPage.html) && /will not appear in the public directory unless approved/.test(publicPage.html));
+check("business registration publishes only after successful registration", /business will appear in the public directory immediately after successful registration/i.test(publicPage.html) && /published: true/.test(read("supabase/functions/register-food-business/index.ts")));
 check("public directory fetch filters published restaurants", /is_published=eq\.true/.test(publicPage.html));
 check("privacy and terms pages are linked", /privacy\.html/.test(publicPage.html) && /terms\.html/.test(publicPage.html));
 check("privacy notice describes saved customer orders", /order history/.test(read("privacy.html")) && /delivery address/.test(read("privacy.html")));
