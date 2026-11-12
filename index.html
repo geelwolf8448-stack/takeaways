@@ -445,7 +445,16 @@ const categories=["All","Burgers","Pizza","Fish & chips","Chicken","Seafood","Ta
 function save(){localStorage.setItem("tt_restaurants",JSON.stringify(restaurants))}
 function money(n){return "R"+Number(n).toFixed(2).replace(".00","")}
 function renderFilters(){document.getElementById("filters").innerHTML=categories.map(c=>`<button class="${c===activeFilter?"active":""}" onclick="activeFilter=${JSON.stringify(c)};render()">${c}</button>`).join("");const p=document.getElementById("provinceFilters");if(p)p.innerHTML=provinces.map(v=>`<button class="${(activeProvince==="All"&&v==="All South Africa")||activeProvince===v?"active":""}" onclick="activeProvince=${JSON.stringify(v==="All South Africa"?"All":v)};render()">${v==="All South Africa"?"🇿🇦 All South Africa":v}</button>`).join("")}
-function render(){renderFilters();let q=document.getElementById("search").value.toLowerCase();let shown=restaurants.filter(r=>(activeFilter==="All"||r.category===activeFilter)&&(activeProvince==="All"||(r.province||"KwaZulu-Natal")===activeProvince)&&[r.name,r.area,r.province,r.category,...r.items.map(i=>i[0])].join(" ").toLowerCase().includes(q));document.getElementById("resultCount").textContent=shown.length+" listing(s) · Demo cards are examples; business partners can register and go live immediately";document.getElementById("restaurants").innerHTML=shown.length?shown.map(r=>`<article class="card"><div class="food-art">${r.emoji||"🍽️"}</div><div class="card-body"><div class="meta"><small>📍 ${esc(r.area)} · ${esc(r.province||"KwaZulu-Natal")}</small><span class="pill">${r.isDemo===false?"LOCAL PREVIEW":"DEMO"}</span></div><h3>${esc(r.name)}</h3><p>${esc(r.desc||"Local takeaway")}</p><div class="card-actions"><button class="secondary" onclick="openMenu('${r.id}')">View menu</button>${r.isDemo===false?`<button onclick="openMenu('${r.id}')">Order</button>`:`<button class="dark" disabled>Demo only</button>`}</div></div></article>`).join(""):`<div class="empty">No matches yet. Try another search or category.</div>`;document.getElementById("basketCount").textContent=basket.reduce((a,b)=>a+b.qty,0);renderLiveAdverts()}
+function render(){
+ renderFilters();
+ let q=document.getElementById('search').value.toLowerCase();
+ let shown=restaurants.filter(r=>(activeFilter==='All'||r.category===activeFilter)&&(activeProvince==='All'||(r.province||'KwaZulu-Natal')===activeProvince)&&[r.name,r.area,r.province,r.category,...r.items.map(i=>i[0])].join(' ').toLowerCase().includes(q));
+ if(customerLocation)shown.sort((a,b)=>(a.distanceKm??Number.MAX_SAFE_INTEGER)-(b.distanceKm??Number.MAX_SAFE_INTEGER));
+ document.getElementById('resultCount').textContent=shown.length+' listing(s)'+(customerLocation?' · Nearest businesses shown first':'');
+ document.getElementById('restaurants').innerHTML=shown.length?shown.map(r=>'<article class="card"><div class="food-art">'+(r.emoji||'🍽️')+'</div><div class="card-body"><div class="meta"><small>📍 '+esc(r.area)+' · '+esc(r.province||'KwaZulu-Natal')+(Number.isFinite(r.distanceKm)?' · '+r.distanceKm.toFixed(1)+' km away':'')+'</small><span class="pill">'+(r.isDemo===false?'LOCAL PREVIEW':'DEMO')+'</span></div><h3>'+esc(r.name)+'</h3><p>'+esc(r.desc||'Local takeaway')+'</p><div class="card-actions"><button class="secondary" onclick="openMenu(\''+r.id+'\')">View menu</button>'+(r.isDemo===false?'<button onclick="openMenu(\''+r.id+'\')">Order</button>':'<button class="dark" disabled>Demo only</button>')+'</div></div></article>').join(''):'<div class="empty">No matches yet. Try another search or category.</div>';
+ document.getElementById('basketCount').textContent=basket.reduce((a,b)=>a+b.qty,0);
+ renderLiveAdverts();
+}
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 
 function renderLiveAdverts(){
@@ -537,21 +546,22 @@ function inviteRestaurant(){const message="Hi! I'm sharing Takeaways Tonight?, a
 function openAdmin(){document.getElementById("adminDialog").showModal()}
 function databaseReady(){const c=window.TT_CONFIG||{};return /^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(c.supabaseUrl||"")&&typeof c.supabaseAnonKey==="string"&&c.supabaseAnonKey.length>20}
 async function loadSharedRestaurants(){
- const status=document.getElementById("directoryStatus");
- if(!databaseReady()){if(status)status.textContent="Shared directory is not configured. Showing sample listings.";return;}
+ const status=document.getElementById('directoryStatus');
+ if(!databaseReady()){if(status)status.textContent='Shared directory is not configured. Showing sample listings.';return;}
  const c=window.TT_CONFIG;
  try{
-  const response=await fetch(c.supabaseUrl+"/rest/v1/restaurants?select=id,name,area,province,category,whatsapp,description,menu,menu_file_url,accepted_payment_methods&is_published=eq.true&order=name.asc",{headers:{apikey:c.supabaseAnonKey}});
-  if(!response.ok){const detail=await response.text();throw new Error("Directory request failed ("+response.status+"): "+detail);}
-  const rows=await response.json();
-  const shared=rows.map(r=>({id:"shared-"+r.id,name:r.name,area:r.area,province:r.province||"KwaZulu-Natal",category:r.category,phone:r.whatsapp,desc:r.description||"Verified local restaurant",items:Array.isArray(r.menu)?r.menu:[],menuFileUrl:r.menu_file_url||"",acceptedPaymentMethods:Array.isArray(r.accepted_payment_methods)&&r.accepted_payment_methods.length?r.accepted_payment_methods:["cash_collection","cash_delivery","eft","card_machine"],emoji:"🍽️",isDemo:false}));
-  restaurants=[...restaurants.filter(r=>!String(r.id).startsWith("shared-")), ...shared];
-  render();
-  if(status)status.textContent=shared.length?("Live directory connected · "+shared.length+" approved restaurant(s)"): "Database connected · No approved restaurants listed yet. Sample cards are shown below.";
- }catch(error){
-  console.warn("Shared directory connection failed.",error);
-  if(status)status.textContent="Could not connect to the shared directory. Showing sample listings only.";
- }
+  let rows=[];
+  if(customerLocation){
+   const response=await fetch(c.supabaseUrl+'/rest/v1/rpc/list_nearby_food_businesses',{method:'POST',headers:{apikey:c.supabaseAnonKey,'Content-Type':'application/json'},body:JSON.stringify({p_latitude:customerLocation.latitude,p_longitude:customerLocation.longitude})});
+   if(!response.ok)throw new Error('Nearby directory request failed ('+response.status+').');rows=await response.json();
+  }else{
+   const response=await fetch(c.supabaseUrl+'/rest/v1/restaurants?select=id,name,area,province,category,whatsapp,description,menu,menu_file_url,accepted_payment_methods,latitude,longitude&is_published=eq.true&order=name.asc',{headers:{apikey:c.supabaseAnonKey}});
+   if(!response.ok)throw new Error('Directory request failed ('+response.status+').');rows=await response.json();
+  }
+  const shared=rows.map(r=>({id:'shared-'+r.id,name:r.name,area:r.area,province:r.province||'KwaZulu-Natal',category:r.category,phone:r.whatsapp,desc:r.description||'Local food business',items:Array.isArray(r.menu)?r.menu:[],menuFileUrl:r.menu_file_url||'',acceptedPaymentMethods:Array.isArray(r.accepted_payment_methods)&&r.accepted_payment_methods.length?r.accepted_payment_methods:['cash_collection','cash_delivery','eft','card_machine'],emoji:'🍽️',isDemo:false,distanceKm:r.distance_km==null?null:Number(r.distance_km)}));
+  restaurants=[...restaurants.filter(r=>!String(r.id).startsWith('shared-')),...shared];render();
+  if(status)status.textContent=shared.length?(customerLocation?'Location-based directory connected · Nearest businesses shown first':'Directory connected · Enable location to sort by distance'):'No published business listings yet. Sample cards are shown below.';
+ }catch(error){console.warn('Could not load location-aware shared directory.',error);if(status)status.textContent='Could not connect to the shared directory. Showing sample listings.';}
 }
 async function addRestaurant(){
  const val=id=>document.getElementById(id).value.trim();
