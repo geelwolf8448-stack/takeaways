@@ -231,22 +231,22 @@ function startOrderPolling(){
  window.setInterval(()=>{if(session&&memberships.length)loadRestaurantsOrders();},15000);
 }
 async function changeOrder(orderId,status,markPaid=false){
- try{await api("update_order",{orderId,status,markPaid});if(markPaid){$("status").textContent="Payment confirmation recorded. Takeaways Tonight? admin will see the confirmation in its dashboard.";}await loadRestaurantsOrders()}
+ try{await api("update_order",{orderId,status,markPaid});if(markPaid){$("status").textContent="PAYMENT RECEIVED recorded. The customer and Takeaways Tonight? admin will be notified.";}await loadRestaurantsOrders()}
  catch(e){alert(e.message)}
 }
 async function loadRestaurantsOrders(){
  const ids=memberships.map(m=>m.restaurant_id);if(!ids.length)return;
- const {data,error}=await sb.from("marketplace_orders").select("id,order_number,restaurant_id,status,payment_status,payment_method,total_cents,created_at,customer_name,customer_phone,fulfilment_type,delivery_address,customer_notes,marketplace_order_items(item_name,quantity,unit_price_cents)").in("restaurant_id",ids).order("created_at",{ascending:false}).limit(60);
+ const {data,error}=await sb.from("marketplace_orders").select("id,order_number,restaurant_id,status,payment_status,payment_received_at,payment_method,total_cents,created_at,customer_name,customer_phone,fulfilment_type,delivery_address,customer_notes,marketplace_order_items(item_name,quantity,unit_price_cents)").in("restaurant_id",ids).order("created_at",{ascending:false}).limit(60);
  if(error){$("ordersArea").innerHTML='<p class="small">Could not load orders.</p>';return}
  announceNewOrders(data||[]);
  $("ordersArea").innerHTML=data?.length?data.map(o=>{
   let actions="";
   if(o.status==="submitted")actions='<button onclick="changeOrder(\''+o.id+'\',\'accepted\')">Accept</button><button class="danger" onclick="changeOrder(\''+o.id+'\',\'rejected\')">Reject</button>';
-  if(["accepted","preparing","ready"].includes(o.status)&&o.payment_status!=="paid_directly_to_restaurant")actions+='<button class="secondary" onclick="changeOrder(\''+o.id+'\',\'\',true)">Confirm payment received</button>';
+  if(o.status==="ready"&&!["paid","paid_directly_to_restaurant"].includes(o.payment_status))actions+='<button class="secondary" onclick="changeOrder(\''+o.id+'\',\'\',true)">PAYMENT RECEIVED</button><p class="small">Only confirm after cash/card is received or the EFT reflects in your bank account. A proof of payment alone is not confirmation.</p>';
   if(o.status==="accepted")actions+='<button onclick="changeOrder(\''+o.id+'\',\'preparing\')">Start preparing</button>';
   if(o.status==="preparing")actions+='<button onclick="changeOrder(\''+o.id+'\',\'ready\')">Mark ready</button>';
-  if(o.status==="ready"&&o.payment_status==="paid_directly_to_restaurant")actions+='<button onclick="changeOrder(\''+o.id+'\',\'completed\')">Complete order</button>';
-  return '<article class="order"><div class="top"><b>Order #'+esc(o.order_number)+'</b><span class="tag">'+esc(o.status.toUpperCase())+'</span></div><p><b>'+esc(o.customer_name)+'</b> · +'+esc(o.customer_phone)+'</p><p>'+esc(o.fulfilment_type)+(o.delivery_address?' · '+esc(o.delivery_address):'')+'</p><div class="items">'+(o.marketplace_order_items||[]).map(i=>esc(i.quantity)+' × '+esc(i.item_name)+' — '+money(i.unit_price_cents*i.quantity)).join('<br>')+'</div><p><b>Total: '+money(o.total_cents)+'</b> · Payment method: '+esc(String(o.payment_method||"").replaceAll("_"," "))+' · Status: '+esc(o.payment_status.replaceAll("_"," "))+'</p><p class="small">'+esc(o.customer_notes||"")+'</p>'+actions+'</article>';
+  if(o.status==="ready"&&["paid","paid_directly_to_restaurant"].includes(o.payment_status))actions+='<button onclick="changeOrder(\''+o.id+'\',\'completed\')">Complete order</button>';
+  return '<article class="order"><div class="top"><b>Order #'+esc(o.order_number)+'</b><span class="tag">'+esc(o.status.toUpperCase())+'</span></div><p><b>'+esc(o.customer_name)+'</b> · +'+esc(o.customer_phone)+'</p><p>'+esc(o.fulfilment_type)+(o.delivery_address?' · '+esc(o.delivery_address):'')+'</p><div class="items">'+(o.marketplace_order_items||[]).map(i=>esc(i.quantity)+' × '+esc(i.item_name)+' — '+money(i.unit_price_cents*i.quantity)).join('<br>')+'</div><p><b>Total: '+money(o.total_cents)+'</b> · Payment method: '+esc(String(o.payment_method||"").replaceAll("_"," "))+' · Payment: '+(o.payment_status==="paid"||o.payment_status==="paid_directly_to_restaurant"?"<b>PAID</b>":"NOT PAID")+(o.payment_received_at?" · Confirmed "+esc(new Date(o.payment_received_at).toLocaleString()):"")+'</p><p class="small">'+esc(o.customer_notes||"")+'</p>'+actions+'</article>';
  }).join(""):'<p class="small">No customer orders yet.</p>';
 }
 const paymentMethodOptions=[["cash_collection","Cash on collection"],["cash_delivery","Cash on delivery"],["eft","EFT / bank transfer"],["card_machine","Card machine at restaurant or on delivery"]];
