@@ -77,7 +77,7 @@ async function loadDashboard(){
  const memberIds=(memberRows||[]).map(m=>m.restaurant_id);
  let ownedRestaurants=[];
  if(memberIds.length){
-  const {data:ownedRows,error:ownedError}=await sb.from("restaurants").select("id,name,area,province,category,whatsapp,description,menu,menu_file_url,business_image_url,accepted_payment_methods").in("id",memberIds);
+  const {data:ownedRows,error:ownedError}=await sb.from("restaurants").select("id,name,area,province,category,whatsapp,description,menu,menu_file_url,business_image_url,accepted_payment_methods,latitude,longitude").in("id",memberIds);
   if(ownedError){$("status").textContent="Your restaurant access was found, but the listing could not be loaded: "+ownedError.message;return;}
   ownedRestaurants=ownedRows||[];
  }
