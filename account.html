@@ -55,7 +55,21 @@ const sb=window.supabase&&cfg.supabaseUrl&&cfg.supabaseAnonKey?window.supabase.c
 window.TT_SUPABASE_CLIENT=sb;
 const $=id=>document.getElementById(id);
 let session=null;
+let orderChannel=null;
+let loadedAccountUserId=null;
 function money(c){return "R"+(Number(c||0)/100).toFixed(2)}
+function watchCustomerOrders(userId){
+ if(orderChannel&&loadedAccountUserId===userId)return;
+ if(orderChannel)sb.removeChannel(orderChannel);
+ loadedAccountUserId=userId;
+ orderChannel=sb.channel("customer-orders-"+userId)
+  .on("postgres_changes",{event:"UPDATE",schema:"public",table:"marketplace_orders",filter:"customer_id=eq."+userId},()=>loadOrders())
+  .subscribe(status=>{if(status==="CHANNEL_ERROR"||status==="TIMED_OUT")console.warn("Customer order live updates unavailable:",status)});
+}
+function orderStatusLabel(status){
+ const labels={submitted:"Awaiting restaurant confirmation",accepted:"Accepted by restaurant",rejected:"Not accepted by restaurant",preparing:"Being prepared",ready:"Ready for collection / delivery",completed:"Completed",cancelled:"Cancelled"};
+ return labels[status]||String(status||"").replaceAll("_"," ");
+}
 function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 async function sendLink(){
  if(!sb){$("loginStatus").textContent="Account service is not configured. Please try again later.";return}
@@ -75,6 +89,8 @@ async function loadAccount(){
  if(!session)return;
  $("loginPanel").classList.add("hidden");$("accountPanel").classList.remove("hidden");
  $("signedInAs").textContent=session.user.email||"Signed in";
+ if(loadedAccountUserId===session.user.id){await loadOrders();return;}
+ watchCustomerOrders(session.user.id);
  $("checkoutReturn").hidden=new URLSearchParams(location.search).get("return")!=="checkout";
  const {data:profile,error}=await sb.from("marketplace_profiles").select("full_name,phone").eq("user_id",session.user.id).maybeSingle();
  if(error){$("accountStatus").textContent="Could not load your profile: "+error.message;return}
@@ -93,11 +109,16 @@ async function loadOrders(){
  const {data,error}=await sb.from("marketplace_orders").select("id,order_number,status,payment_status,total_cents,created_at,restaurant:restaurants(name),marketplace_order_items(item_name,quantity,unit_price_cents)").eq("customer_id",session.user.id).order("created_at",{ascending:false}).limit(30);
  if(error){$("orders").innerHTML='<p class="small">Could not load your orders right now.</p>';return}
  if(!data?.length){$("orders").innerHTML='<p class="small">No orders yet. Browse the restaurant directory when you are ready.</p>';return}
- $("orders").innerHTML=data.map(o=>'<article class="order"><div class="order-top"><b>Order #'+esc(o.order_number)+'</b><span class="tag">'+esc(o.status.replaceAll("_"," ").toUpperCase())+'</span></div><p>'+esc(o.restaurant?.name||"Restaurant")+' · '+new Date(o.created_at).toLocaleString()+'</p><div class="items">'+(o.marketplace_order_items||[]).map(i=>esc(i.quantity)+" × "+esc(i.item_name)+" — "+money(i.unit_price_cents*i.quantity)).join("<br>")+'</div><p><b>Total: '+money(o.total_cents)+'</b></p><p class="small">Payment: '+(o.payment_status==="paid_directly_to_restaurant"?"Confirmed by restaurant":"Pay the restaurant directly after it confirms your order")+'</p></article>').join("");
+ $("orders").innerHTML=data.map(o=>'<article class="order"><div class="order-top"><b>Order #'+esc(o.order_number)+'</b><span class="tag">'+esc(orderStatusLabel(o.status).toUpperCase())+'</span></div><p>'+esc(o.restaurant?.name||"Restaurant")+' · '+new Date(o.created_at).toLocaleString()+'</p><div class="items">'+(o.marketplace_order_items||[]).map(i=>esc(i.quantity)+" × "+esc(i.item_name)+" — "+money(i.unit_price_cents*i.quantity)).join("<br>")+'</div><p><b>Total: '+money(o.total_cents)+'</b></p><p class="small">Payment: '+(o.payment_status==="paid_directly_to_restaurant"?"Confirmed by restaurant":"Pay the restaurant directly after it confirms your order")+'</p></article>').join("");
 }
-async function signOut(){await sb.auth.signOut();session=null;$("accountPanel").classList.add("hidden");$("loginPanel").classList.remove("hidden");$("loginStatus").textContent="You have signed out."}
+async function signOut(){
+ await sb.auth.signOut();session=null;
+ if(orderChannel){await sb.removeChannel(orderChannel);orderChannel=null;}
+ loadedAccountUserId=null;
+ $("accountPanel").classList.add("hidden");$("loginPanel").classList.remove("hidden");$("loginStatus").textContent="You have signed out.";
+}
 if(sb){
- sb.auth.onAuthStateChange((_event,s)=>{session=s;if(s)loadAccount()});
+ sb.auth.onAuthStateChange((_event,s)=>{session=s;if(s)loadAccount();else{if(orderChannel)sb.removeChannel(orderChannel);orderChannel=null;loadedAccountUserId=null;}});
  sb.auth.getSession().then(({data})=>{session=data.session;if(session)loadAccount()});
 }else{$("loginStatus").textContent="Account service is temporarily unavailable."}
 </script>
