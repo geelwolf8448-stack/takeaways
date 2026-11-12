@@ -569,6 +569,7 @@ async function addRestaurant(){
  const name=val("rName"),area=val("rArea"),province=val("rProvince"),businessType=val("rBusinessType"),category=val("rCategory"),whatsapp=val("rPhone"),raw=val("rMenu");
  const menu=raw.split("\n").map(line=>{const m=line.match(/^\s*(.+?)\s*-\s*(\d+(?:\.\d{1,2})?)\s*$/);return m?{name:m[1].trim(),price:Number(m[2])}:null}).filter(Boolean);
  const status=document.getElementById("registrationStatus"),button=document.getElementById("registerBusinessButton");
+ if(!businessLocation){status.textContent="Please set your business location first so nearby customers can find your business.";return;}
  if(ownerName.length<2||!/^\+?27|^0/.test(ownerPhone.replace(/\s/g,""))||!email.includes("@")||password.length<10){status.textContent="Please enter your name, a valid South African mobile number, email address and a password of at least 10 characters.";return;}
  if(!name||!area||!whatsapp||!menu.length){status.textContent="Please complete all business details and add at least one menu item as Name - price.";return;}
  if(!document.getElementById("rConsent").checked){status.textContent="Please confirm that you are authorised to register this business.";return;}
@@ -582,6 +583,10 @@ async function addRestaurant(){
   status.textContent="Your business is now live! Signing you in to the Restaurant Portal…";
   const client=window.TT_SUPABASE_CLIENT||window.supabase.createClient(c.supabaseUrl,c.supabaseAnonKey,{auth:{persistSession:true,autoRefreshToken:true}});
   const {error:loginError}=await client.auth.signInWithPassword({email,password});
+  if(!loginError){
+   const {error:locationError}=await client.rpc("set_my_restaurant_location",{p_restaurant_id:result.restaurantId,p_latitude:businessLocation.latitude,p_longitude:businessLocation.longitude});
+   if(locationError)console.warn("Business registered, but its map location could not be saved:",locationError.message);
+  }
   if(loginError){
    status.innerHTML="Your business is published and your 14-day free pilot has started. Please <a href='restaurant-portal.html'>open the Restaurant Portal</a> and sign in using your email and password.";
    button.textContent="Registration complete";
@@ -602,7 +607,7 @@ async function restorePendingCheckout(){
 }
 render();
 loadLiveAdverts();
-loadSharedRestaurants().then(restorePendingCheckout);
+detectCustomerLocation().then(()=>loadSharedRestaurants()).then(restorePendingCheckout);
 if ("serviceWorker" in navigator && location.protocol.startsWith("http")) { window.addEventListener("load", () => navigator.serviceWorker.register("./service-worker.js").catch(() => {})); }
 </script>
 <script type="module" src="native-auth.js"></script>
