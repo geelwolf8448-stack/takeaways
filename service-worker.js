@@ -1,4 +1,4 @@
-const CACHE_NAME = "takeaways-tonight-v38-location-aware-directory";
+const CACHE_NAME = "takeaways-tonight-v39-black-theme";
 const APP_FILES = [
   "./",
   "./index.html",
