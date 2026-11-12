@@ -396,6 +396,7 @@ dialog{background:#080808!important;color:#fff!important;border:1px solid #b58b1
 <div class="section-ribbon" id="featured"><span>★</span> Explore restaurants & menus <span>★</span></div>
 <div class="section-head"><div><h2>Find your food</h2><p>Choose a category and discover local favourites.</p></div></div><div class="filters" id="filters"></div>
 <div class="section-head"><div><h2>Local restaurants</h2><p id="resultCount">Browse the directory.</p><p class="notice" id="directoryStatus" role="status">Connecting to the shared restaurant directory…</p></div></div><div class="grid" id="restaurants"></div>
+<section class="promo-panel" id="demoExamples" style="margin-top:24px"><div class="eyebrow">ILLUSTRATIVE EXAMPLES — NOT REAL PARTNERS</div><h2>Preview example menus</h2><p>These sample businesses are for demonstration only. They are not participating restaurants, cannot accept orders and are not endorsements.</p><div class="grid" id="demoRestaurants"></div></section>
 <p class="notice">ORDERING — Signed-in customers can submit an order request and notify the restaurant on WhatsApp. The restaurant confirms availability, final delivery charges and payment directly. Takeaways Tonight? does not collect food-order payments yet.</p>
 
 <section id="contact" class="tt-contact" aria-labelledby="tt-contact-title">
@@ -464,6 +465,7 @@ async function installTakeawaysApp(){
 }
 let customerLocation=null;
 let businessLocation=null;
+let pendingBusinessLocationRestaurantId=null;
 let locationAttempted=false;
 function setLocationStatus(message){const el=document.getElementById('customerLocationStatus');if(el)el.textContent=message;}
 function captureBusinessLocation(){
@@ -493,8 +495,11 @@ function render(){
  let q=document.getElementById('search').value.toLowerCase();
  let shown=restaurants.filter(r=>(activeFilter==='All'||r.category===activeFilter)&&(activeProvince==='All'||(r.province||'KwaZulu-Natal')===activeProvince)&&[r.name,r.area,r.province,r.category,...r.items.map(i=>i[0])].join(' ').toLowerCase().includes(q));
  if(customerLocation)shown.sort((a,b)=>(a.distanceKm??Number.MAX_SAFE_INTEGER)-(b.distanceKm??Number.MAX_SAFE_INTEGER));
- document.getElementById('resultCount').textContent=shown.length+' listing(s)'+(customerLocation?' · Nearest businesses shown first':'');
- document.getElementById('restaurants').innerHTML=shown.length?shown.map(r=>'<article class="card"><div class="food-art">'+(r.businessImageUrl?'<img src="'+esc(r.businessImageUrl)+'" alt="'+esc(r.name)+'" loading="lazy" style="width:100%;height:100%;min-height:150px;max-height:190px;object-fit:cover;border-radius:12px">':(r.emoji||'🍽️'))+'</div><div class="card-body"><div class="meta"><small>📍 '+esc(r.area)+' · '+esc(r.province||'KwaZulu-Natal')+(Number.isFinite(r.distanceKm)?' · '+r.distanceKm.toFixed(1)+' km away':'')+'</small><span class="pill">'+(r.isDemo===false?'LOCAL PREVIEW':'DEMO')+'</span></div><h3>'+esc(r.name)+'</h3><p>'+esc(r.desc||'Local takeaway')+'</p><div class="card-actions"><button class="secondary" onclick="openMenu(\''+r.id+'\')">View menu</button>'+(r.isDemo===false?'<button onclick="openMenu(\''+r.id+'\')">Order</button>':'<button class="dark" disabled>Demo only</button>')+'</div></div></article>').join(''):'<div class="empty">No matches yet. Try another search or category.</div>';
+ const liveShown=shown.filter(r=>r.isDemo===false),demoShown=shown.filter(r=>r.isDemo!==false);
+ document.getElementById('resultCount').textContent=liveShown.length+' participating business listing(s)'+(customerLocation?' · Nearest businesses shown first':'');
+ const cardHtml=list=>list.map(r=>'<article class="card"><div class="food-art">'+(r.businessImageUrl?'<img src="'+esc(r.businessImageUrl)+'" alt="'+esc(r.name)+'" loading="lazy" style="width:100%;height:100%;min-height:150px;max-height:190px;object-fit:cover;border-radius:12px">':(r.emoji||'🍽️'))+'</div><div class="card-body"><div class="meta"><small>📍 '+esc(r.area)+' · '+esc(r.province||'KwaZulu-Natal')+(Number.isFinite(r.distanceKm)?' · '+r.distanceKm.toFixed(1)+' km away':'')+'</small><span class="pill">'+(r.isDemo===false?'PARTICIPATING BUSINESS':'DEMO EXAMPLE')+'</span></div><h3>'+esc(r.name)+'</h3><p>'+esc(r.desc||'Local takeaway')+'</p><div class="card-actions"><button class="secondary" onclick="openMenu(\\''+r.id+'\\')">View menu</button>'+(r.isDemo===false?'<button onclick="openMenu(\\''+r.id+'\\')">Order</button>':'<button class="dark" disabled>Example only</button>')+'</div></div></article>').join('');
+ document.getElementById('restaurants').innerHTML=liveShown.length?cardHtml(liveShown):'<div class="empty">No participating businesses are published yet. The example listings are shown separately below and cannot accept orders.</div>';
+ const demoRoot=document.getElementById('demoRestaurants');if(demoRoot)demoRoot.innerHTML=demoShown.length?cardHtml(demoShown):'<div class="empty">No demo examples are currently displayed.</div>';
  document.getElementById('basketCount').textContent=basket.reduce((a,b)=>a+b.qty,0);
  renderLiveAdverts();
 }
@@ -620,24 +625,46 @@ async function addRestaurant(){
  button.disabled=true;button.textContent="Registering your business…";status.textContent="Creating your owner account, publishing your listing and starting your free pilot…";
  try{
   const c=window.TT_CONFIG;
-  const response=await fetch(c.supabaseUrl+"/functions/v1/register-food-business",{method:"POST",headers:{apikey:c.supabaseAnonKey,"Content-Type":"application/json"},body:JSON.stringify({ownerName,ownerPhone,email,password,businessName:name,businessType,area,province,category,whatsapp,menu,website:val("rWebsite")})});
+  const response=await fetch(c.supabaseUrl+"/functions/v1/register-food-business",{method:"POST",headers:{apikey:c.supabaseAnonKey,"Content-Type":"application/json"},body:JSON.stringify({ownerName,ownerPhone,email,password,businessName:name,businessType,area,province,category,whatsapp,menu,latitude:businessLocation.latitude,longitude:businessLocation.longitude,website:val("rWebsite")})});
   const result=await response.json();
   if(!response.ok)throw new Error(result.error||"Registration could not be completed.");
   status.textContent="Your business is now live! Signing you in to the Restaurant Portal…";
   const client=window.TT_SUPABASE_CLIENT||window.supabase.createClient(c.supabaseUrl,c.supabaseAnonKey,{auth:{persistSession:true,autoRefreshToken:true}});
   const {error:loginError}=await client.auth.signInWithPassword({email,password});
   if(!loginError){
-   const {error:locationError}=await client.rpc("set_my_restaurant_location",{p_restaurant_id:result.restaurantId,p_latitude:businessLocation.latitude,p_longitude:businessLocation.longitude});
-   if(locationError)console.warn("Business registered, but its map location could not be saved:",locationError.message);
+   pendingBusinessLocationRestaurantId=result.restaurantId;
+   const locationSaved=await savePendingBusinessLocation(client);
+   if(!locationSaved){
+    status.innerHTML="Your business is registered and published, but we could not confirm its map location. Please use the button below to retry before leaving this page. <button type='button' class='secondary' onclick='retryBusinessLocationSave()'>Retry saving business location</button>";
+    button.disabled=false;button.textContent="Registration complete — location needs attention";
+    return;
+   }
   }
   if(loginError){
-   status.innerHTML="Your business is published and your 14-day free pilot has started. Please <a href='restaurant-portal.html'>open the Restaurant Portal</a> and sign in using your email and password.";
+   status.innerHTML="Your business is published and your 14-day free pilot has started, but we could not sign you in to save its map location. Please <a href='restaurant-portal.html'>open the Restaurant Portal</a>, sign in and use the business-location control to save it.";
    button.textContent="Registration complete";
    return;
   }
   closeDialog("adminDialog");
   location.href="restaurant-portal.html";
  }catch(error){status.textContent=error.message||"Registration could not be completed. Please try again.";button.disabled=false;button.textContent="Register business and go live";}
+}
+async function savePendingBusinessLocation(client){
+ if(!pendingBusinessLocationRestaurantId||!businessLocation)return false;
+ const {error}=await client.rpc("set_my_restaurant_location",{p_restaurant_id:pendingBusinessLocationRestaurantId,p_latitude:businessLocation.latitude,p_longitude:businessLocation.longitude});
+ if(error){console.warn("Business location save failed:",error.message);return false;}
+ const {data,error:readError}=await client.from("restaurants").select("latitude,longitude").eq("id",pendingBusinessLocationRestaurantId).single();
+ if(readError||!data||Math.abs(Number(data.latitude)-businessLocation.latitude)>0.000001||Math.abs(Number(data.longitude)-businessLocation.longitude)>0.000001){console.warn("Business location could not be verified after saving.",readError?.message||"Coordinates did not match.");return false;}
+ return true;
+}
+async function retryBusinessLocationSave(){
+ const status=document.getElementById("registrationStatus"),client=window.TT_SUPABASE_CLIENT;
+ if(!client||!pendingBusinessLocationRestaurantId||!businessLocation){status.textContent="Please sign in to the Restaurant Portal and save your business location there.";return;}
+ status.textContent="Saving and verifying your business location…";
+ const ok=await savePendingBusinessLocation(client);
+ if(!ok){status.innerHTML="We still could not verify the location. Please open the Restaurant Portal and try its business-location control.";return;}
+ status.textContent="Business location saved and verified. Opening your Restaurant Portal…";
+ location.href="restaurant-portal.html";
 }
 function closeDialog(id){document.getElementById(id).close()}
 const homeConfig=window.TT_CONFIG||{};
