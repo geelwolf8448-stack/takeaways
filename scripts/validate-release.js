@@ -51,7 +51,7 @@ check("customer checkout does not request an email sign-in", /signInAnonymously/
 check("order idempotency key is cleared after successful submission", /sessionStorage\.removeItem\("tt_order_idempotency"/.test(publicPage.html));
 check("South African customer and restaurant phone numbers are validated", /\^27\\d\{9\}\$/.test(publicPage.html));
 check("delivery address is required for delivery", /fulfilment==="Delivery"&&!address/.test(publicPage.html));
-check("partner application requires permission declaration", /rConsent/.test(publicPage.html) && /permission_confirmed:true/.test(publicPage.html));
+check("business registration requires explicit owner authorisation", /rConsent/.test(publicPage.html) && /if\(!document\.getElementById\("rConsent"\)\.checked\)/.test(publicPage.html));
 check("partner applications remain pending until admin approval", /status:"pending"/.test(publicPage.html) && /will not appear in the public directory unless approved/.test(publicPage.html));
 check("public directory fetch filters published restaurants", /is_published=eq\.true/.test(publicPage.html));
 check("privacy and terms pages are linked", /privacy\.html/.test(publicPage.html) && /terms\.html/.test(publicPage.html));
