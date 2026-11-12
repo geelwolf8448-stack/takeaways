@@ -625,7 +625,7 @@ async function sendOrder(){
   const message=["ORDER REQUEST — Takeaways Tonight?","Order reference: #"+order.order_number,"Restaurant: "+restaurant.name,"Customer: "+customerName,"Customer mobile: +"+phone,"Fulfilment: "+fulfilment,...(fulfilment==="Delivery"?["Delivery address: "+address]:[]),"","Items:",...lines,"Food subtotal: "+money(basket.reduce((sum,item)=>sum+item.price*item.qty,0)),...(notes?["Notes: "+notes]:[]),"","Please confirm availability, any delivery charge and final total. Customer payment method selected: "+(document.getElementById("customerPaymentMethod").selectedOptions[0]?.textContent||paymentMethod)+". Payment is made directly to the restaurant. No payment has been made through Takeaways Tonight?"].join("\n");
   localStorage.removeItem("tt_pending_checkout");sessionStorage.removeItem("tt_order_idempotency");
   basket=[];render();closeDialog("basketDialog");
-  showCustomerPaymentNotice(order.order_number,false);watchCustomerPayment(order.id,order.order_number);
+  if(order.payment_confirmation_required){showCustomerPaymentNotice(order.order_number,false);watchCustomerPayment(order.id,order.order_number);}
   alert("Thank you, "+customerName+". Your order request #"+order.order_number+" has been submitted. WhatsApp will open with the order details for you to send to the restaurant. IMPORTANT: Your order is NOT confirmed yet. The restaurant must accept it and confirm availability, the final total and collection or delivery arrangements.");
   const waUrl="https://wa.me/"+whatsapp+"?text="+encodeURIComponent(message);
   if(waWindow)waWindow.location.href=waUrl;else window.location.href=waUrl;
