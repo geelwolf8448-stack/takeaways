@@ -249,9 +249,9 @@ async function loadRestaurantsOrders(){
   return '<article class="order"><div class="top"><b>Order #'+esc(o.order_number)+'</b><span class="tag">'+esc(o.status.toUpperCase())+'</span></div><p><b>'+esc(o.customer_name)+'</b> · +'+esc(o.customer_phone)+'</p><p>'+esc(o.fulfilment_type)+(o.delivery_address?' · '+esc(o.delivery_address):'')+'</p><div class="items">'+(o.marketplace_order_items||[]).map(i=>esc(i.quantity)+' × '+esc(i.item_name)+' — '+money(i.unit_price_cents*i.quantity)).join('<br>')+'</div><p><b>Total: '+money(o.total_cents)+'</b> · Payment method: '+esc(String(o.payment_method||"").replaceAll("_"," "))+' · Status: '+esc(o.payment_status.replaceAll("_"," "))+'</p><p class="small">'+esc(o.customer_notes||"")+'</p>'+actions+'</article>';
  }).join(""):'<p class="small">No customer orders yet.</p>';
 }
-const paymentMethodOptions=[["cash_collection","Cash on collection"],["cash_delivery","Cash on delivery"],["eft","EFT / bank transfer"],["card_machine","Card machine at restaurant"]];
+const paymentMethodOptions=[["cash_collection","Cash on collection"],["cash_delivery","Cash on delivery"],["eft","EFT / bank transfer"],["card_machine","Card machine at restaurant or on delivery"]];
 function paymentMethodSettings(selected,canEdit=true){
- const methods=Array.isArray(selected)&&selected.length?selected:["cash_collection","cash_delivery","eft","card_machine"];
+ const methods=Array.isArray(selected)?selected:[];
  return paymentMethodOptions.map(([value,label])=>'<label style="display:flex;gap:9px;align-items:center;color:#fff;font-weight:normal"><input type="checkbox" data-payment-method="'+value+'" '+(methods.includes(value)?"checked":"")+' '+(canEdit?"":"disabled")+' style="width:auto">'+label+'</label>').join("");
 }
 async function savePaymentMethods(id){
