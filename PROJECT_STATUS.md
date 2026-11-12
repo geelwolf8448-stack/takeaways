@@ -160,3 +160,10 @@ Still not implemented or enabled:
 
 Safety rule: never send merchant keys or passphrases through chat, email, GitHub, or public frontend files. Never mark an invoice paid based only on the browser return URL. Only a verified PayFast notification can settle an invoice. Food-order payments must continue going directly to the business; do not enable split payments or platform commission deductions.
 
+## PayFast sandbox account update (12 November 2026)
+
+- Owner confirmed access to the PayFast Sandbox dashboard and confirmed that the Security/Salt Passphrase has now been created and saved in the sandbox merchant account.
+- Merchant ID and Merchant Key are visible to the owner in the sandbox dashboard. Their values and the passphrase have not been shared in chat, written to GitHub, or stored in project documentation.
+- These credentials have not yet been added to Supabase Edge Function secrets. The available connected Supabase tools do not expose a secrets-management action, so the owner must add them through the Supabase Dashboard's Edge Function Secrets settings.
+- Keep `PAYFAST_MODE=sandbox`. Do not enable live payments. After credentials are added, verify the configuration readiness indicator and complete sandbox payment testing.
+- ITN notification URL: `https://xsrmtokfrqdyfbrqljsm.supabase.co/functions/v1/payfast-itn`.
