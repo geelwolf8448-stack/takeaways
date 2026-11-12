@@ -222,7 +222,7 @@ android {
   fs.rmSync(fixtureDir, { recursive: true, force: true });
 }
 const callbackSource = callback.html;
-check("magic-link callback verifies Supabase magiclink tokens as magiclink", /type:"magiclink"/.test(callbackSource));
+check("sign-in callback supports Supabase magiclink tokens for legacy links", /type:"magiclink"/.test(callbackSource));
 check("email OTP callback supports email token type", /type:"email"/.test(callbackSource));
 for (const file of ["LAUNCH-KIT.md", "ANDROID-RELEASE.md", "RESTAURANT-AGREEMENT-TEMPLATE.md", ".github/workflows/android-release.yml"]) {
   check(file + " exists", fs.existsSync(path.join(root, file)));
