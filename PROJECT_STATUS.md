@@ -133,11 +133,14 @@ Important: The deployed billing function currently manages pilot dates and billi
 ## PayFast integration preparation update (12 November 2026)
 
 - Confirmed from PayFast's current merchant support guidance that setting a Security Passphrase under Settings → Developer Settings enables subscription payments. Tokenization is a separate Recurring Billing setting and is not required for the standard fixed monthly subscription flow planned here.
-- PayFast recurring subscriptions use a credit card, a monthly frequency value, and an indefinite cycle count when appropriate. PayFast requires the passphrase in the payment signature for subscription setup.
+- PayFast recurring subscriptions use credit cards, monthly frequency, and an indefinite cycle count where appropriate. PayFast requires the passphrase in the payment signature for subscription setup.
 - PayFast sandbox supports custom integration and recurring-billing tests without transferring real money. Sandbox ITNs can be inspected in the sandbox dashboard.
-- Updated Supabase Edge Function `platform-billing` to version 2. Added an authenticated `payment_config_status` action that reports only whether required server-side PayFast settings are present; it never returns secret values and does not create payments.
-- Updated the admin billing panel to show whether secure PayFast settings are configured. This is a readiness indicator only, not proof of a successful payment integration.
+- Supabase Edge Function `platform-billing` is ACTIVE at version 4. Its administrator-authenticated `payment_config_status` action reports only whether required server-side PayFast settings are present; it never returns secret values and does not create payments.
+- Deployed Supabase Edge Function `payfast-itn` version 2 as the public PayFast notification receiver. It checks the PayFast source IP allowlist, verifies the notification signature, calls PayFast's server-side validation endpoint, checks merchant/reference/amount, records idempotent payment events, and updates invoice/subscription records only after validation. JWT verification is disabled only for this function because PayFast's server callback cannot supply an administrator JWT; the callback performs its own payment-origin and payload verification.
+- The ITN receiver URL is `https://xsrmtokfrqdyfbrqljsm.supabase.co/functions/v1/payfast-itn`.
+- The admin billing panel continues to show whether secure PayFast settings are configured. This is a readiness indicator only, not proof of a successful payment integration.
 - Added and verified index `billing_payment_events_invoice_id_idx` for the payment-event invoice foreign key.
+- No checkout form is exposed to the browser yet. The PayFast custom form specification includes the merchant key in the submitted form; the project security rule is to keep merchant keys and passphrases out of public frontend code. A safe checkout handoff must be completed before any payment button is enabled.
 
 Required server-side Supabase secrets (to be entered only after PayFast account access is recovered):
 - `PAYFAST_MERCHANT_ID`
@@ -146,14 +149,14 @@ Required server-side Supabase secrets (to be entered only after PayFast account 
 - `PAYFAST_MODE` (must remain `sandbox` during testing)
 - `PAYFAST_RETURN_URL`
 - `PAYFAST_CANCEL_URL`
-- `PAYFAST_NOTIFY_URL`
+- `PAYFAST_NOTIFY_URL` (set to the ITN receiver URL above)
 
 Still not implemented or enabled:
-- Server-generated signed PayFast checkout forms for the R250 once-off admin fee and R500 monthly subscription.
-- A PayFast ITN receiver with signature validation, PayFast server validation, amount/reference matching, duplicate-event protection and subscription-state updates.
-- Recurring subscription creation only after the R250 admin fee is confirmed paid.
+- A safe server-side checkout handoff for the R250 once-off admin fee.
+- Recurring subscription checkout for R500 per month, only after the R250 admin fee is confirmed paid.
+- Monthly invoice generation and recurring billing lifecycle handling.
 - Sandbox end-to-end payment tests.
 - Explicit owner approval before changing any payment configuration from sandbox to live.
 
-Safety rule: never send merchant keys or passphrases through chat, email, GitHub, or public frontend files. Never mark an invoice paid based only on the browser return URL. Only a verified PayFast notification can settle an invoice.
+Safety rule: never send merchant keys or passphrases through chat, email, GitHub, or public frontend files. Never mark an invoice paid based only on the browser return URL. Only a verified PayFast notification can settle an invoice. Food-order payments must continue going directly to the business; do not enable split payments or platform commission deductions.
 
