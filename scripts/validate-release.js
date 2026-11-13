@@ -71,6 +71,7 @@ check("customer page keeps the restaurant directory out of sight and removes unf
 check("customer start has one phone-install action directly below Explore and Order without a duplicate install panel", /id="installAppButton"[^>]*>📲 Get Takeaways Tonight\? on your phone</.test(publicPage.html) && publicPage.html.indexOf('EXPLORE & ORDER NOW') < publicPage.html.indexOf('id="installAppButton"') && publicPage.html.indexOf('id="installAppButton"') < publicPage.html.indexOf('class="poster-region"') && !/<section id="installAppCard"/.test(publicPage.html) && !/id="installHint"/.test(publicPage.html));
 check("customer app offers automatic nearby menus rather than manual restaurant searching", /Location permission is needed to show nearby food/.test(publicPage.html) && !/Search by restaurant, meal or area/.test(publicPage.html) && !/Find restaurants, meals or areas/.test(publicPage.html));
 check("public customer page has no Takeaways Tonight support WhatsApp or QR contact shortcut", !/https:\/\/wa\.me\/27833149674/.test(publicPage.html) && !/<section id="contact"/.test(publicPage.html) && !/whatsapp-qr\.svg/.test(publicPage.html));
+check("customer interior uses the warm market palette with clearer rounded typography and buttons", /Customer interior — warm market palette/.test(publicPage.html) && /--tt-cream:#fff8ef/.test(publicPage.html) && /font-family:"Trebuchet MS"/.test(publicPage.html) && /#installAppButton\{font-family/.test(publicPage.html));
 
 const admin = compileInlineScripts("admin.html");
 check("admin portal inline JavaScript compiles", admin.count > 0);
@@ -154,7 +155,7 @@ check("marketplace API only grants owner access to published restaurants", /rest
 const worker = read("service-worker.js");
 new vm.Script(worker, { filename: "service-worker.js" });
 check("service worker JavaScript compiles", true);
-check("browser checks for the newest app update without reusing a saved worker file", /serviceWorker\.register\("\.\/service-worker\.js\?v=71",\{updateViaCache:"none"\}\)\.then\(registration=>registration\.update\(\)\)/.test(publicPage.html));
+check("browser checks for the newest app update without reusing a saved worker file", /serviceWorker\.register\("\.\/service-worker\.js\?v=72",\{updateViaCache:"none"\}\)\.then\(registration=>registration\.update\(\)\)/.test(publicPage.html));
 for (const file of ["manifest.webmanifest", "config.js", "logo.svg", "icon.svg", "privacy.html", "terms.html", "account.html", "restaurant-portal.html"]) {
   check(file + " exists", fs.existsSync(path.join(root, file)));
 }
