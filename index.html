@@ -381,7 +381,7 @@ dialog{background:#080808!important;color:#fff!important;border:1px solid #b58b1
 <div class="hero-actions"><a class="primary" href="#explore">🛵 ORDER NOW</a><button class="primary" id="installAppButton" type="button" onclick="installTakeawaysApp()">⬇ DOWNLOAD OUR APP</button></div>
 <section id="installAppCard" class="install-panel"><div class="install-copy"><img src="icon.svg" alt="Takeaways Tonight app icon"><div><b>Get Takeaways Tonight? on your phone</b><div id="installHint" class="notice">Install the app for quick access from your home screen.</div></div></div></section>
 <div class="searchbar"><input id="search" placeholder="Search restaurants, meals or areas…" oninput="render()"><button onclick="render()">Search</button></div>
-<div class="notice" style="display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap"><span id="customerLocationStatus" role="status" aria-live="polite">📍 Finding restaurants near your current location…</span><button type="button" class="secondary" onclick="refreshCustomerLocation()">Refresh my location</button></div>
+<div class="notice" style="display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap"><span id="customerLocationStatus" role="status" aria-live="polite">📍 Finding restaurants near your current location…</span></div>
 <section class="promo-panel" id="provinceDirectory">
  <div class="section-head"><div><h2>Choose your province</h2><p>Explore restaurants and takeaway menus from anywhere in South Africa.</p></div></div>
  <div class="filters" id="provinceFilters" aria-label="Filter restaurants by province"></div>
@@ -517,8 +517,24 @@ async function loadLiveAdverts(){
  }catch(error){console.warn("Could not load restaurant adverts",error);const root=document.getElementById("liveAdverts");if(root)root.innerHTML='<div class="empty">Restaurant specials are temporarily unavailable.</div>';}
 }
 
-function openMenu(id){currentRestaurant=restaurants.find(r=>r.id===id&&r.isDemo===false);if(!currentRestaurant)return;document.getElementById("menuTitle").textContent=currentRestaurant.name;document.getElementById("menuContent").innerHTML=currentRestaurant.items.map((it,i)=>`<div class="menu-item"><div><p>${esc(it[0])}</p><small>${money(it[1])}</small></div><button onclick="addToBasket('${id}',${i})">Add +</button></div>`).join("")+(currentRestaurant.isDemo===false?"":'<p class="notice">SAMPLE MENU — You can add items and test your basket. Placing an order is disabled until this is a real approved restaurant partner.</p>');if(currentRestaurant.menuFileUrl)document.getElementById("menuContent").insertAdjacentHTML("afterbegin",'<p><a class="secondary" style="display:inline-block;padding:10px 14px;border-radius:30px" href="'+esc(currentRestaurant.menuFileUrl)+'" target="_blank" rel="noopener">📄 View full uploaded menu</a></p>');updateMenuTotal();document.getElementById("menuDialog").showModal()}
-function addToBasket(id,i){sessionStorage.removeItem("tt_order_idempotency");let r=restaurants.find(x=>x.id===id&&x.isDemo===false);if(!r||!Array.isArray(r.items)||!r.items[i])return;if(basket.length&&basket[0].restaurantId!==id){if(!confirm("Your basket contains another restaurant. Clear it and start this restaurant's order?"))return;basket=[]}let item=r.items[i];let found=basket.find(x=>x.name===item[0]&&x.restaurantId===id);if(found)found.qty++;else basket.push({restaurantId:id,restaurant:r.name,name:item[0],price:Number(item[1]),qty:1,isDemo:r.isDemo!==false});updateMenuTotal();render()}
+function menuItemQuantity(restaurantId,itemIndex){return basket.find(item=>item.restaurantId===restaurantId&&item.menuIndex===itemIndex)?.qty||0}
+function renderMenuContent(){
+ const restaurant=currentRestaurant,content=document.getElementById("menuContent");if(!restaurant||!content)return;
+ const items=Array.isArray(restaurant.items)?restaurant.items:[];
+ content.innerHTML=items.map((item,index)=>{const quantity=menuItemQuantity(restaurant.id,index);return `<div class="menu-item"><div><p>${esc(item[0])}</p><small>${money(item[1])}</small></div><div class="qty" aria-label="Quantity for ${esc(item[0])}"><button class="secondary" type="button" aria-label="Remove one ${esc(item[0])}" onclick="changeMenuItemQuantity('${restaurant.id}',${index},-1)" ${quantity?'':'disabled'}>−</button><b>${quantity}</b><button type="button" aria-label="Add one ${esc(item[0])}" onclick="changeMenuItemQuantity('${restaurant.id}',${index},1)">+</button></div></div>`}).join("")+(items.length?'<button class="secondary" style="width:100%;margin-top:14px" type="button" onclick="openBasket()">View basket & order</button>':'<p class="notice">This restaurant has not added menu items yet.</p>');
+ if(restaurant.menuFileUrl)content.insertAdjacentHTML("afterbegin",'<p><a class="secondary" style="display:inline-block;padding:10px 14px;border-radius:30px" href="'+esc(restaurant.menuFileUrl)+'" target="_blank" rel="noopener">📄 View full uploaded menu</a></p>');
+ updateMenuTotal();
+}
+function openMenu(id){currentRestaurant=restaurants.find(r=>r.id===id&&r.isDemo===false);if(!currentRestaurant)return;document.getElementById("menuTitle").textContent=currentRestaurant.name;renderMenuContent();const dialog=document.getElementById("menuDialog");if(!dialog.open)dialog.showModal()}
+function changeMenuItemQuantity(id,index,change){
+ sessionStorage.removeItem("tt_order_idempotency");const restaurant=restaurants.find(item=>item.id===id&&item.isDemo===false),menuItem=restaurant?.items?.[index];if(!restaurant||!menuItem)return;
+ if(basket.length&&basket[0].restaurantId!==id){if(change<1)return;if(!confirm("Your basket contains another restaurant. Clear it and start this restaurant's order?"))return;basket=[];}
+ const existing=basket.find(item=>item.restaurantId===id&&item.menuIndex===index);
+ if(existing){existing.qty+=change;if(existing.qty<=0)basket=basket.filter(item=>item!==existing);}
+ else if(change>0){basket.push({restaurantId:id,restaurant:restaurant.name,menuIndex:index,name:menuItem[0],price:Number(menuItem[1]),qty:change,isDemo:false});}
+ renderMenuContent();render();
+}
+function addToBasket(id,index){changeMenuItemQuantity(id,index,1)}
 function updateMenuTotal(){let total=basket.reduce((a,b)=>a+b.price*b.qty,0);document.getElementById("menuTotal").textContent="Basket total: "+money(total)}
 function fulfilmentChanged(){populatePaymentMethods();const delivery=document.getElementById("fulfilment").value==="Delivery";const wrap=document.getElementById("deliveryAddressField");const address=document.getElementById("deliveryAddress");wrap.hidden=!delivery;address.required=delivery;if(!delivery)address.value="";}
 function populatePaymentMethods(){

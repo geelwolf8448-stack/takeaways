@@ -39,7 +39,7 @@ const requiredIds = [
 for (const id of requiredIds) {
   check("public page has #" + id, (publicPage.html.includes('id="'+id+'"') || publicPage.html.includes("id='"+id+"'")));
 }
-check("public directory contains no demo listings and refuses demo baskets", !/Demo Burger Kitchen|Demo Pizza Corner|Demo Fish Shack/.test(publicPage.html) && /r=>r.id===id&&r.isDemo===false/.test(publicPage.html) && /x=>x.id===id&&x.isDemo===false/.test(publicPage.html));
+check("public directory contains no demo listings and refuses demo baskets", !/Demo Burger Kitchen|Demo Pizza Corner|Demo Fish Shack/.test(publicPage.html) && /r=>r.id===id&&r.isDemo===false/.test(publicPage.html) && /restaurants\.find\(item=>item\.id===id&&item\.isDemo===false\)/.test(publicPage.html));
 check("demo cards are not labelled as confirmed featured partners", !/Our featured restaurants/.test(publicPage.html));
 check("orders are restricted to published real restaurant records", /r\.isDemo===false/.test(publicPage.html) && /is_published=eq\.true/.test(publicPage.html));
 check("customer order receives live payment confirmation updates", /watchCustomerPayment\(order\.id,order\.order_number\)/.test(publicPage.html) && /postgres_changes/.test(publicPage.html) && /PAYMENT RECEIVED/.test(publicPage.html));
@@ -54,6 +54,8 @@ check("delivery address is required for delivery", /fulfilment==="Delivery"&&!ad
 check("business registration requires explicit owner authorisation", /rConsent/.test(publicPage.html) && /if\(!document\.getElementById\("rConsent"\)\.checked\)/.test(publicPage.html));
 check("business registration explains when the listing is published", /business will appear in the public directory immediately after successful registration/i.test(publicPage.html));
 check("public directory fetch filters published restaurants", /is_published=eq\.true/.test(publicPage.html));
+check("customer location is requested automatically without a manual location button and nearby restaurants are ranked first", /detectCustomerLocation\(\)\.then\(\(\)=>loadSharedRestaurants\(\)\)/.test(publicPage.html) && /list_nearby_food_businesses/.test(publicPage.html) && /Nearest businesses shown first/.test(publicPage.html) && !/Refresh my location/.test(publicPage.html));
+check("restaurant menu popup shows prices with plus-minus quantity controls before checkout", /renderMenuContent/.test(publicPage.html) && /changeMenuItemQuantity/.test(publicPage.html) && /menuItemQuantity/.test(publicPage.html) && /View basket & order/.test(publicPage.html));
 check("privacy and terms pages are linked", /privacy\.html/.test(publicPage.html) && /terms\.html/.test(publicPage.html));
 check("privacy notice describes saved customer orders", /order history/.test(read("privacy.html")) && /delivery address/.test(read("privacy.html")));
 check("terms distinguish order requests from restaurant acceptance", /not an accepted order/.test(read("terms.html")));
