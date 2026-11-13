@@ -29,6 +29,7 @@ function compileInlineScripts(file) {
 
 const publicPage = compileInlineScripts("index.html");
 check("public page contains an inline application script", publicPage.count > 0);
+check("phone-install button uses the customer-facing Takeaways Tonight wording", /id="installAppButton"[^>]*>📲 Get Takeaways Tonight\? on your phone</.test(publicPage.html));
 const requiredIds = [
   "search", "restaurants", "resultCount", "basketCount", "directoryStatus",
   "menuDialog", "menuContent", "basketDialog", "basketContent", "sendOrder",
@@ -60,7 +61,9 @@ check("privacy and terms pages are linked", /privacy\.html/.test(publicPage.html
 check("privacy notice describes saved customer orders", /order history/.test(read("privacy.html")) && /delivery address/.test(read("privacy.html")));
 check("terms distinguish order requests from restaurant acceptance", /not an accepted order/.test(read("terms.html")));
 check("mobile navigation does not advertise unfinished favourites/orders/settings tabs", !/Favourites|>Orders<|>Settings</.test(publicPage.html));
-check("customer navigation opens the live restaurant-adverts section instead of the support area", /id="explore"/.test(publicPage.html) && /href="#explore"/.test(publicPage.html) && /getElementById\('explore'\)\?\.scrollIntoView/.test(publicPage.html) && /Restaurant specials & adverts/.test(publicPage.html));
+check("customer navigation opens Find your food directly below Food Wars instead of the support area", publicPage.html.indexOf('FOOD WARS') < publicPage.html.indexOf('id="explore"') && publicPage.html.indexOf('id="explore"') < publicPage.html.indexOf('How Takeaways Tonight? works') && /<h2>Find your food<\/h2><p>Choose a category and discover local favourites\.<\/p>/.test(publicPage.html) && /href="#explore"/.test(publicPage.html) && /getElementById\('explore'\)\?\.scrollIntoView/.test(publicPage.html) && !/Restaurant specials & adverts/.test(publicPage.html));
+check("customer campaign label uses Food Wars instead of Community Vote", /<small>FOOD WARS<\/small>/.test(publicPage.html) && !/COMMUNITY VOTE/.test(publicPage.html));
+check("customer specials label does not use the outdated Tonight's Spotlight wording", /<small>SPECIALS<\/small>/.test(publicPage.html) && !/TONIGHT'S SPOTLIGHT/.test(publicPage.html));
 check("mobile navigation links to live customer sections", /href="#explore"/.test(publicPage.html) && /href="#owners"/.test(publicPage.html));
 
 const admin = compileInlineScripts("admin.html");
