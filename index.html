@@ -120,6 +120,7 @@ body{font-family:Arial,Helvetica,sans-serif;background:radial-gradient(ellipse a
 .poster-main .hero-actions{grid-template-columns:minmax(0,1fr)!important;max-width:460px!important;margin:14px auto 0!important}
 .poster-region{margin:20px auto 0!important;color:#fff!important;font-size:13px!important;letter-spacing:2px!important;font-weight:1000!important;text-shadow:0 2px 8px #000!important}
 main{max-width:1200px!important;margin:-18px auto 55px!important;padding:0 clamp(14px,3vw,30px)!important;position:relative!important;z-index:2!important}
+#explore{scroll-margin-top:18px}
 .feature-nav{grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:10px!important;margin:0 0 18px!important}
 .feature-nav a{min-height:68px!important;border:2px solid #f3c21a!important;border-radius:15px!important;background:linear-gradient(145deg,#12101a,#030408)!important;color:#fff!important;box-shadow:0 5px 0 #743000,0 9px 20px #0009!important;font-size:13px!important}
 .feature-nav strong{color:#ffd51b!important;font-size:25px!important}
@@ -372,7 +373,7 @@ dialog{background:#080808!important;color:#fff!important;border:1px solid #b58b1
 <div class="poster-main">
 <div class="poster-logo-wrap"><img class="poster-logo" src="logo.svg" alt="Takeaways Tonight? — chef hat and delivery rider logo"></div>
 <div class="poster-tagline">Discover local. Order direct. Support local.</div>
-<a class="poster-download" href="#explore" onclick="event.preventDefault();document.getElementById('explore')?.scrollIntoView({behavior:'smooth',block:'start'});">⬇ &nbsp; EXPLORE & ORDER NOW</a>
+<a class="poster-download" href="#explore" onclick="openFindYourFood(event)">⬇ &nbsp; EXPLORE & ORDER NOW</a>
 <div class="hero-actions"><button class="primary" id="installAppButton" type="button" onclick="installTakeawaysApp()">📲 Get Takeaways Tonight? on your phone</button></div>
 <div class="poster-region">ALL NINE SOUTH AFRICAN PROVINCES</div>
 </div>
@@ -436,6 +437,13 @@ let businessLocation=null;
 let pendingBusinessLocationRestaurantId=null;
 let locationAttempted=false;
 function setLocationStatus(message){const el=document.getElementById('customerLocationStatus');if(el)el.textContent=message;}
+function openFindYourFood(event){
+ if(event)event.preventDefault();
+ const section=document.getElementById("explore");
+ if(!section)return;
+ section.scrollIntoView({behavior:"smooth",block:"start"});
+ if(history.replaceState)history.replaceState(null,"","#explore");
+}
 function captureBusinessLocation(){
  const status=document.getElementById('businessLocationStatus'),button=document.getElementById('captureBusinessLocationButton');
  if(!navigator.geolocation){status.textContent='Location is not available on this device.';return;}
