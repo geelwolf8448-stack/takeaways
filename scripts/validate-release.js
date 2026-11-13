@@ -130,6 +130,11 @@ check("native push stores FCM tokens against the signed-in user", /restaurant_pu
 check("native push requests permission and registers the Android device", /requestPermissions/.test(nativePush) && /PushNotifications\.register/.test(nativePush));
 check("restaurant owner portal uses server-side order updates", /marketplace-api/.test(restaurantPortal.html) && /update_order/.test(restaurantPortal.html));
 check("restaurant owners can manage menus, business images and accepted payment methods", /saveRestaurantMenu/.test(restaurantPortal.html) && /uploadBusinessImage/.test(restaurantPortal.html) && /savePaymentMethods/.test(restaurantPortal.html) && /data-payment-method/.test(restaurantPortal.html));
+check("restaurant owners can build a live menu with categories, food photos, descriptions and prices", /Customer menu builder/.test(restaurantPortal.html) && /uploadRestaurantMenuItemImage/.test(restaurantPortal.html) && /restaurant-menu-items/.test(restaurantPortal.html) && /Food description/.test(restaurantPortal.html) && /normaliseRestaurantMenu/.test(restaurantPortal.html));
+check("customer menu popup groups food by owner category and shows an optional food photo and description", /normaliseCustomerMenuItem/.test(publicPage.html) && /menu-category/.test(publicPage.html) && /menu-item-description/.test(publicPage.html));
+const ownerMenuMigration = read("supabase/migrations/20261113143000_owner_menu_builder_and_photos.sql");
+check("owner menu photos use a dedicated public bucket with owner-manager storage policies", /restaurant-menu-items/.test(ownerMenuMigration) && /Restaurant teams upload their menu item photos/.test(ownerMenuMigration) && /member_role in \('owner', 'manager'\)/.test(ownerMenuMigration));
+check("owner menu save validates categories, descriptions, prices and the restaurant-owned food-photo URL", /Each food item needs a category/.test(ownerMenuMigration) && /Food descriptions may not exceed/.test(ownerMenuMigration) && /Food photo URL is not from this restaurant/.test(ownerMenuMigration));
 check("restaurant portal loads saved adverts when the dashboard opens and keeps view-only team members read-only", /Promise\.all\(\[loadRestaurantsOrders\(\),loadRestaurantAdverts\(\)\]\)/.test(restaurantPortal.html) && /View-only access\. Only the restaurant owner or manager can change adverts\./.test(restaurantPortal.html) && /Only the restaurant owner or manager can edit adverts\./.test(restaurantPortal.html));
 check("restaurant portal does not expose internal fee reporting", !/feeLedger|feeArea/.test(restaurantPortal.html));
 check("web and native pages load the shared auth deep-link handler", /native-auth\.js/.test(publicPage.html) && /native-auth\.js/.test(account.html) && /native-auth\.js/.test(restaurantPortal.html));
@@ -155,7 +160,7 @@ check("marketplace API only grants owner access to published restaurants", /rest
 const worker = read("service-worker.js");
 new vm.Script(worker, { filename: "service-worker.js" });
 check("service worker JavaScript compiles", true);
-check("browser checks for the newest app update without reusing a saved worker file", /serviceWorker\.register\("\.\/service-worker\.js\?v=73",\{updateViaCache:"none"\}\)\.then\(registration=>registration\.update\(\)\)/.test(publicPage.html));
+check("browser checks for the newest app update without reusing a saved worker file", /serviceWorker\.register\("\.\/service-worker\.js\?v=74",\{updateViaCache:"none"\}\)\.then\(registration=>registration\.update\(\)\)/.test(publicPage.html));
 for (const file of ["manifest.webmanifest", "config.js", "logo.svg", "icon.svg", "privacy.html", "terms.html", "account.html", "restaurant-portal.html"]) {
   check(file + " exists", fs.existsSync(path.join(root, file)));
 }

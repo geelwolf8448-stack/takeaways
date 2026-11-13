@@ -414,7 +414,7 @@ button:not(.secondary):not(.dark):not(.x){background:linear-gradient(110deg,#f6c
 button.secondary,button.dark,.card-actions .secondary{background:#291b2b!important;color:#ffda87!important;border-color:#8e6042!important;box-shadow:none!important}button.secondary:hover,button.dark:hover,.card-actions .secondary:hover{background:#3a253a!important}
 .card{background:#211722!important;border-color:#80533d!important;box-shadow:0 9px 24px #0d081066!important}.card-body h3,.card h3{color:#f6cf78!important}.card p,.meta small{color:#ddc2a4!important}.pill{background:#53372b!important;color:#ffdd8e!important}
 dialog{background:#211722!important;color:#ffdaa0!important;border-color:#8d5d40!important;box-shadow:0 20px 70px #08050aaa!important}.modal-head{background:linear-gradient(110deg,#382239 0%,#75404d 62%,#b75b48 100%)!important;border-bottom-color:#d89b3e!important}.modal-body{background:#191119!important;color:#ffdaa0!important}.menu-item,.basket-item{border-bottom-color:#5b4034!important}.menu-item small{color:#ddc2a4!important}.field label{color:#f5c766!important}.field input,.field textarea,.field select{background:#130e15!important;color:#ffdaa0!important;border-color:#80533d!important}
-footer{background:#130d17!important;border-top-color:#e9ad3d!important;color:#e9cba6!important}footer b,footer a{color:#ffdb83!important}
+footer{background:#130d17!important;border-top-color:#e9ad3d!important;color:#e9cba6!important}footer b,footer a{color:#ffdb83!important}.menu-category{margin:18px 0 4px;color:#f5c766;font-weight:900;font-size:14px;letter-spacing:.06em;text-transform:uppercase}.menu-item-copy{display:flex;align-items:center;gap:10px;min-width:0}.menu-item-copy img{width:60px;height:60px;object-fit:cover;border:1px solid #80533d;border-radius:10px;flex:0 0 auto}.menu-item-copy p{margin:0!important}.menu-item-copy small{display:block;margin-top:3px}.menu-item-description{color:#e6c8a6!important;font-size:12px;line-height:1.35}.menu-item-price{color:#ffd980!important;font-weight:900;margin-top:3px}
 </style>
 <body>
 <header class="poster-header">
@@ -544,21 +544,23 @@ async function loadLiveAdverts(){
  }catch(error){console.warn("Could not load restaurant adverts",error);const root=document.getElementById("liveAdverts");if(root)root.innerHTML='<div class="empty">Restaurant specials are temporarily unavailable.</div>';}
 }
 
+function normaliseCustomerMenuItem(item){const source=item&&typeof item==="object"&&!Array.isArray(item)?item:{};const price=Array.isArray(item)?Number(item[1]):Number(source.price);return {name:String(Array.isArray(item)?item[0]:source.name??source.title??"").trim(),price,category:String(Array.isArray(item)?"Menu":source.category||"Menu").trim()||"Menu",description:String(Array.isArray(item)?"":source.description||"").trim(),imageUrl:String(Array.isArray(item)?"":source.image_url||source.imageUrl||"")};}
 function menuItemQuantity(restaurantId,itemIndex){return basket.find(item=>item.restaurantId===restaurantId&&item.menuIndex===itemIndex)?.qty||0}
 function renderMenuContent(){
  const restaurant=currentRestaurant,content=document.getElementById("menuContent");if(!restaurant||!content)return;
- const items=Array.isArray(restaurant.items)?restaurant.items:[];
- content.innerHTML=items.map((item,index)=>{const quantity=menuItemQuantity(restaurant.id,index);return `<div class="menu-item"><div><p>${esc(item[0])}</p><small>${money(item[1])}</small></div><div class="qty" aria-label="Quantity for ${esc(item[0])}"><button class="secondary" type="button" aria-label="Remove one ${esc(item[0])}" onclick="changeMenuItemQuantity('${restaurant.id}',${index},-1)" ${quantity?'':'disabled'}>−</button><b>${quantity}</b><button type="button" aria-label="Add one ${esc(item[0])}" onclick="changeMenuItemQuantity('${restaurant.id}',${index},1)">+</button></div></div>`}).join("")+(items.length?'<button class="secondary" style="width:100%;margin-top:14px" type="button" onclick="openBasket()">View basket & order</button>':'<p class="notice">This restaurant has not added menu items yet.</p>');
+ const items=(Array.isArray(restaurant.items)?restaurant.items:[]).map(normaliseCustomerMenuItem).filter(item=>item.name&&Number.isFinite(item.price));
+ const groups=[];items.forEach((item,index)=>{let group=groups.find(entry=>entry.category===item.category);if(!group){group={category:item.category,items:[]};groups.push(group);}group.items.push({item,index});});
+ content.innerHTML=groups.map(group=>'<div class="menu-category">'+esc(group.category)+'</div>'+group.items.map(({item,index})=>{const quantity=menuItemQuantity(restaurant.id,index),photo=item.imageUrl?'<img src="'+esc(item.imageUrl)+'" alt="'+esc(item.name)+'">':'';return `<div class="menu-item"><div class="menu-item-copy">${photo}<div><p>${esc(item.name)}</p>${item.description?'<small class="menu-item-description">'+esc(item.description)+'</small>':''}<small class="menu-item-price">${money(item.price)}</small></div></div><div class="qty" aria-label="Quantity for ${esc(item.name)}"><button class="secondary" type="button" aria-label="Remove one ${esc(item.name)}" onclick="changeMenuItemQuantity('${restaurant.id}',${index},-1)" ${quantity?'':'disabled'}>−</button><b>${quantity}</b><button type="button" aria-label="Add one ${esc(item.name)}" onclick="changeMenuItemQuantity('${restaurant.id}',${index},1)">+</button></div></div>`}).join("")).join("")+(items.length?'<button class="secondary" style="width:100%;margin-top:14px" type="button" onclick="openBasket()">View basket & order</button>':'<p class="notice">This restaurant has not added menu items yet.</p>');
  if(restaurant.menuFileUrl)content.insertAdjacentHTML("afterbegin",'<p><a class="secondary" style="display:inline-block;padding:10px 14px;border-radius:30px" href="'+esc(restaurant.menuFileUrl)+'" target="_blank" rel="noopener">📄 View full uploaded menu</a></p>');
  updateMenuTotal();
 }
 function openMenu(id){currentRestaurant=restaurants.find(r=>r.id===id&&r.isDemo===false);if(!currentRestaurant)return;document.getElementById("menuTitle").textContent=currentRestaurant.name;renderMenuContent();const dialog=document.getElementById("menuDialog");if(!dialog.open)dialog.showModal()}
 function changeMenuItemQuantity(id,index,change){
- sessionStorage.removeItem("tt_order_idempotency");const restaurant=restaurants.find(item=>item.id===id&&item.isDemo===false),menuItem=restaurant?.items?.[index];if(!restaurant||!menuItem)return;
+ sessionStorage.removeItem("tt_order_idempotency");const restaurant=restaurants.find(item=>item.id===id&&item.isDemo===false),menuItem=normaliseCustomerMenuItem(restaurant?.items?.[index]);if(!restaurant||!menuItem.name||!Number.isFinite(menuItem.price))return;
  if(basket.length&&basket[0].restaurantId!==id){if(change<1)return;if(!confirm("Your basket contains another restaurant. Clear it and start this restaurant's order?"))return;basket=[];}
  const existing=basket.find(item=>item.restaurantId===id&&item.menuIndex===index);
  if(existing){existing.qty+=change;if(existing.qty<=0)basket=basket.filter(item=>item!==existing);}
- else if(change>0){basket.push({restaurantId:id,restaurant:restaurant.name,menuIndex:index,name:menuItem[0],price:Number(menuItem[1]),qty:change,isDemo:false});}
+ else if(change>0){basket.push({restaurantId:id,restaurant:restaurant.name,menuIndex:index,name:menuItem.name,price:menuItem.price,qty:change,isDemo:false});}
  renderMenuContent();render();
 }
 function addToBasket(id,index){changeMenuItemQuantity(id,index,1)}
@@ -691,7 +693,7 @@ async function loadSharedRestaurants(){
    const response=await fetch(c.supabaseUrl+'/rest/v1/restaurants?select=id,name,area,province,category,whatsapp,description,menu,menu_file_url,business_image_url,accepted_payment_methods,latitude,longitude&is_published=eq.true&order=name.asc',{headers:{apikey:c.supabaseAnonKey}});
    if(!response.ok)throw new Error('Directory request failed ('+response.status+').');rows=await response.json();
   }
-  const shared=rows.map(r=>({id:'shared-'+r.id,name:r.name,area:r.area,province:r.province||'KwaZulu-Natal',category:r.category,phone:r.whatsapp,desc:r.description||'Local food business',items:Array.isArray(r.menu)?r.menu.map(entry=>Array.isArray(entry)?entry:[String(entry?.name??entry?.title??""),Number(entry?.price)]).filter(entry=>entry[0]&&Number.isFinite(entry[1])):[],menuFileUrl:r.menu_file_url||'',businessImageUrl:r.business_image_url||'',acceptedPaymentMethods:Array.isArray(r.accepted_payment_methods)?r.accepted_payment_methods:[],emoji:'🍽️',isDemo:false,distanceKm:r.distance_km==null?null:Number(r.distance_km)})).filter(r=>r.businessImageUrl&&r.items.length>0&&r.acceptedPaymentMethods.length>0&&/^27\d{9}$/.test(String(r.phone||"").replace(/\D/g,"")));
+  const shared=rows.map(r=>({id:'shared-'+r.id,name:r.name,area:r.area,province:r.province||'KwaZulu-Natal',category:r.category,phone:r.whatsapp,desc:r.description||'Local food business',items:Array.isArray(r.menu)?r.menu.map(normaliseCustomerMenuItem).filter(item=>item.name&&Number.isFinite(item.price)):[],menuFileUrl:r.menu_file_url||'',businessImageUrl:r.business_image_url||'',acceptedPaymentMethods:Array.isArray(r.accepted_payment_methods)?r.accepted_payment_methods:[],emoji:'🍽️',isDemo:false,distanceKm:r.distance_km==null?null:Number(r.distance_km)})).filter(r=>r.businessImageUrl&&r.items.length>0&&r.acceptedPaymentMethods.length>0&&/^27\d{9}$/.test(String(r.phone||"").replace(/\D/g,"")));
   restaurants=[...restaurants.filter(r=>!String(r.id).startsWith('shared-')),...shared];render();
   if(status)status.textContent=shared.length?(customerLocation?'Location-based directory connected · Nearest businesses shown first':'Directory connected · Enable location to sort by distance'):'';
  }catch(error){console.warn('Could not load location-aware shared directory.',error);restaurants=[];render();if(status)status.textContent='Could not connect to the restaurant directory. Please try again later.';}
@@ -700,7 +702,7 @@ async function addRestaurant(){
  const val=id=>document.getElementById(id).value.trim();
  const ownerName=val("rOwnerName"),ownerPhone=val("rOwnerPhone"),email=val("rOwnerEmail"),password=document.getElementById("rOwnerPassword").value;
  const name=val("rName"),area=val("rArea"),province=val("rProvince"),businessType=val("rBusinessType"),category=val("rCategory"),whatsapp=val("rPhone"),raw=val("rMenu");
- const menu=raw.split("\n").map(line=>{const m=line.match(/^\s*(.+?)\s*-\s*(\d+(?:\.\d{1,2})?)\s*$/);return m?{name:m[1].trim(),price:Number(m[2])}:null}).filter(Boolean);
+ const menu=raw.split("\n").map(line=>{const m=line.match(/^\s*(.+?)\s*-\s*(\d+(?:\.\d{1,2})?)\s*$/);return m?{name:m[1].trim(),category:"Menu",description:"",price:Number(m[2]),image_url:""}:null}).filter(Boolean);
  const status=document.getElementById("registrationStatus"),button=document.getElementById("registerBusinessButton");
  if(!businessLocation){status.textContent="Please set your business location first so nearby customers can find your business.";return;}
  if(ownerName.length<2||!/^\+?27|^0/.test(ownerPhone.replace(/\s/g,""))||!email.includes("@")||password.length<10){status.textContent="Please enter your name, a valid South African mobile number, email address and a password of at least 10 characters.";return;}
@@ -763,7 +765,7 @@ async function restorePendingCheckout(){
 render();
 loadLiveAdverts();
 detectCustomerLocation().then(()=>loadSharedRestaurants()).then(restorePendingCheckout);
-if ("serviceWorker" in navigator && location.protocol.startsWith("http")) { window.addEventListener("load", () => navigator.serviceWorker.register("./service-worker.js?v=73",{updateViaCache:"none"}).then(registration=>registration.update()).catch(() => {})); }
+if ("serviceWorker" in navigator && location.protocol.startsWith("http")) { window.addEventListener("load", () => navigator.serviceWorker.register("./service-worker.js?v=74",{updateViaCache:"none"}).then(registration=>registration.update()).catch(() => {})); }
 </script>
 <script type="module" src="native-auth.js"></script>
 <script type="module" src="push-tap-handler.js"></script>
