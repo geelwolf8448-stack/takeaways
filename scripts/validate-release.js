@@ -84,6 +84,10 @@ check("customer magic links route back into native Android app", /za.co.takeaway
 
 const restaurantPortal = compileInlineScripts("restaurant-portal.html");
 check("restaurant owner portal inline JavaScript compiles", restaurantPortal.count > 0);
+check("restaurant portal has exactly one private restaurant-owner training demo", (restaurantPortal.html.match(/restaurant-owner-training-demo/g) || []).length === 1 && /id="ownerDemo" data-owner-demo="private"/.test(restaurantPortal.html) && /OWNER_DEMO_PROFILE/.test(restaurantPortal.html));
+check("restaurant-owner training demo is loaded only for a signed-in owner and stored per owner browser", /if\(!session\?\.user\?\.id\)\{ownerDemo=null/.test(restaurantPortal.html) && /tt_owner_training_demo_v1_/.test(restaurantPortal.html) && /session\.user\.id/.test(restaurantPortal.html));
+check("restaurant-owner training demo supports logos, menu categories, dish photos, descriptions and prices", /ownerDemoLogo/.test(restaurantPortal.html) && /ownerDemoNewCategory/.test(restaurantPortal.html) && /ownerDemoItemImage-/.test(restaurantPortal.html) && /Food description/.test(restaurantPortal.html) && /Price \(R\)/.test(restaurantPortal.html));
+check("restaurant-owner training demo remains isolated from customer pages and live restaurant storage", !/restaurant-owner-training-demo/.test(publicPage.html) && !/ownerDemo/.test(publicPage.html) && /Practice changes are saved only on this laptop browser/.test(restaurantPortal.html));
 check("restaurant portal can request browser notification permission", /Notification\.requestPermission\(\)/.test(restaurantPortal.html));
 check("restaurant portal polls for new orders while signed in", /window\.setInterval\(\s*\(\s*\)\s*=>\s*\{\s*if\s*\(\s*session\s*&&\s*memberships\.length\s*\)\s*loadRestaurantsOrders\(\)\s*;\s*\}\s*,\s*15000\s*\)/.test(restaurantPortal.html));
 check("new submitted orders trigger an in-dashboard alert and browser notification", /announceNewOrders\(data\|\|\[\]\)/.test(restaurantPortal.html) && /new Notification\("New Takeaways Tonight\? order"/.test(restaurantPortal.html));
@@ -113,6 +117,7 @@ check("native push stores FCM tokens against the signed-in user", /restaurant_pu
 check("native push requests permission and registers the Android device", /requestPermissions/.test(nativePush) && /PushNotifications\.register/.test(nativePush));
 check("restaurant owner portal uses server-side order updates", /marketplace-api/.test(restaurantPortal.html) && /update_order/.test(restaurantPortal.html));
 check("restaurant owners can manage menus, business images and accepted payment methods", /saveRestaurantMenu/.test(restaurantPortal.html) && /uploadBusinessImage/.test(restaurantPortal.html) && /savePaymentMethods/.test(restaurantPortal.html) && /data-payment-method/.test(restaurantPortal.html));
+check("restaurant portal loads saved adverts when the dashboard opens and keeps view-only team members read-only", /Promise\.all\(\[loadRestaurantsOrders\(\),loadRestaurantAdverts\(\)\]\)/.test(restaurantPortal.html) && /View-only access\. Only the restaurant owner or manager can change adverts\./.test(restaurantPortal.html) && /Only the restaurant owner or manager can edit adverts\./.test(restaurantPortal.html));
 check("restaurant portal does not expose internal fee reporting", !/feeLedger|feeArea/.test(restaurantPortal.html));
 check("web and native pages load the shared auth deep-link handler", /native-auth\.js/.test(publicPage.html) && /native-auth\.js/.test(account.html) && /native-auth\.js/.test(restaurantPortal.html));
 const nativeAuth = read("native-auth.js");
