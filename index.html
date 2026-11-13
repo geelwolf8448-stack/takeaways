@@ -395,6 +395,26 @@ button.secondary:hover,button.dark:hover,.card-actions .secondary:hover{backgrou
 dialog{background:var(--tt-paper)!important;color:var(--tt-ink)!important;border:1px solid var(--tt-line)!important;box-shadow:0 20px 70px #41233544!important}.modal-head{background:linear-gradient(110deg,#5b3049 0%,#a44c53 62%,#df7651 100%)!important;border-bottom-color:#f6c56d!important}.modal-body{background:#fff9f1!important;color:var(--tt-ink)!important}.menu-item,.basket-item{border-bottom-color:#ead7c4!important}.menu-item small{color:#745f66!important}.field label{color:var(--tt-plum)!important}.field input,.field textarea,.field select{background:#fff!important;color:var(--tt-ink)!important;border-color:#dfc0a4!important}
 footer{background:#422738!important;border-top:5px solid var(--tt-saffron)!important;color:#fff5e9!important}footer b,footer a{color:#ffe28b!important}
 @media(max-width:760px){.poster-header{box-shadow:0 12px 34px #6d304433!important}.deal{padding:17px!important}.promo-panel{border-radius:18px!important}}
+
+/* Customer interior — night market palette without white panels or white reading. */
+:root{--tt-cream:#120e16;--tt-paper:#211722;--tt-ink:#ffdca0;--tt-plum:#f2c66b;--tt-coral:#e37855;--tt-saffron:#f5bd3e;--tt-line:#8b5a42;--tt-green:#447c67}
+html,body{background:#120e16!important;color:var(--tt-ink)!important}
+body{background:radial-gradient(ellipse at 50% 0%,#352033 0%,#18111b 48%,#0d0a10 100%)!important;color:var(--tt-ink)!important}
+.poster-tagline{background:#251625!important;color:#ffd984!important;border-color:#c88a34!important;box-shadow:0 7px 20px #12081277!important}
+.nav-actions button{background:#281a2b!important;color:#ffd984!important;border-color:#c88a34!important;box-shadow:0 4px 13px #10091488!important}
+.poster-download{background:linear-gradient(110deg,#f6cf4a 0%,#f39a3f 45%,#de684f 100%)!important;border-color:#ffdf79!important;color:#281621!important;box-shadow:0 5px 0 #934738,0 12px 24px #10091488!important}
+#installAppButton{background:#2b1b2c!important;color:#ffdc89!important;border-color:#bd7e38!important;box-shadow:0 4px 0 #63344a,0 10px 21px #10091488!important}
+main,.poster-main{background:transparent!important;color:var(--tt-ink)!important}
+.section-ribbon{background:linear-gradient(105deg,#39233b 0%,#763d4d 55%,#b45b48 100%)!important;color:#ffdb8a!important;box-shadow:0 8px 22px #10091477!important}
+.deal,.deal:nth-child(2),.deal:nth-child(3){border-color:#9b673e!important;color:#ffdfad!important;box-shadow:0 10px 24px #0d081077!important}
+.deal{background:linear-gradient(135deg,#3d2830 0%,#754236 56%,#ad6042 100%)!important}.deal:nth-child(2){background:linear-gradient(135deg,#3a273c 0%,#714052 58%,#a1534f 100%)!important}.deal:nth-child(3){background:linear-gradient(135deg,#18352e 0%,#315f50 58%,#547745 100%)!important}
+.deal small,.deal h3,.deal p,.deal:nth-child(2) small,.deal:nth-child(2) h3,.deal:nth-child(2) p,.deal:nth-child(3) small,.deal:nth-child(3) h3,.deal:nth-child(3) p{color:#ffdfad!important}.deal b{color:#f5bd3e!important;opacity:.42!important}
+.promo-panel{background:linear-gradient(135deg,#241825 0%,#342034 100%)!important;border-color:#80533d!important;box-shadow:0 10px 26px #0d081066!important;color:var(--tt-ink)!important}.promo-panel .eyebrow,.promo-panel h2{color:#f5c766!important}.promo-panel p{color:#e7caa4!important}
+button:not(.secondary):not(.dark):not(.x){background:linear-gradient(110deg,#f6cf4a 0%,#f39a3f 48%,#df6c50 100%)!important;color:#281621!important;border-color:#ffdf79!important;box-shadow:0 4px 0 #914737,0 9px 18px #0d081066!important}
+button.secondary,button.dark,.card-actions .secondary{background:#291b2b!important;color:#ffda87!important;border-color:#8e6042!important;box-shadow:none!important}button.secondary:hover,button.dark:hover,.card-actions .secondary:hover{background:#3a253a!important}
+.card{background:#211722!important;border-color:#80533d!important;box-shadow:0 9px 24px #0d081066!important}.card-body h3,.card h3{color:#f6cf78!important}.card p,.meta small{color:#ddc2a4!important}.pill{background:#53372b!important;color:#ffdd8e!important}
+dialog{background:#211722!important;color:#ffdaa0!important;border-color:#8d5d40!important;box-shadow:0 20px 70px #08050aaa!important}.modal-head{background:linear-gradient(110deg,#382239 0%,#75404d 62%,#b75b48 100%)!important;border-bottom-color:#d89b3e!important}.modal-body{background:#191119!important;color:#ffdaa0!important}.menu-item,.basket-item{border-bottom-color:#5b4034!important}.menu-item small{color:#ddc2a4!important}.field label{color:#f5c766!important}.field input,.field textarea,.field select{background:#130e15!important;color:#ffdaa0!important;border-color:#80533d!important}
+footer{background:#130d17!important;border-top-color:#e9ad3d!important;color:#e9cba6!important}footer b,footer a{color:#ffdb83!important}
 </style>
 <body>
 <header class="poster-header">
@@ -743,7 +763,7 @@ async function restorePendingCheckout(){
 render();
 loadLiveAdverts();
 detectCustomerLocation().then(()=>loadSharedRestaurants()).then(restorePendingCheckout);
-if ("serviceWorker" in navigator && location.protocol.startsWith("http")) { window.addEventListener("load", () => navigator.serviceWorker.register("./service-worker.js?v=72",{updateViaCache:"none"}).then(registration=>registration.update()).catch(() => {})); }
+if ("serviceWorker" in navigator && location.protocol.startsWith("http")) { window.addEventListener("load", () => navigator.serviceWorker.register("./service-worker.js?v=73",{updateViaCache:"none"}).then(registration=>registration.update()).catch(() => {})); }
 </script>
 <script type="module" src="native-auth.js"></script>
 <script type="module" src="push-tap-handler.js"></script>
