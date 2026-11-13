@@ -35,7 +35,7 @@ const requiredIds = [
   "menuDialog", "menuContent", "basketDialog", "basketContent", "sendOrder",
   "customerName", "customerPhone", "fulfilment", "deliveryAddressField",
   "deliveryAddress", "orderNotes", "adminDialog", "rName", "rPhone",
-  "rArea", "rCategory", "rMenu", "rConsent", "installAppButton", "installHint"
+  "rArea", "rCategory", "rMenu", "rConsent", "installAppButton"
 ];
 for (const id of requiredIds) {
   check("public page has #" + id, (publicPage.html.includes('id="'+id+'"') || publicPage.html.includes("id='"+id+"'")));
@@ -64,7 +64,9 @@ check("mobile navigation does not advertise unfinished favourites/orders/setting
 check("customer navigation opens Find your food directly below Food Wars instead of the support area", publicPage.html.indexOf('FOOD WARS') < publicPage.html.indexOf('id="explore"') && publicPage.html.indexOf('id="explore"') < publicPage.html.indexOf('How Takeaways Tonight? works') && /<h2>Find your food<\/h2><p>Choose a category and discover local favourites\.<\/p>/.test(publicPage.html) && /href="#explore"/.test(publicPage.html) && /getElementById\('explore'\)\?\.scrollIntoView/.test(publicPage.html) && !/Restaurant specials & adverts/.test(publicPage.html));
 check("customer campaign label uses Food Wars instead of Community Vote", /<small>FOOD WARS<\/small>/.test(publicPage.html) && !/COMMUNITY VOTE/.test(publicPage.html));
 check("customer specials label does not use the outdated Tonight's Spotlight wording", /<small>SPECIALS<\/small>/.test(publicPage.html) && !/TONIGHT'S SPOTLIGHT/.test(publicPage.html));
-check("mobile navigation links to live customer sections", /href="#explore"/.test(publicPage.html) && /href="#owners"/.test(publicPage.html));
+check("customer start keeps one direct Explore and Order action without duplicate navigation", /EXPLORE & ORDER NOW/.test(publicPage.html) && !/<div class="poster-categories">/.test(publicPage.html) && !/<div class="feature-nav">/.test(publicPage.html) && !/<a class="primary" href="#explore">🛵 ORDER NOW<\/a>/.test(publicPage.html) && !/<nav class="mobile-dock"/.test(publicPage.html));
+check("customer start has one phone-install action without a duplicate install panel", /id="installAppButton"[^>]*>📲 Get Takeaways Tonight\? on your phone</.test(publicPage.html) && !/<section id="installAppCard"/.test(publicPage.html) && !/id="installHint"/.test(publicPage.html));
+check("customer search filters while typing without a duplicate search button", /oninput="render\(\)"/.test(publicPage.html) && !/<button onclick="render\(\)">Search<\/button>/.test(publicPage.html));
 
 const admin = compileInlineScripts("admin.html");
 check("admin portal inline JavaScript compiles", admin.count > 0);
