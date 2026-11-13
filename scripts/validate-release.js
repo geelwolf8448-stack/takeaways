@@ -58,7 +58,8 @@ check("privacy and terms pages are linked", /privacy\.html/.test(publicPage.html
 check("privacy notice describes saved customer orders", /order history/.test(read("privacy.html")) && /delivery address/.test(read("privacy.html")));
 check("terms distinguish order requests from restaurant acceptance", /not an accepted order/.test(read("terms.html")));
 check("mobile navigation does not advertise unfinished favourites/orders/settings tabs", !/Favourites|>Orders<|>Settings</.test(publicPage.html));
-check("mobile navigation links to real sections", /href="#restaurants"/.test(publicPage.html) && /href="#campaigns"/.test(publicPage.html) && /href="#owners"/.test(publicPage.html));
+check("customer navigation opens the live restaurant-adverts section instead of the support area", /id="explore"/.test(publicPage.html) && /href="#explore"/.test(publicPage.html) && /getElementById\('explore'\)\?\.scrollIntoView/.test(publicPage.html) && /Restaurant specials & adverts/.test(publicPage.html));
+check("mobile navigation links to live customer sections", /href="#explore"/.test(publicPage.html) && /href="#owners"/.test(publicPage.html));
 
 const admin = compileInlineScripts("admin.html");
 check("admin portal inline JavaScript compiles", admin.count > 0);
@@ -243,3 +244,4 @@ for (const secret of ["ANDROID_KEYSTORE_BASE64", "ANDROID_KEYSTORE_PASSWORD", "A
 
 console.log("Takeaways Tonight? static release checks passed: " + checks.length);
 for (const item of checks) console.log("PASS " + item);
+

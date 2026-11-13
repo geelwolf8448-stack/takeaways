@@ -1,4 +1,4 @@
-const CACHE_NAME = "takeaways-tonight-v55-private-owner-demo";
+const CACHE_NAME = "takeaways-tonight-v56-explore-adverts";
 const APP_FILES = [
   "./",
   "./index.html",
@@ -66,3 +66,4 @@ self.addEventListener("fetch", event => {
     }))
   );
 });
+
