@@ -67,7 +67,7 @@ check("customer specials label does not use the outdated Tonight's Spotlight wor
 check("customer start keeps one direct Explore and Order action without duplicate navigation", /EXPLORE & ORDER NOW/.test(publicPage.html) && !/<div class="poster-categories">/.test(publicPage.html) && !/<div class="feature-nav">/.test(publicPage.html) && !/<a class="primary" href="#explore">🛵 ORDER NOW<\/a>/.test(publicPage.html) && !/<nav class="mobile-dock"/.test(publicPage.html));
 check("customer page does not repeat the Explore action above the restaurant list", !/<div class="section-ribbon" id="featured">/.test(publicPage.html) && !/Explore restaurants & menus/.test(publicPage.html));
 check("customer page omits the nonessential How Takeaways Tonight works explainer", !/How Takeaways Tonight\? works/.test(publicPage.html) && !/1\. DISCOVER/.test(publicPage.html));
-check("customer page hides the public restaurant-listing count", /<h2>Restaurants<\/h2><p id="resultCount" hidden><\/p>/.test(publicPage.html));
+check("customer page hides the restaurant directory until a real restaurant is ready", /<section id="restaurantDirectory" hidden><div class="section-head"><div><h2>Restaurants<\/h2><p id="resultCount" hidden><\/p><p class="notice" id="directoryStatus" role="status" hidden>/.test(publicPage.html) && /const hasLiveRestaurant=restaurants\.some\(r=>r\.isDemo===false\);/.test(publicPage.html) && /directory\.hidden=!hasLiveRestaurant/.test(publicPage.html) && !/No complete restaurant listings are available yet/.test(publicPage.html) && !/No participating restaurants are available yet/.test(publicPage.html));
 check("customer start has one phone-install action directly below Explore and Order without a duplicate install panel", /id="installAppButton"[^>]*>📲 Get Takeaways Tonight\? on your phone</.test(publicPage.html) && publicPage.html.indexOf('EXPLORE & ORDER NOW') < publicPage.html.indexOf('id="installAppButton"') && publicPage.html.indexOf('id="installAppButton"') < publicPage.html.indexOf('class="poster-region"') && !/<section id="installAppCard"/.test(publicPage.html) && !/id="installHint"/.test(publicPage.html));
 check("customer search filters while typing without a duplicate search button", /oninput="render\(\)"/.test(publicPage.html) && !/<button onclick="render\(\)">Search<\/button>/.test(publicPage.html));
 check("public customer page has no Takeaways Tonight support WhatsApp or QR contact shortcut", !/https:\/\/wa\.me\/27833149674/.test(publicPage.html) && !/<section id="contact"/.test(publicPage.html) && !/whatsapp-qr\.svg/.test(publicPage.html));
@@ -154,6 +154,7 @@ check("marketplace API only grants owner access to published restaurants", /rest
 const worker = read("service-worker.js");
 new vm.Script(worker, { filename: "service-worker.js" });
 check("service worker JavaScript compiles", true);
+check("browser checks for the newest app update without reusing a saved worker file", /serviceWorker\.register\("\.\/service-worker\.js\?v=70",\{updateViaCache:"none"\}\)\.then\(registration=>registration\.update\(\)\)/.test(publicPage.html));
 for (const file of ["manifest.webmanifest", "config.js", "logo.svg", "icon.svg", "privacy.html", "terms.html", "account.html", "restaurant-portal.html"]) {
   check(file + " exists", fs.existsSync(path.join(root, file)));
 }

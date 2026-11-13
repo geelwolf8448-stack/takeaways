@@ -386,7 +386,7 @@ dialog{background:#080808!important;color:#fff!important;border:1px solid #b58b1
 <div class="notice" style="display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap"><span id="customerLocationStatus" role="status" aria-live="polite">📍 Finding restaurants near your current location…</span></div>
 <div class="filters" id="filters"></div>
 <section id="owners" class="promo-panel"><div class="eyebrow">FOOD BUSINESS OWNERS</div><h2>Put your menu in front of hungry locals.</h2><p>Restaurants, takeaway shops, home-based takeaways, inyama shops and coffee shops are all welcome. Join South Africa's local food discovery platform, showcase your menu and specials, and reach customers across all nine provinces.</p><div style="display:flex;flex-wrap:wrap;gap:10px"><button onclick="openAdmin()">APPLY TO JOIN</button><button class="secondary" onclick="inviteRestaurant()">INVITE A RESTAURANT</button></div><p class="notice">14-DAY FREE PILOT FOR EVERY FOOD BUSINESS: Every restaurant, takeaway shop, home-based takeaway, inyama shop and coffee shop gets a free 14-day pilot. After the pilot, continue for a once-off R250 admin fee, followed by R500 per month. No commission is charged on orders — restaurants keep 100% of their food sales. Subscription billing is arranged separately; online payments are not yet active.</p></section>
-<div class="section-head"><div><h2>Restaurants</h2><p id="resultCount" hidden></p><p class="notice" id="directoryStatus" role="status">Connecting to the shared restaurant directory…</p></div></div><div class="grid" id="restaurants"></div>
+<section id="restaurantDirectory" hidden><div class="section-head"><div><h2>Restaurants</h2><p id="resultCount" hidden></p><p class="notice" id="directoryStatus" role="status" hidden></p></div></div><div class="grid" id="restaurants"></div></section>
 
 <p class="notice">ORDERING — Customers enter their name and WhatsApp number, choose a restaurant payment method and submit an order request. WhatsApp opens with the order details for the customer to send to the restaurant. The restaurant confirms the order and payment directly. Takeaways Tonight? does not collect food-order payments.</p>
 
@@ -472,9 +472,11 @@ function render(){
  let shown=restaurants.filter(r=>r.isDemo===false&&(activeFilter==='All'||r.category===activeFilter)&&[r.name,r.area,r.province,r.category,...(Array.isArray(r.items)?r.items:[]).map(i=>i[0])].join(' ').toLowerCase().includes(q));
  if(customerLocation)shown.sort((a,b)=>(a.distanceKm??Number.MAX_SAFE_INTEGER)-(b.distanceKm??Number.MAX_SAFE_INTEGER));
  const liveShown=shown;
+ const hasLiveRestaurant=restaurants.some(r=>r.isDemo===false);
+ const directory=document.getElementById('restaurantDirectory');if(directory)directory.hidden=!hasLiveRestaurant;
  document.getElementById('resultCount').textContent=liveShown.length+' participating business listing(s)'+(customerLocation?' · Nearest businesses shown first':'');
  const cardHtml=list=>list.map(r=>'<article class="card"><div class="food-art">'+(r.businessImageUrl?'<img src="'+esc(r.businessImageUrl)+'" alt="'+esc(r.name)+'" loading="lazy" style="width:100%;height:100%;min-height:150px;max-height:190px;object-fit:cover;border-radius:12px">':(r.emoji||'🍽️'))+'</div><div class="card-body"><div class="meta"><small>📍 '+esc(r.area)+' · '+esc(r.province||'KwaZulu-Natal')+(Number.isFinite(r.distanceKm)?' · '+r.distanceKm.toFixed(1)+' km away':'')+'</small><span class="pill">'+(r.isDemo===false?'PARTICIPATING BUSINESS':'DEMO EXAMPLE')+'</span></div><h3>'+esc(r.name)+'</h3><p>'+esc(r.desc||'Local takeaway')+'</p><div class="card-actions"><button class="secondary" onclick="openMenu(\''+r.id+'\')">View menu</button>'+(r.isDemo===false?'<button onclick="openMenu(\''+r.id+'\')">Order</button>':'<button class="dark" disabled>Example only</button>')+'</div></div></article>').join('');
- document.getElementById('restaurants').innerHTML=liveShown.length?cardHtml(liveShown):'<div class="empty">No participating restaurants are available yet. Please check back soon while local businesses upload their details and menus.</div>';
+ document.getElementById('restaurants').innerHTML=liveShown.length?cardHtml(liveShown):'';
  document.getElementById('basketCount').textContent=basket.reduce((a,b)=>a+b.qty,0);
  renderLiveAdverts();
 }
@@ -645,7 +647,7 @@ async function loadSharedRestaurants(){
   }
   const shared=rows.map(r=>({id:'shared-'+r.id,name:r.name,area:r.area,province:r.province||'KwaZulu-Natal',category:r.category,phone:r.whatsapp,desc:r.description||'Local food business',items:Array.isArray(r.menu)?r.menu.map(entry=>Array.isArray(entry)?entry:[String(entry?.name??entry?.title??""),Number(entry?.price)]).filter(entry=>entry[0]&&Number.isFinite(entry[1])):[],menuFileUrl:r.menu_file_url||'',businessImageUrl:r.business_image_url||'',acceptedPaymentMethods:Array.isArray(r.accepted_payment_methods)?r.accepted_payment_methods:[],emoji:'🍽️',isDemo:false,distanceKm:r.distance_km==null?null:Number(r.distance_km)})).filter(r=>r.businessImageUrl&&r.items.length>0&&r.acceptedPaymentMethods.length>0&&/^27\d{9}$/.test(String(r.phone||"").replace(/\D/g,"")));
   restaurants=[...restaurants.filter(r=>!String(r.id).startsWith('shared-')),...shared];render();
-  if(status)status.textContent=shared.length?(customerLocation?'Location-based directory connected · Nearest businesses shown first':'Directory connected · Enable location to sort by distance'):'No complete restaurant listings are available yet. Businesses must upload a logo, itemised menu, WhatsApp details and accepted payment methods before customers can order.';
+  if(status)status.textContent=shared.length?(customerLocation?'Location-based directory connected · Nearest businesses shown first':'Directory connected · Enable location to sort by distance'):'';
  }catch(error){console.warn('Could not load location-aware shared directory.',error);restaurants=[];render();if(status)status.textContent='Could not connect to the restaurant directory. Please try again later.';}
 }
 async function addRestaurant(){
@@ -715,7 +717,7 @@ async function restorePendingCheckout(){
 render();
 loadLiveAdverts();
 detectCustomerLocation().then(()=>loadSharedRestaurants()).then(restorePendingCheckout);
-if ("serviceWorker" in navigator && location.protocol.startsWith("http")) { window.addEventListener("load", () => navigator.serviceWorker.register("./service-worker.js").catch(() => {})); }
+if ("serviceWorker" in navigator && location.protocol.startsWith("http")) { window.addEventListener("load", () => navigator.serviceWorker.register("./service-worker.js?v=70",{updateViaCache:"none"}).then(registration=>registration.update()).catch(() => {})); }
 </script>
 <script type="module" src="native-auth.js"></script>
 <script type="module" src="push-tap-handler.js"></script>

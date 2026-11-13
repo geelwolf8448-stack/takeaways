@@ -1,4 +1,4 @@
-const CACHE_NAME = "takeaways-tonight-v69-explore-to-find-food";
+const CACHE_NAME = "takeaways-tonight-v70-current-layout";
 const APP_FILES = [
   "./",
   "./index.html",
@@ -6,7 +6,6 @@ const APP_FILES = [
   "./terms.html",
   "./manifest.webmanifest",
   "./icon.svg",
-  "./whatsapp-qr.svg",
   "./logo.svg",
   "./hero-art.svg",
   "./splash.svg",
