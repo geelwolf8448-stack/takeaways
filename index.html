@@ -117,6 +117,7 @@ body{font-family:Arial,Helvetica,sans-serif;background:radial-gradient(ellipse a
 .poster-categories b{font-size:14px!important;line-height:1.15!important;color:#fff!important}
 .poster-categories i{display:none!important}
 .poster-download{display:inline-flex!important;align-items:center!important;justify-content:center!important;min-width:min(420px,92vw)!important;padding:17px 25px!important;border:3px solid #fff2a0!important;border-radius:999px!important;background:linear-gradient(180deg,#fff45b 0%,#ffd000 55%,#ff8500 100%)!important;color:#080808!important;font-size:clamp(18px,3vw,25px)!important;font-weight:1000!important;text-decoration:none!important;box-shadow:0 5px 0 #a13b00,0 12px 30px #000b!important;text-shadow:none!important}
+.poster-main .hero-actions{grid-template-columns:minmax(0,1fr)!important;max-width:460px!important;margin:14px auto 0!important}
 .poster-region{margin:20px auto 0!important;color:#fff!important;font-size:13px!important;letter-spacing:2px!important;font-weight:1000!important;text-shadow:0 2px 8px #000!important}
 main{max-width:1200px!important;margin:-18px auto 55px!important;padding:0 clamp(14px,3vw,30px)!important;position:relative!important;z-index:2!important}
 .feature-nav{grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:10px!important;margin:0 0 18px!important}
@@ -372,11 +373,11 @@ dialog{background:#080808!important;color:#fff!important;border:1px solid #b58b1
 <div class="poster-logo-wrap"><img class="poster-logo" src="logo.svg" alt="Takeaways Tonight? — chef hat and delivery rider logo"></div>
 <div class="poster-tagline">Discover local. Order direct. Support local.</div>
 <a class="poster-download" href="#explore" onclick="event.preventDefault();document.getElementById('explore')?.scrollIntoView({behavior:'smooth',block:'start'});">⬇ &nbsp; EXPLORE & ORDER NOW</a>
+<div class="hero-actions"><button class="primary" id="installAppButton" type="button" onclick="installTakeawaysApp()">📲 Get Takeaways Tonight? on your phone</button></div>
 <div class="poster-region">ALL NINE SOUTH AFRICAN PROVINCES</div>
 </div>
 </header>
 <main>
-<div class="hero-actions"><button class="primary" id="installAppButton" type="button" onclick="installTakeawaysApp()">📲 Get Takeaways Tonight? on your phone</button></div>
 <div class="searchbar"><input id="search" placeholder="Search restaurants, meals or areas…" oninput="render()" aria-label="Search restaurants, meals or areas"></div>
 <div class="notice" style="display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap"><span id="customerLocationStatus" role="status" aria-live="polite">📍 Finding restaurants near your current location…</span></div>
 <div class="section-ribbon" id="campaigns"><span>★</span> South Africa food campaigns <span>★</span></div>
@@ -390,25 +391,8 @@ dialog{background:#080808!important;color:#fff!important;border:1px solid #b58b1
 
 <p class="notice">ORDERING — Customers enter their name and WhatsApp number, choose a restaurant payment method and submit an order request. WhatsApp opens with the order details for the customer to send to the restaurant. The restaurant confirms the order and payment directly. Takeaways Tonight? does not collect food-order payments.</p>
 
-<section id="contact" class="tt-contact" aria-labelledby="tt-contact-title">
-  <div>
-    <p class="tt-kicker">WHATSAPP BUSINESS</p>
-    <h2 id="tt-contact-title">Chat with Takeaways Tonight</h2>
-    <p>Questions about the app or restaurant listings? Message us directly.</p>
-    <p class="tt-contact-note">For food orders, use the WhatsApp button on the restaurant’s listing so its team can confirm availability, delivery and payment details.</p>
-    <div class="tt-contact-actions">
-      <a class="tt-contact-button" href="https://wa.me/27833149674?text=Hi%2C%20I%27m%20contacting%20Takeaways%20Tonight%20about%20the%20app." target="_blank" rel="noopener noreferrer">Message us on WhatsApp</a>
-      <p class="tt-contact-short">Short link: <a href="https://wa.me/27833149674" target="_blank" rel="noopener noreferrer">wa.me/27833149674</a></p>
-    </div>
-  </div>
-  <div class="tt-contact-qr">
-    <img src="./whatsapp-qr.svg" alt="Scan this QR code to chat with Takeaways Tonight on WhatsApp">
-    <a href="./whatsapp-qr.svg" download>Download the WhatsApp QR code</a>
-  </div>
-</section>
-
 </main>
-<footer><b>Takeaways Tonight?</b><br><em>Discover local. Order direct. Support local.</em><br><br>Operated by A Coetzer, sole proprietor trading as Takeaways Tonight?<br>Support email: <a href="mailto:geelwolf8448@gmail.com">geelwolf8448@gmail.com</a><br>Support WhatsApp: <a href="https://wa.me/27833149674" target="_blank" rel="noopener noreferrer">+27 83 314 9674</a><br><br>Across all nine provinces of South Africa · Your food. Tonight.<br><br><a href="privacy.html">Privacy notice</a> · <a href="terms.html">Terms of use</a></footer>
+<footer><b>Takeaways Tonight?</b><br><em>Discover local. Order direct. Support local.</em><br><br>Operated by A Coetzer, sole proprietor trading as Takeaways Tonight?<br>Support email: <a href="mailto:geelwolf8448@gmail.com">geelwolf8448@gmail.com</a><br><br>Across all nine provinces of South Africa · Your food. Tonight.<br><br><a href="privacy.html">Privacy notice</a> · <a href="terms.html">Terms of use</a></footer>
 <dialog id="menuDialog"><div class="modal-head"><h2 id="menuTitle">Restaurant menu</h2><button class="x" onclick="closeDialog('menuDialog')">✕</button></div><div class="modal-body"><div id="menuContent"></div><div class="total" id="menuTotal">Basket total: R0</div><button style="width:100%" onclick="openBasket()">View basket & order</button></div></dialog>
 <dialog id="basketDialog"><div class="modal-head"><h2>Your basket</h2><button class="x" onclick="closeDialog('basketDialog')">✕</button></div><div class="modal-body"><div id="basketContent"></div><div class="total" id="basketTotal">Total: R0</div><div class="field"><label for="customerName">Your name</label><input id="customerName" autocomplete="name" placeholder="Name for the order"></div><div class="field"><label for="customerPhone">Your mobile number</label><input id="customerPhone" type="tel" autocomplete="tel" placeholder="Number the restaurant can contact you"></div><div class="field"><label for="fulfilment">How would you like your food?</label><select id="fulfilment" required onchange="fulfilmentChanged()"><option value="" selected disabled>Choose collection or delivery</option><option value="Collection">Collection — I will pick it up</option><option value="Delivery">Delivery — bring it to my address</option></select></div><div class="field" id="deliveryAddressField" hidden><label for="deliveryAddress">Delivery address</label><textarea id="deliveryAddress" rows="2" autocomplete="street-address" placeholder="House/flat number, street, suburb and area"></textarea></div><div class="field"><label for="customerPaymentMethod">How would you like to pay?</label><select id="customerPaymentMethod" required><option value="">Choose a payment method</option></select><small id="customerPaymentHelp">Payment is made directly to the restaurant.</small></div><div class="field"><label for="orderNotes">Order notes (optional)</label><textarea id="orderNotes" rows="2" placeholder="For example: gate instructions, collection time or food preferences"></textarea></div><button style="width:100%" id="sendOrder" onclick="sendOrder()" disabled>Submit order & notify restaurant</button><p class="notice">No customer account or email address is needed. Enter your name and WhatsApp number. Choose one of the payment methods offered by this restaurant. Your order request will be saved and WhatsApp will open with the order details for you to send to the restaurant. The restaurant must confirm your order. Pay the restaurant directly; Takeaways Tonight? does not collect food-order payments.</p></div></dialog>
 <dialog id="adminDialog"><div class="modal-head"><h2>Register your food business</h2><button class="x" onclick="closeDialog('adminDialog')">✕</button></div><div class="modal-body">
