@@ -1,4 +1,4 @@
-const CACHE_NAME = "takeaways-tonight-v70-current-layout";
+const CACHE_NAME = "takeaways-tonight-v71-automatic-nearby-menu";
 const APP_FILES = [
   "./",
   "./index.html",
