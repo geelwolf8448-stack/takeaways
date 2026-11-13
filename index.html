@@ -765,9 +765,8 @@ async function restorePendingCheckout(){
 render();
 loadLiveAdverts();
 detectCustomerLocation().then(()=>loadSharedRestaurants()).then(restorePendingCheckout);
-if ("serviceWorker" in navigator && location.protocol.startsWith("http")) { window.addEventListener("load", () => navigator.serviceWorker.register("./service-worker.js?v=74",{updateViaCache:"none"}).then(registration=>registration.update()).catch(() => {})); }
+if ("serviceWorker" in navigator && location.protocol.startsWith("http")) { window.addEventListener("load", () => navigator.serviceWorker.register("./service-worker.js?v=76",{updateViaCache:"none"}).then(registration=>registration.update()).catch(() => {})); }
 </script>
 <script type="module" src="native-auth.js"></script>
 <script type="module" src="push-tap-handler.js"></script>
 </body></html>
-

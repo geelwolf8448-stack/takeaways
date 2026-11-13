@@ -97,6 +97,12 @@ check("customer magic links route back into native Android app", /za.co.takeaway
 
 const restaurantPortal = compileInlineScripts("restaurant-portal.html");
 check("restaurant owner portal inline JavaScript compiles", restaurantPortal.count > 0);
+check("restaurant owner portal matches the customer app's sunset exterior and night-market interior", /Restaurant owner dashboard — matching the Takeaways Tonight customer app/.test(restaurantPortal.html) && /class="owner-poster"/.test(restaurantPortal.html) && /hero-art\.svg/.test(restaurantPortal.html) && /class="owner-logo" src="logo\.svg"/.test(restaurantPortal.html) && /--tt-night:#120e16/.test(restaurantPortal.html) && /Build your menu\. Reach hungry locals\./.test(restaurantPortal.html));
+check("restaurant owner dashboard gives each owner a private trial and continuation area", /id="ownerBilling"/.test(restaurantPortal.html) && /get_my_billing/.test(restaurantPortal.html) && /CONTINUE &amp; PAY R250/.test(restaurantPortal.html) && /No payment is being taken from you now/.test(restaurantPortal.html));
+const ownerBillingFunction = read("supabase/functions/owner-billing/index.ts");
+check("owner billing keeps PayFast credentials server-side and requires a deliberately enabled live account", /SUPABASE_SERVICE_ROLE_KEY/.test(ownerBillingFunction) && /PAYFAST_LIVE_BILLING_ENABLED/.test(ownerBillingFunction) && /PAYFAST_MODE/.test(ownerBillingFunction) && /create_continuation_checkout/.test(ownerBillingFunction) && !/PAYFAST_MERCHANT_KEY[^\n]*return reply\(200/.test(ownerBillingFunction));
+const payfastItn = read("supabase/functions/payfast-itn/index.ts");
+check("PayFast payment confirmation verifies the provider and records initial and monthly subscription payments", /eng\/query\/validate/.test(payfastItn) && /fromPayfastNetwork/.test(payfastItn) && /monthly_subscription/.test(payfastItn) && /payfast_subscription_token/.test(payfastItn));
 check("restaurant portal has exactly one private restaurant-owner training demo", (restaurantPortal.html.match(/restaurant-owner-training-demo/g) || []).length === 1 && /id="ownerDemo" data-owner-demo="private"/.test(restaurantPortal.html) && /OWNER_DEMO_PROFILE/.test(restaurantPortal.html));
 check("restaurant-owner training demo is loaded only for a signed-in owner and stored per owner browser", /if\(!session\?\.user\?\.id\)\{ownerDemo=null/.test(restaurantPortal.html) && /tt_owner_training_demo_v1_/.test(restaurantPortal.html) && /session\.user\.id/.test(restaurantPortal.html));
 check("restaurant-owner training demo supports logos, menu categories, dish photos, descriptions and prices", /ownerDemoLogo/.test(restaurantPortal.html) && /ownerDemoNewCategory/.test(restaurantPortal.html) && /ownerDemoItemImage-/.test(restaurantPortal.html) && /Food description/.test(restaurantPortal.html) && /Price \(R\)/.test(restaurantPortal.html));
@@ -160,7 +166,7 @@ check("marketplace API only grants owner access to published restaurants", /rest
 const worker = read("service-worker.js");
 new vm.Script(worker, { filename: "service-worker.js" });
 check("service worker JavaScript compiles", true);
-check("browser checks for the newest app update without reusing a saved worker file", /serviceWorker\.register\("\.\/service-worker\.js\?v=74",\{updateViaCache:"none"\}\)\.then\(registration=>registration\.update\(\)\)/.test(publicPage.html));
+check("browser checks for the newest app update without reusing a saved worker file", /serviceWorker\.register\("\.\/service-worker\.js\?v=76",\{updateViaCache:"none"\}\)\.then\(registration=>registration\.update\(\)\)/.test(publicPage.html));
 for (const file of ["manifest.webmanifest", "config.js", "logo.svg", "icon.svg", "privacy.html", "terms.html", "account.html", "restaurant-portal.html"]) {
   check(file + " exists", fs.existsSync(path.join(root, file)));
 }
@@ -262,4 +268,3 @@ for (const secret of ["ANDROID_KEYSTORE_BASE64", "ANDROID_KEYSTORE_PASSWORD", "A
 
 console.log("Takeaways Tonight? static release checks passed: " + checks.length);
 for (const item of checks) console.log("PASS " + item);
-
