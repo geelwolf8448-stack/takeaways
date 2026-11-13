@@ -382,11 +382,6 @@ dialog{background:#080808!important;color:#fff!important;border:1px solid #b58b1
 <section id="installAppCard" class="install-panel"><div class="install-copy"><img src="icon.svg" alt="Takeaways Tonight app icon"><div><b>Get Takeaways Tonight? on your phone</b><div id="installHint" class="notice">Install the app for quick access from your home screen.</div></div></div></section>
 <div class="searchbar"><input id="search" placeholder="Search restaurants, meals or areas…" oninput="render()"><button onclick="render()">Search</button></div>
 <div class="notice" style="display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap"><span id="customerLocationStatus" role="status" aria-live="polite">📍 Finding restaurants near your current location…</span></div>
-<section class="promo-panel" id="provinceDirectory">
- <div class="section-head"><div><h2>Choose your province</h2><p>Explore restaurants and takeaway menus from anywhere in South Africa.</p></div></div>
- <div class="filters" id="provinceFilters" aria-label="Filter restaurants by province"></div>
-</section>
-
 <div class="section-ribbon" id="campaigns"><span>★</span> South Africa food campaigns <span>★</span></div>
 <div class="deals"><div class="deal"><small>FOOD CHALLENGE</small><h3>The R100<br>meal challenge</h3><p>Find a filling local deal for a hundred rand.</p><b>R100</b></div><div class="deal"><small>TONIGHT'S SPOTLIGHT</small><h3>Give local<br>food a go</h3><p>Discover a new South Coast favourite.</p><b>★</b></div><div class="deal"><small>COMMUNITY VOTE</small><h3>South Coast<br>Food Wars</h3><p>Help choose the people's favourite.</p><b>♥</b></div></div>
  <div class="section-ribbon" id="explore" tabindex="-1"><span>★</span> Restaurant specials & adverts <span>★</span></div><div id="liveAdverts" class="deals"><div class="empty">Loading restaurant specials…</div></div>
@@ -447,8 +442,7 @@ dialog{background:#080808!important;color:#fff!important;border:1px solid #b58b1
 const baseRestaurants=[];
 let restaurants=(JSON.parse(localStorage.getItem("tt_restaurants")||"null")||baseRestaurants).filter(r=>r&&r.isDemo===false);
 localStorage.setItem("tt_restaurants",JSON.stringify(restaurants));
-let basket=[];let activeFilter="All";let activeProvince="All";let currentRestaurant=null;let liveAdverts=[];
-const provinces=["All South Africa","Eastern Cape","Free State","Gauteng","KwaZulu-Natal","Limpopo","Mpumalanga","Northern Cape","North West","Western Cape"];
+let basket=[];let activeFilter="All";let currentRestaurant=null;let liveAdverts=[];
 let deferredInstallPrompt=null;
 window.addEventListener("beforeinstallprompt",event=>{event.preventDefault();deferredInstallPrompt=event;document.getElementById("installAppButton").textContent="📲 Install app";document.getElementById("installHint").textContent="Add the app to your phone's home screen in a few taps.";});
 window.addEventListener("appinstalled",()=>{deferredInstallPrompt=null;document.getElementById("installAppButton").textContent="App installed ✓";document.getElementById("installAppButton").disabled=true;document.getElementById("installHint").textContent="Takeaways Tonight? is now on your home screen.";});
@@ -473,9 +467,9 @@ function captureBusinessLocation(){
 }
 function detectCustomerLocation(){
  if(locationAttempted)return Promise.resolve(customerLocation);locationAttempted=true;
- if(!navigator.geolocation){setLocationStatus('Location unavailable. Search by town or choose a province.');return Promise.resolve(null);}
+ if(!navigator.geolocation){setLocationStatus('Location unavailable. Search by restaurant, meal or area.');return Promise.resolve(null);}
  setLocationStatus('📍 Finding restaurants near your current location…');
- return new Promise(resolve=>navigator.geolocation.getCurrentPosition(pos=>{customerLocation={latitude:pos.coords.latitude,longitude:pos.coords.longitude};setLocationStatus('📍 Location found. Showing food businesses nearest to you first.');resolve(customerLocation);},err=>{setLocationStatus(err.code===1?'Location permission declined. Search by town or choose a province instead.':'Could not detect location. Check device location services or search by town.');resolve(null);},{enableHighAccuracy:true,timeout:12000,maximumAge:300000}));
+ return new Promise(resolve=>navigator.geolocation.getCurrentPosition(pos=>{customerLocation={latitude:pos.coords.latitude,longitude:pos.coords.longitude};setLocationStatus('📍 Location found. Showing food businesses nearest to you first.');resolve(customerLocation);},err=>{setLocationStatus(err.code===1?'Location permission declined. You can still search by restaurant, meal or area.':'Could not detect location. Check device location services or search by restaurant, meal or area.');resolve(null);},{enableHighAccuracy:true,timeout:12000,maximumAge:300000}));
 }
 async function refreshCustomerLocation(){locationAttempted=false;customerLocation=null;setLocationStatus('Refreshing your location…');await detectCustomerLocation();await loadSharedRestaurants();}
 document.addEventListener("visibilitychange",()=>{
@@ -486,11 +480,11 @@ document.addEventListener("visibilitychange",()=>{
 const categories=["All","Burgers","Pizza","Fish & chips","Chicken","Seafood","Takeaways","Bars & experiences","Other"];
 function save(){localStorage.setItem("tt_restaurants",JSON.stringify(restaurants))}
 function money(n){return "R"+Number(n).toFixed(2).replace(".00","")}
-function renderFilters(){document.getElementById("filters").innerHTML=categories.map(c=>`<button class="${c===activeFilter?"active":""}" onclick="activeFilter=${JSON.stringify(c)};render()">${c}</button>`).join("");const p=document.getElementById("provinceFilters");if(p)p.innerHTML=provinces.map(v=>`<button class="${(activeProvince==="All"&&v==="All South Africa")||activeProvince===v?"active":""}" onclick="activeProvince=${JSON.stringify(v==="All South Africa"?"All":v)};render()">${v==="All South Africa"?"🇿🇦 All South Africa":v}</button>`).join("")}
+function renderFilters(){document.getElementById("filters").innerHTML=categories.map(c=>`<button class="${c===activeFilter?"active":""}" onclick="activeFilter=${JSON.stringify(c)};render()">${c}</button>`).join("")}
 function render(){
  renderFilters();
  let q=document.getElementById('search').value.toLowerCase();
- let shown=restaurants.filter(r=>r.isDemo===false&&(activeFilter==='All'||r.category===activeFilter)&&(activeProvince==='All'||(r.province||'KwaZulu-Natal')===activeProvince)&&[r.name,r.area,r.province,r.category,...(Array.isArray(r.items)?r.items:[]).map(i=>i[0])].join(' ').toLowerCase().includes(q));
+ let shown=restaurants.filter(r=>r.isDemo===false&&(activeFilter==='All'||r.category===activeFilter)&&[r.name,r.area,r.province,r.category,...(Array.isArray(r.items)?r.items:[]).map(i=>i[0])].join(' ').toLowerCase().includes(q));
  if(customerLocation)shown.sort((a,b)=>(a.distanceKm??Number.MAX_SAFE_INTEGER)-(b.distanceKm??Number.MAX_SAFE_INTEGER));
  const liveShown=shown;
  document.getElementById('resultCount').textContent=liveShown.length+' participating business listing(s)'+(customerLocation?' · Nearest businesses shown first':'');
@@ -503,7 +497,7 @@ function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",
 
 function renderLiveAdverts(){
  const root=document.getElementById("liveAdverts");if(!root)return;
- const rows=liveAdverts.filter(a=>a.target_province==="All South Africa"||activeProvince==="All"||a.target_province===activeProvince);
+ const rows=liveAdverts;
  root.innerHTML=rows.length?rows.map(a=>'<article class="deal" style="overflow:hidden">'+(a.image_url?'<img src="'+esc(a.image_url)+'" alt="'+esc(a.title)+'" loading="lazy" style="width:100%;max-height:190px;object-fit:cover;border-radius:12px;margin-bottom:10px">':'<div style="font-size:34px">🍽️</div>')+'<small>RESTAURANT SPECIAL · '+esc(a.target_province)+'</small><h3>'+esc(a.title)+'</h3><p>'+esc(a.description||'Special offer from a local restaurant')+'</p><b>'+esc(a.restaurant?.name||'Local restaurant')+'</b><p style="font-size:12px">'+esc(a.restaurant?.area||'')+'</p>'+(a.restaurant?.id?'<button onclick="openMenu(\'shared-'+esc(a.restaurant.id)+'\')">View menu & order</button>':'')+'</article>').join(""):'<div class="empty">No current restaurant specials for this province yet. Check back soon.</div>';
 }
 async function loadLiveAdverts(){
