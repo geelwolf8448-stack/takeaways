@@ -41,7 +41,7 @@ Takeaways Tonight?
 
 ### Optional commercial offer — discuss, do not assume acceptance
 
-Every restaurant, takeaway shop, home-based takeaway, inyama shop and coffee shop receives a 14-day free pilot, followed by a once-off R250 admin fee and R500 per month. Subscription billing is not yet active. Agree the deliverables, start date, cancellation and billing terms in a signed agreement before charging any business. Do not promise orders, customer reach or sales.
+Every restaurant, takeaway shop, home-based takeaway, inyama shop and coffee shop receives a 14-day free pilot. Platform continuation billing is paused while a fresh payment system is selected and set up. Agree the deliverables, start date, cancellation and future billing terms in a signed agreement before charging any business. Do not promise orders, customer reach or sales.
 
 ## 4. Restaurant onboarding information request
 

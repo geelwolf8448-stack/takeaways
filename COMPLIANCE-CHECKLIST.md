@@ -27,7 +27,7 @@ This is an operational checklist, not a legal opinion or a licence. The operator
 - Customers pay the restaurant directly using payment details verified with that restaurant. Takeaways Tonight? does not currently collect, hold, transfer or refund customer food-order funds.
 - The restaurant portal can record that direct payment was received. Do not mark an order completed until the restaurant has confirmed payment.
 - Takeaways Tonight does not deduct any percentage or order-based fee from restaurant food sales. Restaurants retain 100% of their food-sale revenue. Any future change must be disclosed in advance and agreed in writing before implementation.
-- PayFast checkout and split settlement are not live. Do not activate online payments until PayFast approves the merchant arrangement and checkout, verification, refund and settlement processes are implemented and tested.
+- Platform online payment collection and split settlement are not live. Do not activate online payments until a replacement payment arrangement, verification, refund and settlement process has been deliberately approved, implemented and tested.
 - Do not display an order as paid unless the restaurant confirms direct payment or a future verified payment-provider notification confirms it.
 - Restaurant subscriptions/setup fees are separate platform-to-business payments. Do not activate recurring billing until the subscription contract, invoices, cancellation/refund rules and a compliant payment method are ready.
 

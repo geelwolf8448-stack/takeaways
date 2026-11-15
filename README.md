@@ -29,7 +29,7 @@ The project has moved beyond the original static preview. Use the code in `index
 - Test a real partner application from the public site and approve it in the admin portal.
 - Replace demo listings with restaurants that have given written permission and whose details, menus, prices and ordering numbers have been verified.
 - Customer and restaurant-owner portals are implemented in code; real-user sign-in, restaurant-owner verification and end-to-end testing remain outstanding. Restaurant order pop-up notifications require the owner to sign in, keep the portal open and allow browser notifications on that device; they are not yet push notifications when the portal/browser is closed.
-- PayFast checkout, ITN verification, split settlement, automated refunds and delivery dispatch are not implemented. Order status management is implemented for direct-pay orders. `supabase/marketplace-schema.sql` is an older planning reference; use the dated migration files for the live schema.
+- The platform does not offer online payment collection, subscription checkout, split settlement or automated refunds. Customer food payments go directly to the restaurant. Order status management is implemented for direct-pay orders. `supabase/marketplace-schema.sql` is an older planning reference; use the dated migration files for the live schema.
 - Android APK build success does not mean Play Store publication, signing, device testing or release approval is complete.
 
 ## Important operating rules
@@ -37,7 +37,7 @@ The project has moved beyond the original static preview. Use the code in `index
 - The platform does not currently collect customer food-order payments.
 - Do not present demo cards as participating restaurants.
 - Do not promise delivery, sales or platform payment processing that is not active.
-- Every restaurant, takeaway shop, home-based takeaway, inyama shop and coffee shop receives a 14-day free pilot, followed by a once-off R250 admin fee and R500 monthly subscription. Agree the terms in writing with each restaurant before billing.
+- Every restaurant, takeaway shop, home-based takeaway, inyama shop and coffee shop receives a 14-day free pilot. Platform continuation billing is paused while a fresh payment system is deliberately selected and set up. Agree the terms in writing with each restaurant before charging any business.
 
 ## Key files
 - `index.html` — public restaurant directory and partner application.

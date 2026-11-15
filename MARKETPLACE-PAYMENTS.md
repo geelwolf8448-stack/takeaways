@@ -13,19 +13,19 @@ The live customer order flow is a request-and-WhatsApp service:
 
 The admin marketplace overview reports recent order counts, completed orders and order value only. It does not calculate or display deductions from restaurant sales.
 
-## Payment integrations
+## Platform-plan payments
 
-PayFast checkout, payment notifications (ITN), split settlement, automated refunds and restaurant payouts are not active in this project. No PayFast merchant credentials have been supplied or stored.
+Takeaways Tonight does not currently use an online payment provider. Platform-plan continuation billing is paused while a replacement is chosen and implemented. No restaurant is sent to an online checkout, no recurring debit can be started, and no platform payment is collected in this app.
 
-Do not enable online payments until the payment provider has approved the merchant arrangement and the complete checkout, verification, cancellation, refund, settlement and reconciliation processes have been implemented and tested. Any future change to the direct-payment model must be reviewed, disclosed and agreed in writing before activation.
+Do not enable a future platform-plan payment method until the owner has chosen the provider or manual process, the merchant arrangement has been approved, and the complete checkout, verification, cancellation, refund, settlement and reconciliation processes have been implemented and tested. Any change to the direct customer-to-restaurant payment model must be reviewed, disclosed and agreed in writing before activation.
 
 ## Security and launch rules
 
-- Never place PayFast merchant keys, passphrases, Supabase service-role keys or bank credentials in GitHub or browser JavaScript.
+- Never place payment-provider credentials, Supabase service-role keys or bank credentials in GitHub or browser JavaScript.
 - Use Supabase Edge Function secrets for server-only credentials.
 - Browser clients have no direct write access to orders, order items, payments or refunds.
 - All privileged order actions must validate the signed-in user and restaurant membership on the server.
-- Never treat a browser return page as proof of payment; only a verified provider notification can confirm a provider payment.
+- Never treat a browser return page or proof-of-payment image as confirmed payment. Any future payment method must use an independently verified record before a platform plan is changed.
 - Do not accept live customer payments through the platform until provider approval, security testing, refund handling, privacy notices and South African legal/accounting review are complete.
 
 ## Current links

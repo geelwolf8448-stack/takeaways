@@ -34,7 +34,7 @@ button.reject{background:#251010;color:#ffd9d9;border:1px solid #a44}button:disa
 <div class="panel"><h2>Restaurant owner access requests</h2><div class="small">Only verified owners or managers should be granted access to a restaurant.</div><div id="ownerRequests">Loading requests…</div></div>
 <div class="panel"><h2>Marketplace overview</h2><button onclick="loadMarketplaceOverview()">Refresh overview</button><div id="marketplaceOverview" class="status">Loading marketplace totals…</div></div>
 <div class="panel"><h2>Restaurant payment confirmations</h2><p class="small">When a restaurant owner or manager confirms that payment has reached the restaurant, the confirmation appears here.</p><button class="secondary" onclick="enablePaymentNotifications()">Enable browser payment alerts</button><div id="paymentNotifications" class="status" aria-live="polite">Waiting for payment confirmations…</div></div>
-<div class="panel"><div class="row"><div><h2>Business subscriptions &amp; pilot periods</h2><div class="small">14-day pilot · R250 once-off admin fee · R500 monthly · no food-order commission</div></div><button onclick="loadBilling()">Refresh billing</button></div><div class="status" id="billingStatus">Loading subscription records…</div><div class="status" id="payfastConfigStatus">Checking secure PayFast configuration…</div><div id="billingList"></div></div>
+<div class="panel"><div class="row"><div><h2>Business pilots &amp; platform plans</h2><div class="small">14-day pilot · direct customer-to-restaurant payments · no food-order commission</div></div><button onclick="loadBilling()">Refresh pilot records</button></div><div class="status" id="billingStatus">Loading pilot records…</div><div class="status" id="billingSystemStatus">Checking platform-plan status…</div><div id="billingList"></div></div>
 </section>
 <div class="small">Security: the browser uses only the public Supabase publishable key. Review actions are checked again inside a database function; no secret key is stored here.</div>
 </main>
@@ -186,53 +186,23 @@ async function loadBilling(){
   const result=await response.json();if(!response.ok)throw new Error(result.error||"Could not load billing records.");
   const configResponse=await fetch(config.supabaseUrl+"/functions/v1/platform-billing",{method:"POST",headers:apiHeaders(),body:JSON.stringify({action:"payment_config_status"})});
   const configResult=await configResponse.json();
-  const readiness=el("payfastConfigStatus");
-  if(configResponse.ok&&readiness){
-   readiness.textContent=configResult.configured?"PayFast configuration present ("+configResult.mode+"). Payment checkout and webhook testing are still required; live payments remain disabled.":"PayFast is not connected yet. Missing secure settings: "+["merchant ID","merchant key","passphrase","return URL","cancel URL","notification URL","payment mode"].filter((label,index)=>![configResult.merchantIdPresent,configResult.merchantKeyPresent,configResult.passphrasePresent,configResult.returnUrlPresent,configResult.cancelUrlPresent,configResult.notifyUrlPresent,configResult.mode!=="not_configured"][index]).join(", ")+". No payments can be collected yet.";
-  }else if(readiness){readiness.textContent="Could not check PayFast configuration. No payment action was taken."}
+  const readiness=el("billingSystemStatus");
+  if(configResponse.ok&&readiness){readiness.textContent=configResult.message||"No platform payment provider is active. No platform payment can be collected.";}
+  else if(readiness){readiness.textContent="Platform-plan status could not be checked. No payment action was taken."}
   const rows=result.restaurants||[];
   list.innerHTML=rows.length?rows.map(r=>{
-   const sub=r.subscription,inv=r.admin_fee_invoice;
+   const sub=r.subscription;
    const state=sub?esc(sub.status.replaceAll("_"," ").toUpperCase()):"PILOT NOT STARTED";
    const dates=sub&&sub.pilot_started_at?"Pilot: "+new Date(sub.pilot_started_at).toLocaleDateString()+" to "+new Date(sub.pilot_ends_at).toLocaleDateString():"";
-   const next=sub&&sub.next_billing_at?"Next billing date: "+new Date(sub.next_billing_at).toLocaleDateString():"";
-   const fee=sub&&sub.admin_fee_paid_at?"R250 admin fee paid":"R250 admin fee due after pilot";
-   const monthly=sub&&sub.subscription_started_at?"R500 monthly subscription started":"R500 monthly starts after admin fee settlement";
    const startAction=!sub||!sub.pilot_started_at?(r.is_published?'<button data-start-pilot="'+esc(r.id)+'">Start 14-day pilot</button>':'<span class="small">Publish the business before starting its pilot.</span>'):"";
-   const invoiceLine=inv?'<p><b>R250 invoice:</b> '+esc(String(inv.status).toUpperCase())+' · due '+esc(new Date(inv.due_at).toLocaleDateString())+'</p>':"";
-   const dueNow=inv&&inv.status==="pending"&&new Date(inv.due_at).getTime()<=Date.now();
-   const checkoutAction=dueNow?'<button data-pay-admin-fee="'+esc(inv.id)+'" data-business="'+esc(r.name)+'">Pay R250 admin fee (Sandbox)</button>':(inv&&inv.status==="pending"?'<p class="small">Sandbox checkout becomes available when the 14-day pilot ends.</p>':"");
-   return '<article class="application"><div class="row"><h2>'+esc(r.name)+'</h2><span class="tag">'+state+'</span></div><p>'+esc(r.category)+' · '+esc(r.area)+' · '+esc(r.province||"")+'</p><p><b>Commercial terms:</b> R250 once-off admin fee · R500 monthly · no commission</p>'+(dates?'<p>'+esc(dates)+'</p>':"")+(next?'<p>'+esc(next)+'</p>':"")+(sub?'<p>'+esc(fee)+' · '+esc(monthly)+'</p>':'<p class="small">No pilot or billing record has been started yet.</p>')+invoiceLine+startAction+checkoutAction+'</article>';
+   return '<article class="application"><div class="row"><h2>'+esc(r.name)+'</h2><span class="tag">'+state+'</span></div><p>'+esc(r.category)+' · '+esc(r.area)+' · '+esc(r.province||"")+'</p><p><b>Customer payment:</b> paid directly to the restaurant · no commission</p>'+(dates?'<p>'+esc(dates)+'</p>':"")+(sub?'<p class="small">Platform continuation billing is paused while a replacement system is prepared. No platform payment is due through this app.</p>':'<p class="small">No pilot record has been started yet.</p>')+startAction+'</article>';
   }).join(""):'<p class="small">No food businesses found.</p>';
   list.querySelectorAll("button[data-start-pilot]").forEach(button=>button.addEventListener("click",()=>startPilot(button.dataset.startPilot,button)));
-  list.querySelectorAll("button[data-pay-admin-fee]").forEach(button=>button.addEventListener("click",()=>startAdminFeeCheckout(button.dataset.payAdminFee,button.dataset.business,button)));
-  status.textContent=rows.length+" business record(s). R250 checkout is available only after the 14-day pilot ends. R500 monthly billing is not enabled.";
+  status.textContent=rows.length+" business record(s). Direct customer-to-restaurant payment is active. No platform billing is active.";
  }catch(error){status.textContent=error.message}
 }
-async function startAdminFeeCheckout(invoiceId,businessName,button){
- const payerEmail=prompt("Enter the billing contact email for "+businessName+". This is sent to PayFast for the Sandbox checkout.");
- if(!payerEmail)return;
- if(!confirm("Open PayFast SANDBOX for the R250 once-off administration fee for "+businessName+"? No live money will be collected."))return;
- button.disabled=true;
- try{
-  const response=await fetch(config.supabaseUrl+"/functions/v1/platform-billing",{method:"POST",headers:apiHeaders(),body:JSON.stringify({action:"create_admin_fee_checkout",invoiceId,payerEmail})});
-  const result=await response.json();
-  if(!response.ok)throw new Error(result.error||"Could not create the PayFast Sandbox checkout.");
-  if(!result.uuid)throw new Error("PayFast did not return a checkout session.");
-  if(typeof window.payfast_do_onsite_payment!=="function"){
-   await new Promise((resolve,reject)=>{
-    let script=document.querySelector("script[data-payfast-onsite]");
-    if(!script){script=document.createElement("script");script.src="https://www.payfast.co.za/onsite/engine.js";script.async=true;script.dataset.payfastOnsite="true";document.head.appendChild(script);}
-    script.addEventListener("load",resolve,{once:true});
-    script.addEventListener("error",reject,{once:true});
-   });
-  }
-  if(typeof window.payfast_do_onsite_payment!=="function")throw new Error("PayFast checkout could not be opened. No payment was confirmed.");
-  window.payfast_do_onsite_payment({uuid:result.uuid});
- }catch(error){alert(error.message);button.disabled=false}
-}
 async function startPilot(restaurantId,button){
- if(!confirm("Start this business's 14-day free pilot now? The R250 once-off admin fee will be due at the end of the pilot. The R500 monthly subscription starts after the admin fee is settled."))return;
+ if(!confirm("Start this business's 14-day free pilot now? No platform payment will be created or scheduled."))return;
  button.disabled=true;
  try{
   const response=await fetch(config.supabaseUrl+"/functions/v1/platform-billing",{method:"POST",headers:apiHeaders(),body:JSON.stringify({action:"start_trial",restaurantId})});
