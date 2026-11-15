@@ -438,7 +438,7 @@ footer{background:#130d17!important;border-top-color:#e9ad3d!important;color:#e9
 
 </main>
 <footer><b>Takeaways Tonight?</b><br><em>Discover local. Order direct. Support local.</em><br><br>Operated by A Coetzer, sole proprietor trading as Takeaways Tonight?<br>Support email: <a href="mailto:geelwolf8448@gmail.com">geelwolf8448@gmail.com</a><br><br>Across all nine provinces of South Africa · Your food. Tonight.<br><br><a href="privacy.html">Privacy notice</a> · <a href="terms.html">Terms of use</a></footer>
-<dialog id="menuDialog"><div class="modal-head"><h2 id="menuTitle">Restaurant menu</h2><button class="x" onclick="closeDialog('menuDialog')">✕</button></div><div class="modal-body"><div id="menuContent"></div><div class="total" id="menuTotal">Basket total: R0</div><button style="width:100%" onclick="openBasket()">View basket & order</button></div></dialog>
+<dialog id="menuDialog"><div class="modal-head"><h2 id="menuTitle">Restaurant menu</h2><button class="x" onclick="closeDialog('menuDialog')">✕</button></div><div class="modal-body"><div id="menuContent"></div><div class="total" id="menuTotal">Basket total: R0</div><button id="menuBasketButton" style="width:100%" onclick="openBasket()">View basket & order</button></div></dialog>
 <dialog id="basketDialog"><div class="modal-head"><h2>Your basket</h2><button class="x" onclick="closeDialog('basketDialog')">✕</button></div><div class="modal-body"><div id="basketContent"></div><div class="total" id="basketTotal">Total: R0</div><div class="field"><label for="customerName">Your name</label><input id="customerName" autocomplete="name" placeholder="Name for the order"></div><div class="field"><label for="customerPhone">Your mobile number</label><input id="customerPhone" type="tel" autocomplete="tel" placeholder="Number the restaurant can contact you"></div><div class="field"><label for="fulfilment">How would you like your food?</label><select id="fulfilment" required onchange="fulfilmentChanged()"><option value="" selected disabled>Choose collection or delivery</option><option value="Collection">Collection — I will pick it up</option><option value="Delivery">Delivery — bring it to my address</option></select></div><div class="field" id="deliveryAddressField" hidden><label for="deliveryAddress">Delivery address</label><textarea id="deliveryAddress" rows="2" autocomplete="street-address" placeholder="House/flat number, street, suburb and area"></textarea></div><div class="field"><label for="customerPaymentMethod">How would you like to pay?</label><select id="customerPaymentMethod" required><option value="">Choose a payment method</option></select><small id="customerPaymentHelp">Payment is made directly to the restaurant.</small></div><div class="field"><label for="orderNotes">Order notes (optional)</label><textarea id="orderNotes" rows="2" placeholder="For example: gate instructions, collection time or food preferences"></textarea></div><button style="width:100%" id="sendOrder" onclick="sendOrder()" disabled>Submit order & notify restaurant</button><p class="notice">No customer account or email address is needed. Enter your name and WhatsApp number. Choose one of the payment methods offered by this restaurant. Your order request will be saved and WhatsApp will open with the order details for you to send to the restaurant. The restaurant must confirm your order. Pay the restaurant directly; Takeaways Tonight? does not collect food-order payments.</p></div></dialog>
 <dialog id="adminDialog"><div class="modal-head"><h2>Register your food business</h2><button class="x" onclick="closeDialog('adminDialog')">✕</button></div><div class="modal-body">
 <div class="admin-note"><b>REGISTER AND GO LIVE IMMEDIATELY</b><br>Your business will be published as soon as registration is completed and your 14-day free pilot starts immediately. Customers pay you directly using the payment methods you choose. Takeaways Tonight takes no commission and does not collect food-order payments. Platform continuation billing is paused while a new system is prepared.</div>
@@ -482,18 +482,28 @@ let customerLocation=null;
 let businessLocation=null;
 let pendingBusinessLocationRestaurantId=null;
 let locationAttempted=false;
-function setLocationStatus(message){const el=document.getElementById('customerLocationStatus');if(el)el.textContent=message;}
+function setLocationStatus(message){const el=document.getElementById('customerLocationStatus');if(el){el.textContent=message;el.hidden=!message;}}
 function restoreExploreButton(){const button=document.getElementById("exploreButton");if(button){button.textContent="⬇   EXPLORE & ORDER NOW";button.removeAttribute("aria-busy");}}
 async function openNearbyMenu(event){
  if(event)event.preventDefault();
  const button=document.getElementById("exploreButton");
  if(button){button.textContent="📍 FINDING FOOD NEAR YOU…";button.setAttribute("aria-busy","true");}
  const location=await detectCustomerLocation();
- if(!location){if(button){button.textContent="ALLOW LOCATION TO EXPLORE";button.removeAttribute("aria-busy");}return;}
+ if(!location){
+  await loadSharedRestaurants();
+  const hasParticipatingRestaurant=restaurants.some(r=>r.isDemo===false);
+  restoreExploreButton();
+  showExploreMessage(
+   hasParticipatingRestaurant?"Allow location to explore":"Restaurants are coming soon",
+   hasParticipatingRestaurant?"Allow location access and Explore will automatically open the nearest restaurant menu.":"There are no participating restaurants available in the customer app yet. As soon as a real restaurant owner publishes a menu, prices, location and payment methods, Explore will open it automatically."
+  );
+  return;
+ }
  await loadSharedRestaurants();
  const nearestRestaurant=restaurants.filter(r=>r.isDemo===false).sort((a,b)=>(a.distanceKm??Number.MAX_SAFE_INTEGER)-(b.distanceKm??Number.MAX_SAFE_INTEGER))[0];
  if(nearestRestaurant){restoreExploreButton();openMenu(nearestRestaurant.id);return;}
- if(button){button.textContent="NO NEARBY RESTAURANT YET";button.removeAttribute("aria-busy");window.setTimeout(restoreExploreButton,4500);}
+ restoreExploreButton();
+ showExploreMessage("No nearby restaurant yet","We could not find a participating restaurant near your current location yet. Restaurant menus will appear here automatically once approved restaurants have joined your area.");
 }
 function captureBusinessLocation(){
  const status=document.getElementById('businessLocationStatus'),button=document.getElementById('captureBusinessLocationButton');
@@ -554,7 +564,15 @@ function renderMenuContent(){
  if(restaurant.menuFileUrl)content.insertAdjacentHTML("afterbegin",'<p><a class="secondary" style="display:inline-block;padding:10px 14px;border-radius:30px" href="'+esc(restaurant.menuFileUrl)+'" target="_blank" rel="noopener">📄 View full uploaded menu</a></p>');
  updateMenuTotal();
 }
-function openMenu(id){currentRestaurant=restaurants.find(r=>r.id===id&&r.isDemo===false);if(!currentRestaurant)return;document.getElementById("menuTitle").textContent=currentRestaurant.name;renderMenuContent();const dialog=document.getElementById("menuDialog");if(!dialog.open)dialog.showModal()}
+function showExploreMessage(title,message){
+ const dialog=document.getElementById("menuDialog"),basketButton=document.getElementById("menuBasketButton");
+ document.getElementById("menuTitle").textContent=title;
+ document.getElementById("menuContent").innerHTML='<div class="empty">'+esc(message)+'</div>';
+ document.getElementById("menuTotal").textContent="";
+ if(basketButton)basketButton.hidden=true;
+ if(!dialog.open)dialog.showModal();
+}
+function openMenu(id){currentRestaurant=restaurants.find(r=>r.id===id&&r.isDemo===false);if(!currentRestaurant)return;const basketButton=document.getElementById("menuBasketButton");if(basketButton)basketButton.hidden=false;document.getElementById("menuTitle").textContent=currentRestaurant.name;renderMenuContent();const dialog=document.getElementById("menuDialog");if(!dialog.open)dialog.showModal()}
 function changeMenuItemQuantity(id,index,change){
  sessionStorage.removeItem("tt_order_idempotency");const restaurant=restaurants.find(item=>item.id===id&&item.isDemo===false),menuItem=normaliseCustomerMenuItem(restaurant?.items?.[index]);if(!restaurant||!menuItem.name||!Number.isFinite(menuItem.price))return;
  if(basket.length&&basket[0].restaurantId!==id){if(change<1)return;if(!confirm("Your basket contains another restaurant. Clear it and start this restaurant's order?"))return;basket=[];}
@@ -765,7 +783,13 @@ async function restorePendingCheckout(){
 render();
 loadLiveAdverts();
 detectCustomerLocation().then(()=>loadSharedRestaurants()).then(restorePendingCheckout);
-  if ("serviceWorker" in navigator && location.protocol.startsWith("http")) { window.addEventListener("load", () => navigator.serviceWorker.register("./service-worker.js?v=77",{updateViaCache:"none"}).then(registration=>registration.update()).catch(() => {})); }
+  if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
+   let refreshingForNewRelease=false;
+   window.addEventListener("load", () => navigator.serviceWorker.register("./service-worker.js?v=78",{updateViaCache:"none"}).then(registration=>{
+    navigator.serviceWorker.addEventListener("controllerchange",()=>{if(!refreshingForNewRelease){refreshingForNewRelease=true;window.location.reload();}});
+    return registration.update();
+   }).catch(() => {}));
+  }
 </script>
 <script type="module" src="native-auth.js"></script>
 <script type="module" src="push-tap-handler.js"></script>

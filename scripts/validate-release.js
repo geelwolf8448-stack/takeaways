@@ -61,7 +61,7 @@ check("privacy and terms pages are linked", /privacy\.html/.test(publicPage.html
 check("privacy notice describes saved customer orders", /order history/.test(read("privacy.html")) && /delivery address/.test(read("privacy.html")));
 check("terms distinguish order requests from restaurant acceptance", /not an accepted order/.test(read("terms.html")));
 check("mobile navigation does not advertise unfinished favourites/orders/settings tabs", !/Favourites|>Orders<|>Settings</.test(publicPage.html));
-check("Explore and Order opens the nearest restaurant menu without manual search or category controls", /id="exploreButton" href="#nearby-menu" onclick="openNearbyMenu\(event\)"/.test(publicPage.html) && /async function openNearbyMenu\(event\)[\s\S]*?await detectCustomerLocation\(\);[\s\S]*?await loadSharedRestaurants\(\);[\s\S]*?openMenu\(nearestRestaurant\.id\)/.test(publicPage.html) && !/id="search"/.test(publicPage.html) && !/id="filters"/.test(publicPage.html) && !/<h2>Find your food<\/h2>/.test(publicPage.html));
+check("Explore and Order opens the nearest restaurant menu or a clear no-listings message without manual search controls", /id="exploreButton" href="#nearby-menu" onclick="openNearbyMenu\(event\)"/.test(publicPage.html) && /async function openNearbyMenu\(event\)[\s\S]*?await detectCustomerLocation\(\);[\s\S]*?await loadSharedRestaurants\(\);[\s\S]*?openMenu\(nearestRestaurant\.id\)/.test(publicPage.html) && /showExploreMessage/.test(publicPage.html) && !/id="search"/.test(publicPage.html) && !/id="filters"/.test(publicPage.html) && !/<h2>Find your food<\/h2>/.test(publicPage.html));
 check("customer campaign label uses Food Wars with a nationwide catchy prompt", /<small>FOOD WARS<\/small>/.test(publicPage.html) && /Who serves<br>it best\?/.test(publicPage.html) && !/South Coast<br>Food Wars/.test(publicPage.html) && !/COMMUNITY VOTE/.test(publicPage.html));
 check("customer specials label does not use the outdated Tonight's Spotlight wording", /<small>SPECIALS<\/small>/.test(publicPage.html) && !/TONIGHT'S SPOTLIGHT/.test(publicPage.html));
 check("customer start keeps one direct Explore and Order action without duplicate navigation", /EXPLORE & ORDER NOW/.test(publicPage.html) && !/<div class="poster-categories">/.test(publicPage.html) && !/<div class="feature-nav">/.test(publicPage.html) && !/<a class="primary" href="#explore">🛵 ORDER NOW<\/a>/.test(publicPage.html) && !/<nav class="mobile-dock"/.test(publicPage.html));
@@ -169,7 +169,7 @@ check("marketplace API only grants owner access to published restaurants", /rest
 const worker = read("service-worker.js");
 new vm.Script(worker, { filename: "service-worker.js" });
 check("service worker JavaScript compiles", true);
-check("browser checks for the newest app update without reusing a saved worker file", /serviceWorker\.register\("\.\/service-worker\.js\?v=77",\{updateViaCache:"none"\}\)\.then\(registration=>registration\.update\(\)\)/.test(publicPage.html));
+check("browser checks for the newest app update without reusing a saved worker file", /serviceWorker\.register\("\.\/service-worker\.js\?v=78",\{updateViaCache:"none"\}\)\.then\(registration=>/.test(publicPage.html) && /controllerchange/.test(publicPage.html));
 for (const file of ["manifest.webmanifest", "config.js", "logo.svg", "icon.svg", "privacy.html", "terms.html", "account.html", "restaurant-portal.html"]) {
   check(file + " exists", fs.existsSync(path.join(root, file)));
 }
