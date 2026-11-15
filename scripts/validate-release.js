@@ -48,6 +48,7 @@ check("customer can enable browser payment notifications", /enableCustomerPaymen
 check("checkout only shows payment methods configured by the restaurant", /acceptedPaymentMethods:Array\.isArray\(r\.accepted_payment_methods\)\?r\.accepted_payment_methods:\[\]/.test(publicPage.html) && /const methods=restaurant\?\.acceptedPaymentMethods\|\|\[\]/.test(publicPage.html));
 check("empty customer basket clearly explains why payment and submit wait for a food item", /unlock payment methods and Submit Order/.test(publicPage.html) && /optional order notes now/.test(publicPage.html));
 check("WhatsApp order request is generated", /https:\/\/wa\.me\//.test(publicPage.html) && /No payment has been made/.test(publicPage.html));
+check("customer menus clearly offer WhatsApp, call and text restaurant contact options", /CONTACT THIS RESTAURANT/.test(publicPage.html) && /href="https:\/\/wa\.me\//.test(publicPage.html) && /href="tel:\+/.test(publicPage.html) && /href="sms:\+/.test(publicPage.html));
 check("customer guest checkout needs no email or account", /No customer account or email address is needed/.test(publicPage.html) && /signInAnonymously/.test(publicPage.html) && /marketplace-api/.test(publicPage.html));
 check("customer checkout does not request an email sign-in", /signInAnonymously/.test(publicPage.html) && !/signInWithOtp/.test(publicPage.html));
 check("order idempotency key is cleared after successful submission", /sessionStorage\.removeItem\("tt_order_idempotency"/.test(publicPage.html));
@@ -113,6 +114,7 @@ check("restaurant-owner training demo supports logos, menu categories, dish phot
 check("restaurant-owner training demo remains isolated from customer pages and live restaurant storage", !/restaurant-owner-training-demo/.test(publicPage.html) && !/ownerDemo/.test(publicPage.html) && /Practice changes are saved only on this laptop browser/.test(restaurantPortal.html));
 check("restaurant portal can request browser notification permission", /Notification\.requestPermission\(\)/.test(restaurantPortal.html));
 check("restaurant portal polls for new orders while signed in", /window\.setInterval\(\s*\(\s*\)\s*=>\s*\{\s*if\s*\(\s*session\s*&&\s*memberships\.length\s*\)\s*loadRestaurantsOrders\(\)\s*;\s*\}\s*,\s*15000\s*\)/.test(restaurantPortal.html));
+check("restaurant owners are told to monitor WhatsApp, calls and texts on their saved business number", /Customers can use WhatsApp, call, or send a normal text message/.test(restaurantPortal.html) && /Customer contact/.test(restaurantPortal.html));
 check("new submitted orders trigger an in-dashboard alert and browser notification", /announceNewOrders\(data\|\|\[\]\)/.test(restaurantPortal.html) && /new Notification\("New Takeaways Tonight\? order"/.test(restaurantPortal.html));
 check("restaurant owners request verified access", /restaurant_owner_requests/.test(restaurantPortal.html));
 check("restaurant-owner magic links route back into native Android app", /za.co.takeawaystonight.app:\/\/auth\/callback\?target=restaurant/.test(restaurantPortal.html));
@@ -170,7 +172,7 @@ check("marketplace API only grants owner access to published restaurants", /rest
 const worker = read("service-worker.js");
 new vm.Script(worker, { filename: "service-worker.js" });
 check("service worker JavaScript compiles", true);
-check("browser checks for the newest app update without reusing a saved worker file", /serviceWorker\.register\("\.\/service-worker\.js\?v=78",\{updateViaCache:"none"\}\)\.then\(registration=>/.test(publicPage.html) && /controllerchange/.test(publicPage.html));
+check("browser checks for the newest app update without reusing a saved worker file", /serviceWorker\.register\("\.\/service-worker\.js\?v=79",\{updateViaCache:"none"\}\)\.then\(registration=>/.test(publicPage.html) && /controllerchange/.test(publicPage.html));
 for (const file of ["manifest.webmanifest", "config.js", "logo.svg", "icon.svg", "privacy.html", "terms.html", "account.html", "restaurant-portal.html"]) {
   check(file + " exists", fs.existsSync(path.join(root, file)));
 }
