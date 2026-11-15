@@ -46,6 +46,7 @@ check("orders are restricted to published real restaurant records", /r\.isDemo==
 check("customer order receives live payment confirmation updates", /watchCustomerPayment\(order\.id,order\.order_number\)/.test(publicPage.html) && /postgres_changes/.test(publicPage.html) && /PAYMENT RECEIVED/.test(publicPage.html));
 check("customer can enable browser payment notifications", /enableCustomerPaymentNotifications/.test(publicPage.html) && /Notification\.requestPermission\(\)/.test(publicPage.html));
 check("checkout only shows payment methods configured by the restaurant", /acceptedPaymentMethods:Array\.isArray\(r\.accepted_payment_methods\)\?r\.accepted_payment_methods:\[\]/.test(publicPage.html) && /const methods=restaurant\?\.acceptedPaymentMethods\|\|\[\]/.test(publicPage.html));
+check("empty customer basket clearly explains why payment and submit wait for a food item", /unlock payment methods and Submit Order/.test(publicPage.html) && /optional order notes now/.test(publicPage.html));
 check("WhatsApp order request is generated", /https:\/\/wa\.me\//.test(publicPage.html) && /No payment has been made/.test(publicPage.html));
 check("customer guest checkout needs no email or account", /No customer account or email address is needed/.test(publicPage.html) && /signInAnonymously/.test(publicPage.html) && /marketplace-api/.test(publicPage.html));
 check("customer checkout does not request an email sign-in", /signInAnonymously/.test(publicPage.html) && !/signInWithOtp/.test(publicPage.html));
