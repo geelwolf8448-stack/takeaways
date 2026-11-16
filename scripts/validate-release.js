@@ -77,7 +77,7 @@ check("customer interior uses the night market palette without white panels or w
 
 const admin = compileInlineScripts("admin.html");
 check("admin portal inline JavaScript compiles", admin.count > 0);
-check("admin uses passwordless email sign-in", /signInWithOtp/.test(admin.html) && /shouldCreateUser:false/.test(admin.html));
+check("admin signs in with a password instead of requiring an emailed one-time code", /signInWithPassword/.test(admin.html) && /auth\.signInWithPassword\(\{email,password\}\)/.test(admin.html) && !/id="emailOtp"/.test(admin.html) && !/onclick="sendMagicLink\(\)"/.test(admin.html));
 check("admin offers a secure password sign-in fallback when email delivery is unavailable", /signInWithPassword/.test(admin.html) && /auth\.signInWithPassword\(\{email,password\}\)/.test(admin.html) && /Administrator account password/.test(admin.html));
 check("admin checks explicit allowlist", /admin_users/.test(admin.html) && /review_partner_application/.test(admin.html));
 check("admin can review restaurant owner access requests", /review_owner_request/.test(admin.html) && /ownerRequests/.test(admin.html));
@@ -85,7 +85,7 @@ check("admin dashboard lists and receives realtime restaurant payment confirmati
 check("admin has order-only marketplace reporting", /marketplace_orders/.test(admin.html) && /marketplaceOverview/.test(admin.html));
 check("admin password fallback keeps the password masked and does not store it in browser storage", /id="adminPassword"[^>]+type="password"/.test(admin.html) && !/localStorage[^\n]+adminPassword|sessionStorage[^\n]+adminPassword/.test(admin.html));
 
-check("admin shows SMTP troubleshooting for delivery errors", /Supabase Dashboard → Logs → Auth Logs/.test(admin.html));
+check("admin clearly tells the owner that emailed one-time codes are not used", /This dashboard does not use emailed one-time codes/.test(admin.html));
 
 const callback = compileInlineScripts("reset-password.html");
 check("sign-in callback JavaScript compiles", callback.count > 0);

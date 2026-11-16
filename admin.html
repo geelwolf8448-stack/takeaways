@@ -25,12 +25,8 @@ button.reject{background:#251010;color:#ffd9d9;border:1px solid #a44}button:disa
 <label for="email">Administrator email</label><input id="email" type="email" autocomplete="email" value="geelwolf8448@gmail.com">
 <label for="adminPassword">Administrator account password</label><input id="adminPassword" type="password" autocomplete="current-password" placeholder="Your Takeaways Tonight password">
 <button id="passwordButton" onclick="signInWithPassword()">Sign in to my dashboard</button>
-<p class="small">If you already have a valid session on this device, the dashboard opens automatically. The email-code option below remains available as a backup once email delivery is restored.</p>
-<hr>
-<button id="magicButton" class="secondary" onclick="sendMagicLink()">Request email sign-in code</button>
-<label for="emailOtp">Six-digit email code</label><input id="emailOtp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" placeholder="Enter the code from your email">
-<button id="verifyOtpButton" class="secondary" onclick="verifyEmailOtp()">Verify email code</button>
-<div class="status" id="resetStatus" aria-live="polite">Use your administrator account password above. Do not enter your password or a one-time code into a message.</div>
+<p class="small">If you already have a valid session on this device, the dashboard opens automatically. If you do not remember your Takeaways Tonight password, do not enter your email password or share any password in a message.</p>
+<div class="status" id="resetStatus" aria-live="polite">Use your administrator account password above. This dashboard does not use emailed one-time codes.</div>
 </div>
 <section id="dashboard" class="hidden">
 <div class="panel"><div class="row"><div><h2>Pending applications</h2><div class="small" id="who"></div></div><button class="reject" onclick="signOut()">Sign out</button></div><button onclick="loadApplications()">Refresh list</button><div class="status" id="status">Signed in. Loading applications…</div></div>
