@@ -787,7 +787,7 @@ loadLiveAdverts();
 detectCustomerLocation().then(()=>loadSharedRestaurants()).then(restorePendingCheckout);
   if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
    let refreshingForNewRelease=false;
-   window.addEventListener("load", () => navigator.serviceWorker.register("./service-worker.js?v=79",{updateViaCache:"none"}).then(registration=>{
+   window.addEventListener("load", () => navigator.serviceWorker.register("./service-worker.js?v=80",{updateViaCache:"none"}).then(registration=>{
     navigator.serviceWorker.addEventListener("controllerchange",()=>{if(!refreshingForNewRelease){refreshingForNewRelease=true;window.location.reload();}});
     return registration.update();
    }).catch(() => {}));

@@ -78,11 +78,12 @@ check("customer interior uses the night market palette without white panels or w
 const admin = compileInlineScripts("admin.html");
 check("admin portal inline JavaScript compiles", admin.count > 0);
 check("admin uses passwordless email sign-in", /signInWithOtp/.test(admin.html) && /shouldCreateUser:false/.test(admin.html));
+check("admin offers a secure password sign-in fallback when email delivery is unavailable", /signInWithPassword/.test(admin.html) && /auth\.signInWithPassword\(\{email,password\}\)/.test(admin.html) && /Administrator account password/.test(admin.html));
 check("admin checks explicit allowlist", /admin_users/.test(admin.html) && /review_partner_application/.test(admin.html));
 check("admin can review restaurant owner access requests", /review_owner_request/.test(admin.html) && /ownerRequests/.test(admin.html));
 check("admin dashboard lists and receives realtime restaurant payment confirmations", /paymentNotifications/.test(admin.html) && /payment_received_at/.test(admin.html) && /postgres_changes/.test(admin.html) && /enablePaymentNotifications/.test(admin.html));
 check("admin has order-only marketplace reporting", /marketplace_orders/.test(admin.html) && /marketplaceOverview/.test(admin.html));
-check("admin has no password field", !/<input[^>]+type=["']password["']/i.test(admin.html));
+check("admin password fallback keeps the password masked and does not store it in browser storage", /id="adminPassword"[^>]+type="password"/.test(admin.html) && !/localStorage[^\n]+adminPassword|sessionStorage[^\n]+adminPassword/.test(admin.html));
 
 check("admin shows SMTP troubleshooting for delivery errors", /Supabase Dashboard → Logs → Auth Logs/.test(admin.html));
 
@@ -172,7 +173,7 @@ check("marketplace API only grants owner access to published restaurants", /rest
 const worker = read("service-worker.js");
 new vm.Script(worker, { filename: "service-worker.js" });
 check("service worker JavaScript compiles", true);
-check("browser checks for the newest app update without reusing a saved worker file", /serviceWorker\.register\("\.\/service-worker\.js\?v=79",\{updateViaCache:"none"\}\)\.then\(registration=>/.test(publicPage.html) && /controllerchange/.test(publicPage.html));
+check("browser checks for the newest app update without reusing a saved worker file", /serviceWorker\.register\("\.\/service-worker\.js\?v=80",\{updateViaCache:"none"\}\)\.then\(registration=>/.test(publicPage.html) && /controllerchange/.test(publicPage.html));
 for (const file of ["manifest.webmanifest", "config.js", "logo.svg", "icon.svg", "privacy.html", "terms.html", "account.html", "restaurant-portal.html"]) {
   check(file + " exists", fs.existsSync(path.join(root, file)));
 }

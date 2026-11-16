@@ -21,12 +21,16 @@ button.reject{background:#251010;color:#ffd9d9;border:1px solid #a44}button:disa
 <header><div class="wrap"><h1>Takeaways Tonight? · Admin</h1><p class="sub">Private restaurant application review</p></div></header>
 <main class="wrap">
 <div class="panel" id="loginPanel"><h2>Administrator access</h2>
-<p class="small">No password required. Enter your administrator email and we will send you a secure one-time sign-in link.</p>
+<p class="small">Sign in with the password for your Takeaways Tonight administrator account. This is not a restaurant password and you must never share it in a message.</p>
 <label for="email">Administrator email</label><input id="email" type="email" autocomplete="email" value="geelwolf8448@gmail.com">
-<button id="magicButton" onclick="sendMagicLink()">Email me a one-time code</button>
+<label for="adminPassword">Administrator account password</label><input id="adminPassword" type="password" autocomplete="current-password" placeholder="Your Takeaways Tonight password">
+<button id="passwordButton" onclick="signInWithPassword()">Sign in to my dashboard</button>
+<p class="small">If you already have a valid session on this device, the dashboard opens automatically. The email-code option below remains available as a backup once email delivery is restored.</p>
+<hr>
+<button id="magicButton" class="secondary" onclick="sendMagicLink()">Request email sign-in code</button>
 <label for="emailOtp">Six-digit email code</label><input id="emailOtp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" placeholder="Enter the code from your email">
-<button id="verifyOtpButton" onclick="verifyEmailOtp()">Verify code and sign in</button>
-<div class="status" id="resetStatus" aria-live="polite">Enter your administrator email, request a code, then enter the six digits from the email. Do not click an email link.</div>
+<button id="verifyOtpButton" class="secondary" onclick="verifyEmailOtp()">Verify email code</button>
+<div class="status" id="resetStatus" aria-live="polite">Use your administrator account password above. Do not enter your password or a one-time code into a message.</div>
 </div>
 <section id="dashboard" class="hidden">
 <div class="panel"><div class="row"><div><h2>Pending applications</h2><div class="small" id="who"></div></div><button class="reject" onclick="signOut()">Sign out</button></div><button onclick="loadApplications()">Refresh list</button><div class="status" id="status">Signed in. Loading applications…</div></div>
@@ -47,6 +51,26 @@ const supabaseClient=(window.supabase&&config.supabaseUrl&&config.supabaseAnonKe
 const el=id=>document.getElementById(id);
 function say(message){el("status").textContent=message}
 function apiHeaders(){return {apikey:config.supabaseAnonKey,Authorization:"Bearer "+accessToken,"Content-Type":"application/json"}}
+async function beginAdministratorSession(session,fallbackEmail){
+ if(!session)throw new Error("Secure sign-in did not return a session. Please try again.");
+ accessToken=session.access_token;currentEmail=session.user?.email||fallbackEmail;currentUserId=session.user?.id||"";
+ el("loginPanel").classList.add("hidden");el("dashboard").classList.remove("hidden");el("who").textContent="Signed in as "+currentEmail;
+ await loadApplications();
+}
+async function signInWithPassword(){
+ const email=el("email").value.trim(),password=el("adminPassword").value;
+ if(!email){el("resetStatus").textContent="Enter your administrator email first.";el("email").focus();return;}
+ if(!password){el("resetStatus").textContent="Enter your Takeaways Tonight administrator account password.";el("adminPassword").focus();return;}
+ if(!supabaseClient){el("resetStatus").textContent="Supabase sign-in could not initialise. Refresh the page and try again.";return;}
+ const button=el("passwordButton");button.disabled=true;el("resetStatus").textContent="Signing in securely…";
+ try{
+  const {data,error}=await supabaseClient.auth.signInWithPassword({email,password});
+  if(error)throw error;
+  await beginAdministratorSession(data.session,email);
+  el("adminPassword").value="";
+ }catch(error){el("resetStatus").textContent=(error.message||"The administrator password could not be verified.")+" Check that you are using your Takeaways Tonight account password, not an email password.";}
+ finally{button.disabled=false;}
+}
 async function sendMagicLink(){
  const email=el("email").value.trim();
  if(!email){el("resetStatus").textContent="Enter your account email first.";el("email").focus();return;}
@@ -75,9 +99,7 @@ async function verifyEmailOtp(){
   const {data,error}=await supabaseClient.auth.verifyOtp({email,token,type:"email"});
   if(error)throw error;
   if(!data.session)throw new Error("The code was accepted but no secure session was returned. Request a new code.");
-  accessToken=data.session.access_token;currentEmail=data.user?.email||email;currentUserId=data.user?.id||"";
-  el("loginPanel").classList.add("hidden");el("dashboard").classList.remove("hidden");el("who").textContent="Signed in as "+currentEmail;
-  await loadApplications();
+  await beginAdministratorSession(data.session,email);
  }catch(error){
   el("resetStatus").textContent=(error.message||"The code could not be verified.")+" Request a fresh code if it has expired.";
  }finally{button.disabled=false;}
@@ -85,8 +107,7 @@ async function verifyEmailOtp(){
 async function restoreExistingSession(){
  if(!supabaseClient)return;
  try{const {data,error}=await supabaseClient.auth.getSession();if(error||!data.session)return;
-  accessToken=data.session.access_token;currentEmail=data.session.user.email||"";currentUserId=data.session.user.id||"";
-  el("loginPanel").classList.add("hidden");el("dashboard").classList.remove("hidden");el("who").textContent="Signed in as "+currentEmail;await loadApplications();
+  await beginAdministratorSession(data.session,"");
  }catch(e){el("resetStatus").textContent=e.message||"Could not restore your sign-in session."}
 }
 async function loadApplications(){
