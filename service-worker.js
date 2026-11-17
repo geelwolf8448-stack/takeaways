@@ -1,4 +1,4 @@
-const CACHE_NAME = "takeaways-tonight-v80-admin-password-access";
+const CACHE_NAME = "takeaways-tonight-v82-secure-owner-passwords";
 const APP_FILES = [
   "./",
   "./index.html",

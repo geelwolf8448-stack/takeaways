@@ -55,7 +55,7 @@ check("order idempotency key is cleared after successful submission", /sessionSt
 check("South African customer and restaurant phone numbers are validated", /\^27\\d\{9\}\$/.test(publicPage.html));
 check("delivery address is required for delivery", /fulfilment==="Delivery"&&!address/.test(publicPage.html));
 check("business registration requires explicit owner authorisation", /rConsent/.test(publicPage.html) && /if\(!document\.getElementById\("rConsent"\)\.checked\)/.test(publicPage.html));
-check("business registration explains when the listing is published", /business will appear in the public directory immediately after successful registration/i.test(publicPage.html));
+check("business registration stays private until owner email confirmation and approval", /stays private until my owner email is confirmed and Takeaways Tonight approves it/i.test(publicPage.html) && /will stay private until the owner and business details are verified and approved/i.test(publicPage.html) && !/business will appear in the public directory immediately after successful registration/i.test(publicPage.html));
 check("public directory fetch filters published restaurants", /is_published=eq\.true/.test(publicPage.html));
 check("customer location is requested automatically without location or province controls and nearby restaurants are ranked first", /detectCustomerLocation\(\)\.then\(\(\)=>loadSharedRestaurants\(\)\)/.test(publicPage.html) && /list_nearby_food_businesses/.test(publicPage.html) && /maximumAge:0/.test(publicPage.html) && !/Refresh my location|Choose your province|provinceFilters|choose a province/i.test(publicPage.html));
 check("restaurant menu popup shows prices with plus-minus quantity controls before checkout", /renderMenuContent/.test(publicPage.html) && /changeMenuItemQuantity/.test(publicPage.html) && /menuItemQuantity/.test(publicPage.html) && /View basket & order/.test(publicPage.html));
@@ -102,6 +102,12 @@ const restaurantPortal = compileInlineScripts("restaurant-portal.html");
 check("restaurant owner portal inline JavaScript compiles", restaurantPortal.count > 0);
 check("restaurant owner portal matches the customer app's sunset exterior and night-market interior", /Restaurant owner dashboard — matching the Takeaways Tonight customer app/.test(restaurantPortal.html) && /class="owner-poster"/.test(restaurantPortal.html) && /hero-art\.svg/.test(restaurantPortal.html) && /class="owner-logo" src="logo\.svg"/.test(restaurantPortal.html) && /--tt-night:#120e16/.test(restaurantPortal.html) && /Build your menu\. Reach hungry locals\./.test(restaurantPortal.html));
 check("restaurant owner dashboard keeps the private trial area and pauses platform collection", /id="ownerBilling"/.test(restaurantPortal.html) && /get_my_billing/.test(restaurantPortal.html) && /No platform payment is collected here/.test(restaurantPortal.html) && !/payfast/i.test(restaurantPortal.html));
+const secureRegistration = read("supabase/functions/register-food-business/index.ts");
+check("public business registration creates a private pending application instead of publishing directly", /auth\.auth\.signUp/.test(secureRegistration) && /status: "pending"/.test(secureRegistration) && /owner_email_confirmed_at/.test(secureRegistration) && !/admin\.auth\.admin\.createUser/.test(secureRegistration) && !/register_food_business/.test(secureRegistration));
+check("public business registration validates strong passwords and rate-limits attempts without storing raw contact values in the rate table", /strongPassword/.test(secureRegistration) && /record_restaurant_registration_attempt/.test(secureRegistration) && /crypto\.subtle\.digest\("SHA-256"/.test(secureRegistration) && /normaliseMenu/.test(secureRegistration));
+const secureRegistrationMigration = read("supabase/migrations/20261117101500_secure_restaurant_applications.sql");
+check("database prevents browser users from directly inserting restaurant applications", /drop policy if exists "Anyone can submit partner applications"/.test(secureRegistrationMigration) && /revoke insert on public\.partner_applications from anon, authenticated/.test(secureRegistrationMigration));
+check("database blocks approval before an owner email confirmation and creates owner access only after approval", /owner_email_confirmed_at is null/.test(secureRegistrationMigration) && /insert into public\.restaurant_members/.test(secureRegistrationMigration) && /insert into public\.billing_subscriptions/.test(secureRegistrationMigration));
 const ownerBillingFunction = read("supabase/functions/owner-billing/index.ts");
 check("owner billing reads protected pilot details without any payment-provider credentials or checkout", /SUPABASE_SERVICE_ROLE_KEY/.test(ownerBillingFunction) && /get_my_billing/.test(ownerBillingFunction) && !/payfast/i.test(ownerBillingFunction) && !/checkout/i.test(ownerBillingFunction));
 const payfastItn = read("supabase/functions/payfast-itn/index.ts");
@@ -173,7 +179,7 @@ check("marketplace API only grants owner access to published restaurants", /rest
 const worker = read("service-worker.js");
 new vm.Script(worker, { filename: "service-worker.js" });
 check("service worker JavaScript compiles", true);
-check("browser checks for the newest app update without reusing a saved worker file", /serviceWorker\.register\("\.\/service-worker\.js\?v=80",\{updateViaCache:"none"\}\)\.then\(registration=>/.test(publicPage.html) && /controllerchange/.test(publicPage.html));
+check("browser checks for the newest app update without reusing a saved worker file", /serviceWorker\.register\("\.\/service-worker\.js\?v=82",\{updateViaCache:"none"\}\)\.then\(registration=>/.test(publicPage.html) && /controllerchange/.test(publicPage.html));
 for (const file of ["manifest.webmanifest", "config.js", "logo.svg", "icon.svg", "privacy.html", "terms.html", "account.html", "restaurant-portal.html"]) {
   check(file + " exists", fs.existsSync(path.join(root, file)));
 }
