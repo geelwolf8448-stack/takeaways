@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#030303">
-<link rel="manifest" href="manifest.webmanifest">
+<link rel="manifest" href="manifest.webmanifest?v=84">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon.svg">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -424,6 +424,7 @@ footer{background:#130d17!important;border-top-color:#e9ad3d!important;color:#e9
 <div class="poster-tagline">Discover local. Order direct. Support local.</div>
 <a class="poster-download" id="exploreButton" href="#restaurantDirectory" onclick="openRestaurantDirectory(event)">⬇ &nbsp; EXPLORE & ORDER NOW</a>
 <div class="hero-actions"><button class="primary" id="installAppButton" type="button" onclick="installTakeawaysApp()">📲 Get Takeaways Tonight? on your phone</button></div>
+<p id="installStatus" role="status" hidden></p>
 <div class="poster-region">ALL NINE SOUTH AFRICAN PROVINCES</div>
 </div>
 </header>
@@ -475,15 +476,45 @@ let directoryLoading=false;
 let directoryError="";
 let basket=[];let currentRestaurant=null;let liveAdverts=[];
 let deferredInstallPrompt=null;
-function setInstallButtonLabel(message){const button=document.getElementById("installAppButton");if(button)button.textContent=message;}
-window.addEventListener("beforeinstallprompt",event=>{event.preventDefault();deferredInstallPrompt=event;setInstallButtonLabel("📲 Get Takeaways Tonight? on your phone");});
-window.addEventListener("appinstalled",()=>{deferredInstallPrompt=null;const button=document.getElementById("installAppButton");setInstallButtonLabel("Takeaways Tonight? added to your phone ✓");if(button)button.disabled=true;});
+const installButton=document.getElementById("installAppButton");
+const installStatus=document.getElementById("installStatus");
+function showInstallStatus(message){
+ installStatus.textContent=message;
+ installStatus.hidden=!message;
+}
+function markAppInstalled(){
+ deferredInstallPrompt=null;
+ installButton.hidden=true;
+ showInstallStatus("Takeaways Tonight? is installed.");
+}
+if(window.matchMedia("(display-mode: standalone)").matches||navigator.standalone===true){
+ markAppInstalled();
+}
+window.addEventListener("beforeinstallprompt",event=>{
+ event.preventDefault();
+ deferredInstallPrompt=event;
+ showInstallStatus("");
+});
+window.addEventListener("appinstalled",markAppInstalled);
 async function installTakeawaysApp(){
- if(deferredInstallPrompt){deferredInstallPrompt.prompt();const choice=await deferredInstallPrompt.userChoice;deferredInstallPrompt=null;if(choice&&choice.outcome==="accepted"){setInstallButtonLabel("Installing Takeaways Tonight?…");}return;}
- const ua=navigator.userAgent||"",isIOS=/iphone|ipad|ipod/i.test(ua),isAndroid=/android/i.test(ua);
- if(isIOS){setInstallButtonLabel("Safari: Share → Add to Home Screen");}
- else if(isAndroid){setInstallButtonLabel("Chrome menu ⋮: Install app");}
- else{setInstallButtonLabel("Use your browser menu to install the app");}
+ const prompt=deferredInstallPrompt;
+ if(prompt){
+  deferredInstallPrompt=null;
+  try{
+   await prompt.prompt();
+   return;
+  }catch(error){
+   console.warn("The browser could not open the install prompt.",error);
+  }
+ }
+ const device=navigator.userAgent||"";
+ if(/android/i.test(device)){
+  showInstallStatus("Open this page directly in Chrome in a regular tab. Tap ⋮, then Add to Home screen. Choose Install if Chrome offers it. If Chrome only offers Create shortcut, that still adds a home screen icon.");
+ }else if(/iphone|ipad|ipod/i.test(device)){
+  showInstallStatus("In Safari, tap Share, then Add to Home Screen.");
+ }else{
+  showInstallStatus("To install on Android, open this page directly in Chrome on your phone and tap this button there.");
+ }
 }
 let customerLocation=null;
 let businessLocation=null;
@@ -820,7 +851,7 @@ detectCustomerLocation();
 loadSharedRestaurants().then(restorePendingCheckout);
   if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
    let refreshingForNewRelease=false;
-   window.addEventListener("load", () => navigator.serviceWorker.register("./service-worker.js?v=83",{updateViaCache:"none"}).then(registration=>{
+   window.addEventListener("load", () => navigator.serviceWorker.register("./service-worker.js?v=84",{updateViaCache:"none"}).then(registration=>{
     navigator.serviceWorker.addEventListener("controllerchange",()=>{if(!refreshingForNewRelease){refreshingForNewRelease=true;window.location.reload();}});
     return registration.update();
    }).catch(() => {}));

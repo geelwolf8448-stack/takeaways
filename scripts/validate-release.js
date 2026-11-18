@@ -179,7 +179,7 @@ check("marketplace API only grants owner access to published restaurants", /rest
 const worker = read("service-worker.js");
 new vm.Script(worker, { filename: "service-worker.js" });
 check("service worker JavaScript compiles", true);
-check("browser checks for the newest app update without reusing a saved worker file", /serviceWorker\.register\("\.\/service-worker\.js\?v=83",\{updateViaCache:"none"\}\)\.then\(registration=>/.test(publicPage.html) && /controllerchange/.test(publicPage.html));
+check("browser checks for the newest app update without reusing a saved worker file", /serviceWorker\.register\("\.\/service-worker\.js\?v=84",\{updateViaCache:"none"\}\)\.then\(registration=>/.test(publicPage.html) && /controllerchange/.test(publicPage.html));
 for (const file of ["manifest.webmanifest", "config.js", "logo.svg", "icon.svg", "privacy.html", "terms.html", "account.html", "restaurant-portal.html"]) {
   check(file + " exists", fs.existsSync(path.join(root, file)));
 }
@@ -190,7 +190,14 @@ check("browser config uses only a public Supabase publishable/anon key", /^(sb_p
 
 const manifest = JSON.parse(read("manifest.webmanifest"));
 check("PWA manifest is valid JSON and uses the black/gold brand", manifest.name.includes("Takeaways Tonight?") && manifest.background_color === "#020202" && manifest.theme_color === "#ffd900");
-check("PWA manifest icon exists", fs.existsSync(path.join(root, manifest.icons[0].src)));
+for (const size of [192, 512]) {
+  const icon = manifest.icons.find(entry => entry.sizes === size + "x" + size && entry.type === "image/png");
+  check("PWA declares a " + size + "px PNG icon", Boolean(icon));
+  const png = fs.readFileSync(path.join(root, icon.src));
+  check("PWA icon matches its declared dimensions", png.readUInt32BE(16) === size && png.readUInt32BE(20) === size);
+  check("PWA icon is cached for install", worker.includes('"./' + icon.src + '"'));
+}
+check("phone install opens the browser prompt and explains the Android shortcut fallback", /await prompt\.prompt\(\)/.test(publicPage.html) && /Add to Home screen/.test(publicPage.html) && /Create shortcut/.test(publicPage.html));
 check("service worker cache includes the secure sign-in callback", /reset-password\.html/.test(worker));
 check("service worker cache includes customer and restaurant portals", /account\.html/.test(worker) && /restaurant-portal\.html/.test(worker));
 check("service worker cache includes native auth handler", /native-auth\.js/.test(worker));
