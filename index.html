@@ -422,7 +422,7 @@ footer{background:#130d17!important;border-top-color:#e9ad3d!important;color:#e9
 <div class="poster-main">
 <div class="poster-logo-wrap"><img class="poster-logo" src="logo.svg" alt="Takeaways Tonight? — chef hat and delivery rider logo"></div>
 <div class="poster-tagline">Discover local. Order direct. Support local.</div>
-<a class="poster-download" id="exploreButton" href="#nearby-menu" onclick="openNearbyMenu(event)">⬇ &nbsp; EXPLORE & ORDER NOW</a>
+<a class="poster-download" id="exploreButton" href="#restaurantDirectory" onclick="openRestaurantDirectory(event)">⬇ &nbsp; EXPLORE & ORDER NOW</a>
 <div class="hero-actions"><button class="primary" id="installAppButton" type="button" onclick="installTakeawaysApp()">📲 Get Takeaways Tonight? on your phone</button></div>
 <div class="poster-region">ALL NINE SOUTH AFRICAN PROVINCES</div>
 </div>
@@ -430,9 +430,15 @@ footer{background:#130d17!important;border-top-color:#e9ad3d!important;color:#e9
 <main>
 <div class="section-ribbon" id="campaigns"><span>★</span> South Africa food campaigns <span>★</span></div>
 <div class="deals"><div class="deal"><small>FOOD CHALLENGE</small><h3>The R100<br>meal challenge</h3><p>Find a filling local deal for a hundred rand.</p><b>R100</b></div><div class="deal"><small>SPECIALS</small><h3>Give local<br>food a go</h3><p>Discover a new South Coast favourite.</p><b>★</b></div><div class="deal"><small>FOOD WARS</small><h3>Who serves<br>it best?</h3><p>Help choose the people's favourite.</p><b>♥</b></div></div>
-<p id="customerLocationStatus" role="status" aria-live="polite" hidden></p>
 <section id="owners" class="promo-panel"><div class="eyebrow">FOOD BUSINESS OWNERS</div><h2>Put your menu in front of hungry locals.</h2><p>Restaurants, takeaway shops, home-based takeaways, inyama shops and coffee shops are all welcome. Join South Africa's local food discovery platform, showcase your menu and specials, and reach customers across all nine provinces.</p><div style="display:flex;flex-wrap:wrap;gap:10px"><button onclick="openAdmin()">APPLY TO JOIN</button><button class="secondary" onclick="inviteRestaurant()">INVITE A RESTAURANT</button></div><p class="notice">14-DAY FREE PILOT FOR EVERY FOOD BUSINESS: Submit a secure application, confirm your owner email address and wait for approval. The free 14-day pilot starts only after approval. Customers pay the restaurant directly. Takeaways Tonight takes no commission and does not collect food-order payments. Platform continuation billing is being rebuilt; no platform payment is taken in this app.</p></section>
-<section id="restaurantDirectory" hidden><div class="section-head"><div><h2>Restaurants</h2><p id="resultCount" hidden></p><p class="notice" id="directoryStatus" role="status" hidden></p></div></div><div class="grid" id="restaurants"></div></section>
+<section id="restaurantDirectory" hidden tabindex="-1" aria-labelledby="restaurantDirectoryHeading">
+ <div class="section-head"><div><h2 id="restaurantDirectoryHeading">Choose a restaurant</h2><p id="resultCount"></p></div></div>
+ <div class="field"><label for="restaurantSearch">Search by restaurant, food or area</label><input type="search" id="restaurantSearch" oninput="render()" autocomplete="off"></div>
+ <button type="button" class="secondary" id="directoryRefresh" onclick="refreshRestaurantDirectory()">Refresh restaurants &amp; location</button>
+ <p id="customerLocationStatus" role="status" hidden></p>
+ <p class="notice" id="directoryStatus" role="status" hidden></p>
+ <div class="grid" id="restaurants"></div>
+</section>
 
 <p class="notice"><b>CONTACT THE RESTAURANT YOUR WAY.</b> Choose food and save your order. The main order button opens WhatsApp with the details already written. Prefer a phone call or normal text message? Every restaurant menu also has <b>CALL</b> and <b>TEXT</b> buttons using that restaurant's saved business number. The restaurant confirms availability, final price and payment directly.</p>
 
@@ -463,9 +469,10 @@ footer{background:#130d17!important;border-top-color:#e9ad3d!important;color:#e9
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
 <script>
-const baseRestaurants=[];
-let restaurants=(JSON.parse(localStorage.getItem("tt_restaurants")||"null")||baseRestaurants).filter(r=>r&&r.isDemo===false);
-localStorage.setItem("tt_restaurants",JSON.stringify(restaurants));
+let restaurants=[];
+let directoryRequest=null;
+let directoryLoading=false;
+let directoryError="";
 let basket=[];let currentRestaurant=null;let liveAdverts=[];
 let deferredInstallPrompt=null;
 function setInstallButtonLabel(message){const button=document.getElementById("installAppButton");if(button)button.textContent=message;}
@@ -481,29 +488,18 @@ async function installTakeawaysApp(){
 let customerLocation=null;
 let businessLocation=null;
 let pendingBusinessLocationRestaurantId=null;
-let locationAttempted=false;
-function setLocationStatus(message){const el=document.getElementById('customerLocationStatus');if(el){el.textContent=message;el.hidden=!message;}}
-function restoreExploreButton(){const button=document.getElementById("exploreButton");if(button){button.textContent="⬇   EXPLORE & ORDER NOW";button.removeAttribute("aria-busy");}}
-async function openNearbyMenu(event){
- if(event)event.preventDefault();
- const button=document.getElementById("exploreButton");
- if(button){button.textContent="📍 FINDING FOOD NEAR YOU…";button.setAttribute("aria-busy","true");}
- const location=await detectCustomerLocation();
- if(!location){
-  await loadSharedRestaurants();
-  const hasParticipatingRestaurant=restaurants.some(r=>r.isDemo===false);
-  restoreExploreButton();
-  showExploreMessage(
-   hasParticipatingRestaurant?"Allow location to explore":"Restaurants are coming soon",
-   hasParticipatingRestaurant?"Allow location access and Explore will automatically open the nearest restaurant menu.":"There are no participating restaurants available in the customer app yet. As soon as a real restaurant owner publishes a menu, prices, location and payment methods, Explore will open it automatically."
-  );
-  return;
- }
- await loadSharedRestaurants();
- const nearestRestaurant=restaurants.filter(r=>r.isDemo===false).sort((a,b)=>(a.distanceKm??Number.MAX_SAFE_INTEGER)-(b.distanceKm??Number.MAX_SAFE_INTEGER))[0];
- if(nearestRestaurant){restoreExploreButton();openMenu(nearestRestaurant.id);return;}
- restoreExploreButton();
- showExploreMessage("No nearby restaurant yet","We could not find a participating restaurant near your current location yet. Restaurant menus will appear here automatically once approved restaurants have joined your area.");
+let locationRequest=null;
+function setLocationStatus(message){
+ const status=document.getElementById("customerLocationStatus");
+ status.textContent=message;
+ status.hidden=!message;
+}
+function openRestaurantDirectory(event){
+ event.preventDefault();
+ const directory=document.getElementById("restaurantDirectory");
+ directory.hidden=false;
+ directory.focus({preventScroll:true});
+ directory.scrollIntoView({block:"start"});
 }
 function captureBusinessLocation(){
  const status=document.getElementById('businessLocationStatus'),button=document.getElementById('captureBusinessLocationButton');
@@ -512,30 +508,72 @@ function captureBusinessLocation(){
  navigator.geolocation.getCurrentPosition(pos=>{businessLocation={latitude:pos.coords.latitude,longitude:pos.coords.longitude};status.textContent='Business location captured successfully.';button.textContent='✓ Business location captured';button.disabled=false;},err=>{status.textContent=err.code===1?'Location permission was declined. Allow location access and try again.':'Could not detect location. Check device location services and try again.';button.disabled=false;},{enableHighAccuracy:true,timeout:15000,maximumAge:0});
 }
 function detectCustomerLocation(){
- if(locationAttempted)return Promise.resolve(customerLocation);locationAttempted=true;
- if(!navigator.geolocation){setLocationStatus('Location is unavailable on this device.');return Promise.resolve(null);}
- setLocationStatus('📍 Finding restaurants near your current location…');
- return new Promise(resolve=>navigator.geolocation.getCurrentPosition(pos=>{customerLocation={latitude:pos.coords.latitude,longitude:pos.coords.longitude};setLocationStatus('📍 Location found. Finding food nearest to you.');resolve(customerLocation);},err=>{setLocationStatus(err.code===1?'Location permission is needed to show nearby food.':'Could not detect your location. Check device location services.');resolve(null);},{enableHighAccuracy:true,timeout:12000,maximumAge:0}));
-}
-async function refreshCustomerLocation(){locationAttempted=false;customerLocation=null;setLocationStatus('Refreshing your location…');await detectCustomerLocation();await loadSharedRestaurants();}
-document.addEventListener("visibilitychange",()=>{
- if(document.visibilityState==="visible"&&locationAttempted){
-  refreshCustomerLocation();
+ if(locationRequest)return locationRequest;
+ if(!navigator.geolocation){
+  setLocationStatus("Location is unavailable. You can still search for a restaurant.");
+  return Promise.resolve();
  }
+ setLocationStatus("Finding your location…");
+ locationRequest=new Promise(resolve=>navigator.geolocation.getCurrentPosition(pos=>{
+  customerLocation={latitude:pos.coords.latitude,longitude:pos.coords.longitude};
+  setLocationStatus("Nearest restaurants are shown first.");
+  resolve();
+ },()=>{
+  customerLocation=null;
+  setLocationStatus("Location is unavailable. You can still search for a restaurant.");
+  resolve();
+ },{enableHighAccuracy:true,timeout:12000,maximumAge:0})).finally(()=>{
+  locationRequest=null;
+  render();
+ });
+ return locationRequest;
+}
+async function refreshRestaurantDirectory(){
+ const button=document.getElementById("directoryRefresh");
+ button.disabled=true;
+ try{await Promise.all([loadSharedRestaurants(),detectCustomerLocation()]);}
+ finally{button.disabled=false;}
+}
+document.addEventListener("visibilitychange",()=>{
+ if(document.visibilityState==="visible")loadSharedRestaurants();
 });
-function save(){localStorage.setItem("tt_restaurants",JSON.stringify(restaurants))}
+function restaurantDistance(restaurant){
+ if(!customerLocation||!Number.isFinite(restaurant.latitude)||!Number.isFinite(restaurant.longitude))return null;
+ const radians=Math.PI/180;
+ const lat1=customerLocation.latitude*radians;
+ const lat2=restaurant.latitude*radians;
+ const deltaLongitude=(restaurant.longitude-customerLocation.longitude)*radians;
+ const distance=Math.sin((lat2-lat1)/2)**2+Math.cos(lat1)*Math.cos(lat2)*Math.sin(deltaLongitude/2)**2;
+ return 6371*2*Math.asin(Math.sqrt(Math.min(1,distance)));
+}
 function money(n){return "R"+Number(n).toFixed(2).replace(".00","")}
 function render(){
- let shown=restaurants.filter(r=>r.isDemo===false);
- if(customerLocation)shown.sort((a,b)=>(a.distanceKm??Number.MAX_SAFE_INTEGER)-(b.distanceKm??Number.MAX_SAFE_INTEGER));
- const liveShown=shown;
- const directory=document.getElementById('restaurantDirectory');if(directory)directory.hidden=true;
- document.getElementById('resultCount').textContent=liveShown.length+' participating business listing(s)'+(customerLocation?' · Nearest businesses shown first':'');
- const cardHtml=list=>list.map(r=>'<article class="card"><div class="food-art">'+(r.businessImageUrl?'<img src="'+esc(r.businessImageUrl)+'" alt="'+esc(r.name)+'" loading="lazy" style="width:100%;height:100%;min-height:150px;max-height:190px;object-fit:cover;border-radius:12px">':(r.emoji||'🍽️'))+'</div><div class="card-body"><div class="meta"><small>📍 '+esc(r.area)+' · '+esc(r.province||'KwaZulu-Natal')+(Number.isFinite(r.distanceKm)?' · '+r.distanceKm.toFixed(1)+' km away':'')+'</small><span class="pill">'+(r.isDemo===false?'PARTICIPATING BUSINESS':'DEMO EXAMPLE')+'</span></div><h3>'+esc(r.name)+'</h3><p>'+esc(r.desc||'Local takeaway')+'</p><div class="card-actions"><button class="secondary" onclick="openMenu(\''+r.id+'\')">View menu</button>'+(r.isDemo===false?'<button onclick="openMenu(\''+r.id+'\')">Order</button>':'<button class="dark" disabled>Example only</button>')+'</div></div></article>').join('');
- document.getElementById('restaurants').innerHTML=liveShown.length?cardHtml(liveShown):'';
- document.getElementById('basketCount').textContent=basket.reduce((a,b)=>a+b.qty,0);
+ const query=document.getElementById("restaurantSearch").value.trim().toLowerCase();
+ const shown=restaurants.filter(r=>r.isDemo===false&&(
+  [r.name,r.area,r.province,r.category,...r.items.map(item=>item.name)].join(" ").toLowerCase().includes(query)
+ )).map(restaurant=>({restaurant,distance:restaurantDistance(restaurant)}));
+ shown.sort((a,b)=>(a.distance??Infinity)-(b.distance??Infinity)||a.restaurant.name.localeCompare(b.restaurant.name));
+ const status=document.getElementById("directoryStatus");
+ status.textContent=directoryError||(directoryLoading&&!restaurants.length?"Loading restaurants…":
+  !restaurants.length?"No participating restaurants are available yet.":
+  !shown.length?"No restaurants match your search.":"");
+ status.hidden=!status.textContent;
+ const count=document.getElementById("resultCount");
+ count.textContent=shown.length?shown.length+(shown.length===1?" restaurant":" restaurants"):"";
+ const results=document.getElementById("restaurants");
+ results.innerHTML=shown.map(({restaurant:r,distance})=>`<article class="card">
+  <div class="food-art"><img src="${esc(r.businessImageUrl)}" alt="${esc(r.name)}" loading="lazy" style="width:100%;height:100%;min-height:150px;max-height:190px;object-fit:cover;border-radius:12px"></div>
+  <div class="card-body"><div class="meta"><small>📍 ${esc(r.area)} · ${esc(r.province)}${distance===null?"":" · "+distance.toFixed(1)+" km away"}</small></div>
+  <h3>${esc(r.name)}</h3><p>${esc(r.desc)}</p>
+  <div class="card-actions"><button class="secondary" type="button" data-restaurant-menu="${esc(r.id)}">View menu</button></div></div>
+ </article>`).join("");
+ document.getElementById("basketCount").textContent=basket.reduce((a,b)=>a+b.qty,0);
  renderLiveAdverts();
 }
+document.getElementById("restaurants").addEventListener("click",event=>{
+ const button=event.target.closest("[data-restaurant-menu]");
+ if(button)openMenu(button.dataset.restaurantMenu);
+});
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 
 function renderLiveAdverts(){
@@ -565,14 +603,6 @@ function renderMenuContent(){
  if(/^27\d{9}$/.test(contactNumber))content.insertAdjacentHTML("afterbegin",'<div class="notice" style="margin:0 0 14px"><b>CONTACT THIS RESTAURANT</b><br>Choose how you prefer to contact them about your order.<br><br><a class="tt-contact-button" href="https://wa.me/'+esc(contactNumber)+'" target="_blank" rel="noopener">💬 WhatsApp</a> <a class="tt-contact-button" href="tel:+'+esc(contactNumber)+'">📞 Call</a> <a class="tt-contact-button" href="sms:+'+esc(contactNumber)+'">✉ Text</a></div>');
  if(restaurant.menuFileUrl)content.insertAdjacentHTML("afterbegin",'<p><a class="secondary" style="display:inline-block;padding:10px 14px;border-radius:30px" href="'+esc(restaurant.menuFileUrl)+'" target="_blank" rel="noopener">📄 View full uploaded menu</a></p>');
  updateMenuTotal();
-}
-function showExploreMessage(title,message){
- const dialog=document.getElementById("menuDialog"),basketButton=document.getElementById("menuBasketButton");
- document.getElementById("menuTitle").textContent=title;
- document.getElementById("menuContent").innerHTML='<div class="empty">'+esc(message)+'</div>';
- document.getElementById("menuTotal").textContent="";
- if(basketButton)basketButton.hidden=true;
- if(!dialog.open)dialog.showModal();
 }
 function openMenu(id){currentRestaurant=restaurants.find(r=>r.id===id&&r.isDemo===false);if(!currentRestaurant)return;const basketButton=document.getElementById("menuBasketButton");if(basketButton)basketButton.hidden=false;document.getElementById("menuTitle").textContent=currentRestaurant.name;renderMenuContent();const dialog=document.getElementById("menuDialog");if(!dialog.open)dialog.showModal()}
 function changeMenuItemQuantity(id,index,change){
@@ -700,23 +730,40 @@ async function sendOrder(){
 function inviteRestaurant(){const message="Hi! I'm sharing Takeaways Tonight?, a South African food directory helping people discover takeaway menus and restaurant specials across all nine provinces. We're inviting restaurants, takeaway shops, home-based takeaways, inyama shops and coffee shops nationwide to join our launch. Every business in these categories gets a 14-day FREE pilot after owner verification and approval. Customers pay restaurants directly and restaurants keep 100% of their food sales — there is no order commission. Platform continuation billing is being rebuilt, and no platform payment is taken through the app. If you're interested, you can view the preview here: https://geelwolf8448-stack.github.io/takeaways/ and use the Apply to Join form on the website or reply to this message for application details. Applications are kept private until the owner email and business are verified. Would you be interested in chatting?";window.open("https://wa.me/?text="+encodeURIComponent(message),"_blank");}
 function openAdmin(){document.getElementById("adminDialog").showModal()}
 function databaseReady(){const c=window.TT_CONFIG||{};return /^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(c.supabaseUrl||"")&&typeof c.supabaseAnonKey==="string"&&c.supabaseAnonKey.length>20}
-async function loadSharedRestaurants(){
- const status=document.getElementById('directoryStatus');
- if(!databaseReady()){restaurants=[];render();if(status)status.textContent='The restaurant directory is temporarily unavailable.';return;}
- const c=window.TT_CONFIG;
- try{
-  let rows=[];
-  if(customerLocation){
-   const response=await fetch(c.supabaseUrl+'/rest/v1/rpc/list_nearby_food_businesses',{method:'POST',headers:{apikey:c.supabaseAnonKey,'Content-Type':'application/json'},body:JSON.stringify({p_latitude:customerLocation.latitude,p_longitude:customerLocation.longitude})});
-   if(!response.ok)throw new Error('Nearby directory request failed ('+response.status+').');rows=await response.json();
-  }else{
-   const response=await fetch(c.supabaseUrl+'/rest/v1/restaurants?select=id,name,area,province,category,whatsapp,description,menu,menu_file_url,business_image_url,accepted_payment_methods,latitude,longitude&is_published=eq.true&order=name.asc',{headers:{apikey:c.supabaseAnonKey}});
-   if(!response.ok)throw new Error('Directory request failed ('+response.status+').');rows=await response.json();
-  }
-  const shared=rows.map(r=>({id:'shared-'+r.id,name:r.name,area:r.area,province:r.province||'KwaZulu-Natal',category:r.category,phone:r.whatsapp,desc:r.description||'Local food business',items:Array.isArray(r.menu)?r.menu.map(normaliseCustomerMenuItem).filter(item=>item.name&&Number.isFinite(item.price)):[],menuFileUrl:r.menu_file_url||'',businessImageUrl:r.business_image_url||'',acceptedPaymentMethods:Array.isArray(r.accepted_payment_methods)?r.accepted_payment_methods:[],emoji:'🍽️',isDemo:false,distanceKm:r.distance_km==null?null:Number(r.distance_km)})).filter(r=>r.businessImageUrl&&r.items.length>0&&r.acceptedPaymentMethods.length>0&&/^27\d{9}$/.test(String(r.phone||"").replace(/\D/g,"")));
-  restaurants=[...restaurants.filter(r=>!String(r.id).startsWith('shared-')),...shared];render();
-  if(status)status.textContent=shared.length?(customerLocation?'Location-based directory connected · Nearest businesses shown first':'Directory connected · Enable location to sort by distance'):'';
- }catch(error){console.warn('Could not load location-aware shared directory.',error);restaurants=[];render();if(status)status.textContent='Could not connect to the restaurant directory. Please try again later.';}
+function loadSharedRestaurants(){
+ if(directoryRequest)return directoryRequest;
+ directoryLoading=true;
+ directoryError="";
+ render();
+ directoryRequest=fetchPublishedRestaurants().catch(error=>{
+  console.warn("Could not load the restaurant directory.",error);
+  directoryError="Could not refresh the restaurant directory. Please try again.";
+ }).finally(()=>{
+  directoryLoading=false;
+  directoryRequest=null;
+  render();
+ });
+ return directoryRequest;
+}
+async function fetchPublishedRestaurants(){
+ if(!databaseReady())throw new Error("Restaurant directory is unavailable.");
+ const config=window.TT_CONFIG;
+ const rows=[];
+ const pageSize=500;
+ for(let offset=0;;offset+=pageSize){
+  const response=await fetch(config.supabaseUrl+"/rest/v1/restaurants?select=id,name,area,province,category,whatsapp,description,menu,menu_file_url,business_image_url,accepted_payment_methods,latitude,longitude&is_published=eq.true&order=name.asc,id.asc&limit="+pageSize+"&offset="+offset,{headers:{apikey:config.supabaseAnonKey}});
+  if(!response.ok)throw new Error("Directory request failed ("+response.status+").");
+  const page=await response.json();
+  rows.push(...page);
+  if(page.length<pageSize)break;
+ }
+ restaurants=rows.map(r=>({
+  id:"shared-"+r.id,name:r.name,area:r.area,province:r.province||"KwaZulu-Natal",category:r.category,phone:r.whatsapp,
+  desc:r.description||"Local food business",items:Array.isArray(r.menu)?r.menu.map(normaliseCustomerMenuItem).filter(item=>item.name&&Number.isFinite(item.price)):[],
+  menuFileUrl:r.menu_file_url||"",businessImageUrl:r.business_image_url||"",
+  acceptedPaymentMethods:Array.isArray(r.accepted_payment_methods)?r.accepted_payment_methods:[],
+  latitude:r.latitude==null?null:Number(r.latitude),longitude:r.longitude==null?null:Number(r.longitude),isDemo:false
+ })).filter(r=>r.businessImageUrl&&r.items.length>0&&r.acceptedPaymentMethods.length>0&&/^27\d{9}$/.test(String(r.phone||"").replace(/\D/g,"")));
 }
 async function addRestaurant(){
  const val=id=>document.getElementById(id).value.trim();
@@ -769,10 +816,11 @@ async function restorePendingCheckout(){
 }
 render();
 loadLiveAdverts();
-detectCustomerLocation().then(()=>loadSharedRestaurants()).then(restorePendingCheckout);
+detectCustomerLocation();
+loadSharedRestaurants().then(restorePendingCheckout);
   if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
    let refreshingForNewRelease=false;
-   window.addEventListener("load", () => navigator.serviceWorker.register("./service-worker.js?v=82",{updateViaCache:"none"}).then(registration=>{
+   window.addEventListener("load", () => navigator.serviceWorker.register("./service-worker.js?v=83",{updateViaCache:"none"}).then(registration=>{
     navigator.serviceWorker.addEventListener("controllerchange",()=>{if(!refreshingForNewRelease){refreshingForNewRelease=true;window.location.reload();}});
     return registration.update();
    }).catch(() => {}));

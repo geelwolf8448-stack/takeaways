@@ -18,7 +18,7 @@ button.reject{background:#251010;color:#ffd9d9;border:1px solid #a44}button:disa
 </style>
 </head>
 <body>
-<header><div class="wrap"><h1>Takeaways Tonight? · Admin</h1><p class="sub">Private restaurant application review</p></div></header>
+<header><div class="wrap"><h1>Takeaways Tonight? · Owner Dashboard</h1><p class="sub">Operated by A Coetzer, sole proprietor trading as Takeaways Tonight?</p></div></header>
 <main class="wrap">
 <div class="panel" id="loginPanel"><h2>Administrator access</h2>
 <p class="small">Sign in with the password for your Takeaways Tonight administrator account. This is not a restaurant password and you must never share it in a message.</p>
@@ -47,9 +47,19 @@ const supabaseClient=(window.supabase&&config.supabaseUrl&&config.supabaseAnonKe
 const el=id=>document.getElementById(id);
 function say(message){el("status").textContent=message}
 function apiHeaders(){return {apikey:config.supabaseAnonKey,Authorization:"Bearer "+accessToken,"Content-Type":"application/json"}}
+async function verifyAdministratorAccess(userId,token){
+ if(!userId||!token)throw new Error("Your sign-in session could not be verified. Sign in again.");
+ const response=await fetch(config.supabaseUrl+"/rest/v1/admin_users?select=user_id&user_id=eq."+encodeURIComponent(userId),{
+  headers:{apikey:config.supabaseAnonKey,Authorization:"Bearer "+token}
+ });
+ if(!response.ok)throw new Error("Could not verify administrator access ("+response.status+"). Please try again.");
+ const admins=await response.json();
+ if(!admins.some(admin=>admin.user_id===userId))throw new Error("This account does not have access to the Owner Dashboard.");
+}
 async function beginAdministratorSession(session,fallbackEmail){
  if(!session)throw new Error("Secure sign-in did not return a session. Please try again.");
- accessToken=session.access_token;currentEmail=session.user?.email||fallbackEmail;currentUserId=session.user?.id||"";
+ await verifyAdministratorAccess(session.user?.id,session.access_token);
+ accessToken=session.access_token;currentEmail=session.user?.email||fallbackEmail;currentUserId=session.user.id;
  el("loginPanel").classList.add("hidden");el("dashboard").classList.remove("hidden");el("who").textContent="Signed in as "+currentEmail;
  await loadApplications();
 }
@@ -109,11 +119,7 @@ async function restoreExistingSession(){
 async function loadApplications(){
  say("Checking administrator access…");
  try{
-  if(!currentUserId)throw new Error("Your sign-in session has no user ID. Sign out and sign in again.");
-  const access=await fetch(config.supabaseUrl+"/rest/v1/admin_users?select=user_id&user_id=eq."+encodeURIComponent(currentUserId),{headers:apiHeaders()});
-  if(!access.ok)throw new Error("Could not verify administrator access ("+access.status+"). Check the admin_users table permissions.");
-  const admins=await access.json();
-  if(!admins.length)throw new Error("You are signed in, but this account is not on the administrator allowlist yet. The admin user must be added to public.admin_users in Supabase.");
+  await verifyAdministratorAccess(currentUserId,accessToken);
   say("Administrator verified. Loading pending applications…");
   const response=await fetch(config.supabaseUrl+"/rest/v1/partner_applications?select=id,restaurant_name,area,province,category,whatsapp,menu,created_at,status,permission_confirmed,permission_confirmed_at,owner_name,owner_phone,owner_email,business_type,latitude,longitude,owner_email_confirmed_at&status=eq.pending&order=created_at.asc",{headers:apiHeaders()});
   const data=await response.json();if(!response.ok)throw new Error(data.message||data.hint||"Could not load applications. Check that the SQL upgrade was run and this account is allowlisted.");

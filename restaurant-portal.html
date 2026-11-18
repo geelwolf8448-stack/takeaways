@@ -78,17 +78,21 @@ async function sendLink(){
 }
 async function loadDashboard(){
  if(!session)return;$("loginPanel").classList.add("hidden");$("dashboard").classList.remove("hidden");$("signedIn").textContent=session.user.email||"Signed in";$("status").textContent="Loading restaurant access…";
+ const userId=session.user.id;
+ renderOwnerDemo();
  const [{data:profile},{data:memberRows,error:memberError},{data:restaurants,error:restError},{data:requests,error:reqError}]=await Promise.all([
   sb.from("marketplace_profiles").select("full_name,phone").eq("user_id",session.user.id).maybeSingle(),
   sb.from("restaurant_members").select("restaurant_id,member_role").eq("user_id",session.user.id),
   sb.from("restaurants").select("id,name,area,category").eq("is_published",true).order("name"),
   sb.from("restaurant_owner_requests").select("id,restaurant_id,status,created_at,restaurant:restaurants(name)").eq("user_id",session.user.id).order("created_at",{ascending:false})
  ]);
+ if(session?.user.id!==userId)return;
  if(memberError||restError||reqError){const problem=memberError||restError||reqError;$("status").textContent="PORTAL DATA ERROR: "+(problem.message||"Unknown database error")+" (code: "+(problem.code||"not supplied")+"). Please send this message to support.";return}
  const memberIds=(memberRows||[]).map(m=>m.restaurant_id);
  let ownedRestaurants=[];
  if(memberIds.length){
   const {data:ownedRows,error:ownedError}=await sb.from("restaurants").select("id,name,area,province,category,whatsapp,description,menu,menu_file_url,business_image_url,accepted_payment_methods,order_system_option,latitude,longitude").in("id",memberIds);
+  if(session?.user.id!==userId)return;
   if(ownedError){$("status").textContent="Your restaurant access was found, but the listing could not be loaded: "+ownedError.message;return;}
   ownedRestaurants=ownedRows||[];
  }
@@ -101,7 +105,7 @@ async function loadDashboard(){
  $("status").textContent=memberships.length?("You have access to "+memberships.length+" restaurant(s)."):"You do not yet have access to a restaurant. Submit an access request above or apply to list a new restaurant.";
  renderOwnerDashboardGuide();
  await loadOwnerBilling();
- renderOwnerDemo();
+ if(session?.user.id!==userId)return;
  try{await renderRestaurants();}catch(renderError){const message=renderError?.message||String(renderError);$("restaurants").innerHTML='<div class="panel"><h2>Your restaurants</h2><div class="status">DISPLAY ERROR: '+esc(message)+'</div><p class="small">Your account access was found, but the restaurant card could not be drawn. Please send this exact message to support.</p></div>';$("status").textContent="Restaurant display error: "+message;return;}
  if(window.Capacitor?.isNativePlatform?.()&&window.TT_NATIVE_PUSH?.sync){await window.TT_NATIVE_PUSH.sync();}
 }
@@ -459,8 +463,38 @@ async function deleteRestaurantAdvert(adId,restaurantId){
  if(error){alert("Could not delete advert: "+error.message);return;}await loadRestaurantAdverts();
 }
 
-async function signOut(){if(session?.user?.id){await sb.from("restaurant_push_tokens").delete().eq("user_id",session.user.id);}if(window.Capacitor?.isNativePlatform?.()&&window.TT_NATIVE_PUSH){await window.TT_NATIVE_PUSH.unregister().catch(()=>{});}await sb.auth.signOut();session=null;$("dashboard").classList.add("hidden");$("loginPanel").classList.remove("hidden");$("loginStatus").textContent="You have signed out."}
-if(sb){sb.auth.onAuthStateChange((_e,s)=>{session=s;if(s)loadDashboard()});sb.auth.getSession().then(({data})=>{session=data.session;if(session)loadDashboard()})}
+function hideRestaurantDashboard(){
+ memberships=[];
+ ownerBilling=null;
+ ownerDemo=null;
+ ownerDemoUserId=null;
+ $("ownerDemo").replaceChildren();
+ $("restaurants").replaceChildren();
+ $("dashboard").classList.add("hidden");
+ $("loginPanel").classList.remove("hidden");
+}
+async function signOut(){
+ if(session?.user?.id){await sb.from("restaurant_push_tokens").delete().eq("user_id",session.user.id);}
+ if(window.Capacitor?.isNativePlatform?.()&&window.TT_NATIVE_PUSH){await window.TT_NATIVE_PUSH.unregister().catch(()=>{});}
+ const {error}=await sb.auth.signOut();
+ if(error){$("status").textContent=error.message||"Could not sign out. Please try again.";return;}
+ $("loginStatus").textContent="You have signed out.";
+}
+if(sb){
+ sb.auth.onAuthStateChange((_event,nextSession)=>{
+  const previousUser=session?.user?.id;
+  session=nextSession;
+  if(!session){hideRestaurantDashboard();return;}
+  if(previousUser===session.user.id)return;
+  hideRestaurantDashboard();
+  const userId=session.user.id;
+  window.setTimeout(()=>{
+   if(session?.user.id===userId)loadDashboard().catch(error=>{
+    if(session?.user.id===userId)$("status").textContent=error.message||"Could not load your restaurant access.";
+   });
+  },0);
+ });
+}
 else $("loginStatus").textContent="Account service is temporarily unavailable.";
 </script>
 <script type="module" src="native-auth.js"></script><script type="module" src="native-push.js"></script>
