@@ -423,11 +423,73 @@ footer{background:#130d17!important;border-top-color:#e9ad3d!important;color:#e9
 <div class="poster-logo-wrap"><img class="poster-logo" src="logo.svg" alt="Takeaways Tonight? — chef hat and delivery rider logo"></div>
 <div class="poster-tagline">Discover local. Order direct. Support local.</div>
 <a class="poster-download" id="exploreButton" href="#restaurantDirectory" onclick="openRestaurantDirectory(event)">⬇ &nbsp; EXPLORE & ORDER NOW</a>
-<div class="hero-actions"><button class="primary" id="installAppButton" type="button" onclick="installTakeawaysApp()">📲 Get Takeaways Tonight? on your phone</button></div>
+<div class="hero-actions"><button class="primary" id="installAppButton" type="button" aria-describedby="installStatus">📲 Get Takeaways Tonight? on your phone</button></div>
 <p id="installStatus" role="status" hidden></p>
 <div class="poster-region">ALL NINE SOUTH AFRICAN PROVINCES</div>
 </div>
 </header>
+<script>
+(() => {
+  const installButton = document.getElementById("installAppButton");
+  const installStatus = document.getElementById("installStatus");
+  let installPrompt = null;
+
+  function showInstallStatus(message) {
+    installStatus.textContent = message;
+    installStatus.hidden = !message;
+  }
+
+  if (window.matchMedia("(display-mode: standalone)").matches ||
+      navigator.standalone === true || window.Capacitor?.isNativePlatform?.()) {
+    installButton.hidden = true;
+    return;
+  }
+
+  window.addEventListener("beforeinstallprompt", event => {
+    event.preventDefault();
+    installPrompt = event;
+    if (!installStatus.hidden) {
+      showInstallStatus("Tap the button again, then choose Install.");
+    }
+  });
+
+  const installAccepted = "Install requested. Look for Takeaways Tonight? on your home screen or in your apps.";
+
+  window.addEventListener("appinstalled", () => {
+    installPrompt = null;
+    installButton.hidden = true;
+    showInstallStatus(installAccepted);
+  });
+
+  installButton.addEventListener("click", async () => {
+    const prompt = installPrompt;
+    if (prompt) {
+      installPrompt = null;
+      installButton.disabled = true;
+      try {
+        const result = (await prompt.prompt()) ?? (await prompt.userChoice);
+        if (result?.outcome === "accepted") {
+          showInstallStatus(installAccepted);
+          return;
+        }
+      } catch (error) {
+        console.warn("The browser could not open the install prompt.", error);
+      } finally {
+        installButton.disabled = false;
+      }
+    }
+
+    if (/android/i.test(navigator.userAgent)) {
+      showInstallStatus("In Chrome, tap ⋮ → Add to Home screen or Install and create shortcut → Install. If you opened this link inside another app, choose Open in Chrome first. A Create shortcut option on its own adds a link that opens in Chrome.");
+    } else if (/iphone|ipad|ipod/i.test(navigator.userAgent) ||
+               (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)) {
+      showInstallStatus("Open this page in Safari. Tap Share → Add to Home Screen, turn on Open as Web App if shown, then tap Add.");
+    } else {
+      showInstallStatus("Open this same link on your phone and tap this button there.");
+    }
+  });
+})();
+</script>
 <main>
 <div class="section-ribbon" id="campaigns"><span>★</span> South Africa food campaigns <span>★</span></div>
 <div class="deals"><div class="deal"><small>FOOD CHALLENGE</small><h3>The R100<br>meal challenge</h3><p>Find a filling local deal for a hundred rand.</p><b>R100</b></div><div class="deal"><small>SPECIALS</small><h3>Give local<br>food a go</h3><p>Discover a new South Coast favourite.</p><b>★</b></div><div class="deal"><small>FOOD WARS</small><h3>Who serves<br>it best?</h3><p>Help choose the people's favourite.</p><b>♥</b></div></div>
@@ -475,47 +537,6 @@ let directoryRequest=null;
 let directoryLoading=false;
 let directoryError="";
 let basket=[];let currentRestaurant=null;let liveAdverts=[];
-let deferredInstallPrompt=null;
-const installButton=document.getElementById("installAppButton");
-const installStatus=document.getElementById("installStatus");
-function showInstallStatus(message){
- installStatus.textContent=message;
- installStatus.hidden=!message;
-}
-function markAppInstalled(){
- deferredInstallPrompt=null;
- installButton.hidden=true;
- showInstallStatus("Takeaways Tonight? is installed.");
-}
-if(window.matchMedia("(display-mode: standalone)").matches||navigator.standalone===true){
- markAppInstalled();
-}
-window.addEventListener("beforeinstallprompt",event=>{
- event.preventDefault();
- deferredInstallPrompt=event;
- showInstallStatus("");
-});
-window.addEventListener("appinstalled",markAppInstalled);
-async function installTakeawaysApp(){
- const prompt=deferredInstallPrompt;
- if(prompt){
-  deferredInstallPrompt=null;
-  try{
-   await prompt.prompt();
-   return;
-  }catch(error){
-   console.warn("The browser could not open the install prompt.",error);
-  }
- }
- const device=navigator.userAgent||"";
- if(/android/i.test(device)){
-  showInstallStatus("Open this page directly in Chrome in a regular tab. Tap ⋮, then Add to Home screen. Choose Install if Chrome offers it. If Chrome only offers Create shortcut, that still adds a home screen icon.");
- }else if(/iphone|ipad|ipod/i.test(device)){
-  showInstallStatus("In Safari, tap Share, then Add to Home Screen.");
- }else{
-  showInstallStatus("To install on Android, open this page directly in Chrome on your phone and tap this button there.");
- }
-}
 let customerLocation=null;
 let businessLocation=null;
 let pendingBusinessLocationRestaurantId=null;
