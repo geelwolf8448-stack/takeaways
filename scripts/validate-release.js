@@ -88,11 +88,12 @@ check("owner dashboard installs under its own identity and opens the private ent
 check("admin has order-only marketplace reporting", /marketplace_orders/.test(admin.html) && /marketplaceOverview/.test(admin.html));
 check("admin password fallback keeps the password masked and does not store it in browser storage", /id="adminPassword"[^>]+type="password"/.test(admin.html) && !/localStorage[^\n]+adminPassword|sessionStorage[^\n]+adminPassword/.test(admin.html));
 
-check("admin clearly tells the owner that emailed one-time codes are not used", /This dashboard does not use emailed one-time codes/.test(admin.html));
+check("admin offers a password recovery email with a PKCE redirect", /id="resetPasswordButton"/.test(admin.html) && /flowType:"pkce"/.test(admin.html) && /auth\.resetPasswordForEmail\(email,\{redirectTo\}\)/.test(admin.html) && /new URL\("\.\/reset-password\.html",location\.href\)/.test(admin.html));
 
 const callback = compileInlineScripts("reset-password.html");
 check("sign-in callback JavaScript compiles", callback.count > 0);
 check("sign-in callback returns to admin portal", /admin\.html/.test(callback.html));
+check("password recovery shows a masked form only after a verified administrator recovery session", /redirectType==="recovery"/.test(callback.html) && /from\("admin_users"\)/.test(callback.html) && /id="passwordForm" hidden/.test(callback.html) && /id="newPassword" autocomplete="new-password"/.test(callback.html) && /auth\.updateUser\(\{password:password\.value\}\)/.test(callback.html));
 
 const account = compileInlineScripts("account.html");
 check("customer account inline JavaScript compiles", account.count > 0);

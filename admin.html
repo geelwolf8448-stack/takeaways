@@ -30,8 +30,9 @@ button.reject{background:#251010;color:#ffd9d9;border:1px solid #a44}button:disa
 <label for="email">Administrator email</label><input id="email" type="email" autocomplete="email" value="geelwolf8448@gmail.com">
 <label for="adminPassword">Administrator account password</label><input id="adminPassword" type="password" autocomplete="current-password" placeholder="Your Takeaways Tonight password">
 <button id="passwordButton" onclick="signInWithPassword()">Sign in to my dashboard</button>
+<button type="button" id="resetPasswordButton" onclick="requestPasswordReset()">Forgot password? Send reset email</button>
 <p class="small">On your laptop, sign in once in the browser you use to install this dashboard. It opens automatically while your saved administrator session is valid.</p>
-<div class="status" id="resetStatus" aria-live="polite">Use your administrator account password above. This dashboard does not use emailed one-time codes.</div>
+<div class="status" id="resetStatus" aria-live="polite">Use your administrator account password or request a reset email to choose a new one.</div>
 </div>
 <section id="dashboard" class="hidden">
 <nav class="dashboard-links" aria-label="Takeaways Tonight apps"><a href="./" target="_blank" rel="noopener">Open customer app</a><a href="restaurant-portal.html" target="_blank" rel="noopener">Open Restaurant Portal</a></nav>
@@ -50,7 +51,7 @@ button.reject{background:#251010;color:#ffd9d9;border:1px solid #a44}button:disa
 let accessToken="",currentEmail="",currentUserId="",paymentChannel=null;const paymentNoticeRows=[],seenPaymentIds=new Set();
 let sessionRevision=0,applicationRefreshTimer=null,pendingApplicationRequest=null,lastApplicationCards=null;
 const config=window.TT_CONFIG||{};
-const supabaseClient=(window.supabase&&config.supabaseUrl&&config.supabaseAnonKey)?window.supabase.createClient(config.supabaseUrl,config.supabaseAnonKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}}):null;
+const supabaseClient=(window.supabase&&config.supabaseUrl&&config.supabaseAnonKey)?window.supabase.createClient(config.supabaseUrl,config.supabaseAnonKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,flowType:"pkce"}}):null;
 const el=id=>document.getElementById(id);
 function say(message){el("status").textContent=message}
 function apiHeaders(){return {apikey:config.supabaseAnonKey,Authorization:"Bearer "+accessToken,"Content-Type":"application/json"}}
@@ -91,42 +92,35 @@ async function signInWithPassword(){
   if(error)throw error;
   await beginAdministratorSession(data.session,email);
   el("adminPassword").value="";
- }catch(error){el("resetStatus").textContent=(error.message||"The administrator password could not be verified.")+" Check that you are using your Takeaways Tonight account password, not an email password.";}
- finally{button.disabled=false;}
-}
-async function sendMagicLink(){
- const email=el("email").value.trim();
- if(!email){el("resetStatus").textContent="Enter your account email first.";el("email").focus();return;}
- if(!supabaseClient){el("resetStatus").textContent="Supabase sign-in could not initialise. Refresh the page and try again.";return;}
- const button=el("magicButton");button.disabled=true;el("resetStatus").textContent="Sending a one-time sign-in link…";
- try{
-  const {error}=await supabaseClient.auth.signInWithOtp({email,options:{shouldCreateUser:false}});
-  if(error)throw error;
-  el("resetStatus").textContent="One-time code requested. Open the newest Takeaways Tonight email, enter its six-digit code below, and select Verify code and sign in. Do not click any link in the email.";
-  }catch(error){
-  const detail=error.message||"Could not send the sign-in link.";
-  const diagnostics=/Error sending magic link email/i.test(detail)
-   ?" Supabase could not deliver the email. Check Supabase Dashboard → Logs → Auth Logs for the SMTP response. Confirm the Brevo sender address is verified, the SMTP host is smtp-relay.brevo.com, port is 587, the username is the Brevo SMTP login (not an API key), the SMTP key is current, and the Auth email rate limit has not been reached."
-   :"";
-  el("resetStatus").textContent=detail+(error.status?" (HTTP "+error.status+")":"")+(error.code?" ["+error.code+"]":"")+diagnostics;
+ }catch(error){
+  el("resetStatus").textContent=error.code==="invalid_credentials"||error.message==="Invalid login credentials"
+   ?"The administrator password was not accepted. Select Forgot password? Send reset email to choose a new one."
+   :(error.message||"The administrator password could not be verified.");
  }
  finally{button.disabled=false;}
 }
-async function verifyEmailOtp(){
- const email=el("email").value.trim(),token=el("emailOtp").value.trim();
- if(!email){el("resetStatus").textContent="Enter your administrator email first.";return;}
- if(!/^\\d{6}$/.test(token)){el("resetStatus").textContent="Enter the six-digit code from the newest email.";el("emailOtp").focus();return;}
- if(!supabaseClient){el("resetStatus").textContent="Supabase sign-in could not initialise. Refresh the page and try again.";return;}
- const button=el("verifyOtpButton");button.disabled=true;el("resetStatus").textContent="Verifying your one-time code…";
+async function requestPasswordReset(){
+ const email=el("email").value.trim();
+ const status=el("resetStatus");
+ if(!email||!el("email").checkValidity()){
+  status.textContent="Enter the email address for your administrator account.";
+  el("email").focus();
+  return;
+ }
+ if(!supabaseClient){status.textContent="The sign-in service is unavailable. Refresh this page and try again.";return;}
+ const button=el("resetPasswordButton");
+ button.disabled=true;
+ status.textContent="Requesting a password reset email…";
  try{
-  const {data,error}=await supabaseClient.auth.verifyOtp({email,token,type:"email"});
+  const redirectTo=new URL("./reset-password.html",location.href).href;
+  const {error}=await supabaseClient.auth.resetPasswordForEmail(email,{redirectTo});
   if(error)throw error;
-  if(!data.session)throw new Error("The code was accepted but no secure session was returned. Request a new code.");
-  await beginAdministratorSession(data.session,email);
+  status.textContent="Reset email requested. Open the newest password reset email in this same browser and choose a new dashboard password. Check Spam if it does not arrive.";
  }catch(error){
-  el("resetStatus").textContent=(error.message||"The code could not be verified.")+" Request a fresh code if it has expired.";
+  status.textContent=error.status===429?"Please wait a minute before requesting another reset email.":"Could not request the reset email. "+(error.message||"Try again shortly.");
  }finally{button.disabled=false;}
 }
+
 async function restoreExistingSession(){
  try{
   if(!supabaseClient)throw new Error("Sign-in service could not initialise. Refresh this page to try again.");
