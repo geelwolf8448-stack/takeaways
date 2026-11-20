@@ -1,4 +1,4 @@
-const CACHE_NAME = "takeaways-tonight-v86-install";
+const CACHE_NAME = "takeaways-tonight-v87-owner";
 const APP_FILES = [
   "./",
   "./index.html",
@@ -15,6 +15,7 @@ const APP_FILES = [
   "./splash.svg",
   "./config.js",
   "./admin.html",
+  "./owner.webmanifest",
   "./reset-password.html",
   "./account.html",
   "./restaurant-portal.html",
