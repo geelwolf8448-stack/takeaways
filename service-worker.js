@@ -1,4 +1,4 @@
-const CACHE_NAME = "takeaways-tonight-v85-install";
+const CACHE_NAME = "takeaways-tonight-v86-install";
 const APP_FILES = [
   "./",
   "./index.html",

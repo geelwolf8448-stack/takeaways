@@ -32,11 +32,11 @@
         (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)) {
       showStatus("Open this page in Safari. Tap Share → Add to Home Screen, turn on Open as Web App if shown, then tap Add.");
     } else if (/Android/i.test(userAgent)) {
-      showStatus("Open this page in Chrome. Tap ⋮ → Add to Home screen → Install if available. Create shortcut adds a link that opens in Chrome.");
+      showStatus("Open this page in Chrome. Tap ⋮, choose Add to Home screen or Install and create shortcut, then choose Install. Create shortcut adds a link that opens in Chrome.");
     } else if (/Macintosh/i.test(userAgent) && /Safari/i.test(userAgent) && !/Chrome|Chromium|Edg/i.test(userAgent)) {
       showStatus("In Safari on macOS Sonoma or later, choose File → Add to Dock.");
     } else if (/Edg\//i.test(userAgent)) {
-      showStatus("In Edge, choose ⋯ → Apps → Install this site as an app. You can also use the install icon in the address bar when it appears.");
+      showStatus("In Edge, choose ⋯ → More tools → Apps → Install this site as an app. You can also use the install icon in the address bar when it appears.");
     } else {
       showStatus("Open this page in Chrome or Edge. Use the install icon in the address bar if shown. In Chrome, you can also choose ⋮ → Cast, save and share → Install page as app.");
     }
