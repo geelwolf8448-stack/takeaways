@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#030303">
-<link rel="manifest" href="manifest.webmanifest?v=84">
+<link rel="manifest" href="manifest.webmanifest?v=85">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="icon.svg">
+<link rel="apple-touch-icon" href="icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Takeaways Tonight?">
@@ -376,6 +376,7 @@ body{font-family:"Segoe UI",Aptos,Arial,sans-serif!important;background:linear-g
 .poster-tagline{font-family:Georgia,"Times New Roman",serif!important;color:var(--tt-plum)!important;background:#fff9ef!important;border-color:#f7c56f!important;box-shadow:0 7px 20px #5d294331!important}
 .nav-actions button{font-family:"Segoe UI",Aptos,Arial,sans-serif!important;font-weight:800!important;border-color:#fff7e7!important;color:var(--tt-plum)!important;box-shadow:0 4px 13px #531d3444!important}
 .poster-download{font-family:"Trebuchet MS","Segoe UI",Arial,sans-serif!important;background:linear-gradient(110deg,#ffe373 0%,#f7bd38 40%,#ef7851 100%)!important;border-color:#fff9df!important;color:#3f2630!important;box-shadow:0 5px 0 #b55b40,0 12px 24px #3c183755!important;letter-spacing:.7px!important}
+#installAppButton[hidden]{display:none!important}
 #installAppButton{font-family:"Trebuchet MS","Segoe UI",Arial,sans-serif!important;background:#fffaf1!important;color:var(--tt-plum)!important;border:2px solid #f5d39c!important;box-shadow:0 4px 0 #d8ae75,0 10px 21px #32132644!important}
 main,.poster-main{background:transparent!important;color:var(--tt-ink)!important}
 .section-ribbon{font-family:"Trebuchet MS","Segoe UI",Arial,sans-serif!important;background:linear-gradient(105deg,#5e324a 0%,#9e4850 52%,#de7450 100%)!important;border:0!important;color:#fffdf7!important;box-shadow:0 8px 22px #8d4a3b28!important}
@@ -423,77 +424,16 @@ footer{background:#130d17!important;border-top-color:#e9ad3d!important;color:#e9
 <div class="poster-logo-wrap"><img class="poster-logo" src="logo.svg" alt="Takeaways Tonight? — chef hat and delivery rider logo"></div>
 <div class="poster-tagline">Discover local. Order direct. Support local.</div>
 <a class="poster-download" id="exploreButton" href="#restaurantDirectory" onclick="openRestaurantDirectory(event)">⬇ &nbsp; EXPLORE & ORDER NOW</a>
-<div class="hero-actions"><button class="primary" id="installAppButton" type="button" aria-describedby="installStatus">📲 Get Takeaways Tonight? on your phone</button></div>
+<div class="hero-actions"><button class="primary" id="installAppButton" type="button" aria-describedby="installStatus" data-app-name="Takeaways Tonight?">📲 Install Takeaways Tonight?</button></div>
 <p id="installStatus" role="status" hidden></p>
 <div class="poster-region">ALL NINE SOUTH AFRICAN PROVINCES</div>
 </div>
 </header>
-<script>
-(() => {
-  const installButton = document.getElementById("installAppButton");
-  const installStatus = document.getElementById("installStatus");
-  let installPrompt = null;
-
-  function showInstallStatus(message) {
-    installStatus.textContent = message;
-    installStatus.hidden = !message;
-  }
-
-  if (window.matchMedia("(display-mode: standalone)").matches ||
-      navigator.standalone === true || window.Capacitor?.isNativePlatform?.()) {
-    installButton.hidden = true;
-    return;
-  }
-
-  window.addEventListener("beforeinstallprompt", event => {
-    event.preventDefault();
-    installPrompt = event;
-    if (!installStatus.hidden) {
-      showInstallStatus("Tap the button again, then choose Install.");
-    }
-  });
-
-  const installAccepted = "Install requested. Look for Takeaways Tonight? on your home screen or in your apps.";
-
-  window.addEventListener("appinstalled", () => {
-    installPrompt = null;
-    installButton.hidden = true;
-    showInstallStatus(installAccepted);
-  });
-
-  installButton.addEventListener("click", async () => {
-    const prompt = installPrompt;
-    if (prompt) {
-      installPrompt = null;
-      installButton.disabled = true;
-      try {
-        const result = (await prompt.prompt()) ?? (await prompt.userChoice);
-        if (result?.outcome === "accepted") {
-          showInstallStatus(installAccepted);
-          return;
-        }
-      } catch (error) {
-        console.warn("The browser could not open the install prompt.", error);
-      } finally {
-        installButton.disabled = false;
-      }
-    }
-
-    if (/android/i.test(navigator.userAgent)) {
-      showInstallStatus("In Chrome, tap ⋮ → Add to Home screen or Install and create shortcut → Install. If you opened this link inside another app, choose Open in Chrome first. A Create shortcut option on its own adds a link that opens in Chrome.");
-    } else if (/iphone|ipad|ipod/i.test(navigator.userAgent) ||
-               (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)) {
-      showInstallStatus("Open this page in Safari. Tap Share → Add to Home Screen, turn on Open as Web App if shown, then tap Add.");
-    } else {
-      showInstallStatus("Open this same link on your phone and tap this button there.");
-    }
-  });
-})();
-</script>
+<script src="install-app.js?v=85"></script>
 <main>
 <div class="section-ribbon" id="campaigns"><span>★</span> South Africa food campaigns <span>★</span></div>
 <div class="deals"><div class="deal"><small>FOOD CHALLENGE</small><h3>The R100<br>meal challenge</h3><p>Find a filling local deal for a hundred rand.</p><b>R100</b></div><div class="deal"><small>SPECIALS</small><h3>Give local<br>food a go</h3><p>Discover a new South Coast favourite.</p><b>★</b></div><div class="deal"><small>FOOD WARS</small><h3>Who serves<br>it best?</h3><p>Help choose the people's favourite.</p><b>♥</b></div></div>
-<section id="owners" class="promo-panel"><div class="eyebrow">FOOD BUSINESS OWNERS</div><h2>Put your menu in front of hungry locals.</h2><p>Restaurants, takeaway shops, home-based takeaways, inyama shops and coffee shops are all welcome. Join South Africa's local food discovery platform, showcase your menu and specials, and reach customers across all nine provinces.</p><div style="display:flex;flex-wrap:wrap;gap:10px"><button onclick="openAdmin()">APPLY TO JOIN</button><button class="secondary" onclick="inviteRestaurant()">INVITE A RESTAURANT</button></div><p class="notice">14-DAY FREE PILOT FOR EVERY FOOD BUSINESS: Submit a secure application, confirm your owner email address and wait for approval. The free 14-day pilot starts only after approval. Customers pay the restaurant directly. Takeaways Tonight takes no commission and does not collect food-order payments. Platform continuation billing is being rebuilt; no platform payment is taken in this app.</p></section>
+<section id="owners" class="promo-panel"><div class="eyebrow">FOOD BUSINESS OWNERS</div><h2>Put your menu in front of hungry locals.</h2><p>Restaurants, takeaway shops, home-based takeaways, inyama shops and coffee shops are all welcome. Join South Africa's local food discovery platform, showcase your menu and specials, and reach customers across all nine provinces.</p><div style="display:flex;flex-wrap:wrap;gap:10px"><button onclick="openAdmin()">APPLY TO JOIN</button><button class="secondary" onclick="inviteRestaurant()">INVITE A RESTAURANT</button></div><p>Already registered? <a href="restaurant-portal.html" style="color:inherit;text-decoration:underline">Open the Restaurant Portal</a>.</p><p class="notice">14-DAY FREE PILOT FOR EVERY FOOD BUSINESS: Submit a secure application, confirm your owner email address and wait for approval. The free 14-day pilot starts only after approval. Customers pay the restaurant directly. Takeaways Tonight takes no commission and does not collect food-order payments. Platform continuation billing is being rebuilt; no platform payment is taken in this app.</p></section>
 <section id="restaurantDirectory" hidden tabindex="-1" aria-labelledby="restaurantDirectoryHeading">
  <div class="section-head"><div><h2 id="restaurantDirectoryHeading">Choose a restaurant</h2><p id="resultCount"></p></div></div>
  <div class="field"><label for="restaurantSearch">Search by restaurant, food or area</label><input type="search" id="restaurantSearch" oninput="render()" autocomplete="off"></div>
@@ -870,13 +810,6 @@ render();
 loadLiveAdverts();
 detectCustomerLocation();
 loadSharedRestaurants().then(restorePendingCheckout);
-  if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
-   let refreshingForNewRelease=false;
-   window.addEventListener("load", () => navigator.serviceWorker.register("./service-worker.js?v=84",{updateViaCache:"none"}).then(registration=>{
-    navigator.serviceWorker.addEventListener("controllerchange",()=>{if(!refreshingForNewRelease){refreshingForNewRelease=true;window.location.reload();}});
-    return registration.update();
-   }).catch(() => {}));
-  }
 </script>
 <script type="module" src="native-auth.js"></script>
 <script type="module" src="push-tap-handler.js"></script>

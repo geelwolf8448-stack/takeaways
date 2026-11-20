@@ -1,10 +1,12 @@
-const CACHE_NAME = "takeaways-tonight-v84-install";
+const CACHE_NAME = "takeaways-tonight-v85-install";
 const APP_FILES = [
   "./",
   "./index.html",
   "./privacy.html",
   "./terms.html",
-  "./manifest.webmanifest?v=84",
+  "./manifest.webmanifest?v=85",
+  "./restaurant.webmanifest?v=85",
+  "./install-app.js?v=85",
   "./icon-192.png",
   "./icon-512.png",
   "./icon.svg",

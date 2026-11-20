@@ -29,7 +29,7 @@ function compileInlineScripts(file) {
 
 const publicPage = compileInlineScripts("index.html");
 check("public page contains an inline application script", publicPage.count > 0);
-check("phone-install button uses the customer-facing Takeaways Tonight wording", /id="installAppButton"[^>]*>📲 Get Takeaways Tonight\? on your phone</.test(publicPage.html));
+check("the homepage offers customer installation and links to the restaurant portal", /id="installAppButton"[^>]*>📲 Install Takeaways Tonight\?</.test(publicPage.html) && /href="restaurant-portal\.html"[^>]*>Open the Restaurant Portal</.test(publicPage.html));
 const requiredIds = [
   "restaurants", "resultCount", "basketCount", "directoryStatus",
   "menuDialog", "menuContent", "basketDialog", "basketContent", "sendOrder",
@@ -70,7 +70,7 @@ check("customer start keeps one direct Explore and Order action without duplicat
 check("customer page does not repeat the Explore action above the restaurant list", !/<div class="section-ribbon" id="featured">/.test(publicPage.html) && !/Explore restaurants & menus/.test(publicPage.html));
 check("customer page omits the nonessential How Takeaways Tonight works explainer", !/How Takeaways Tonight\? works/.test(publicPage.html) && !/1\. DISCOVER/.test(publicPage.html));
 check("the directory provides loading, empty and retry states", /<section id="restaurantDirectory" hidden/.test(publicPage.html) && /Loading restaurants/.test(publicPage.html) && /No participating restaurants are available yet/.test(publicPage.html) && /refreshRestaurantDirectory\(\)/.test(publicPage.html));
-check("customer start has one phone-install action directly below Explore and Order without a duplicate install panel", /id="installAppButton"[^>]*>📲 Get Takeaways Tonight\? on your phone</.test(publicPage.html) && publicPage.html.indexOf('EXPLORE & ORDER NOW') < publicPage.html.indexOf('id="installAppButton"') && publicPage.html.indexOf('id="installAppButton"') < publicPage.html.indexOf('class="poster-region"') && !/<section id="installAppCard"/.test(publicPage.html) && !/id="installHint"/.test(publicPage.html));
+check("customer start has one install action directly below Explore and Order without a duplicate install panel", /id="installAppButton"[^>]*>📲 Install Takeaways Tonight\?</.test(publicPage.html) && publicPage.html.indexOf('EXPLORE & ORDER NOW') < publicPage.html.indexOf('id="installAppButton"') && publicPage.html.indexOf('id="installAppButton"') < publicPage.html.indexOf('class="poster-region"') && !/<section id="installAppCard"/.test(publicPage.html) && !/id="installHint"/.test(publicPage.html));
 check("the directory allows searches by restaurant, food or area and shows an empty search state", /id="restaurantSearch" oninput="render\(\)"/.test(publicPage.html) && /No restaurants match your search/.test(publicPage.html));
 check("public customer page has no Takeaways Tonight support WhatsApp or QR contact shortcut", !/https:\/\/wa\.me\/27833149674/.test(publicPage.html) && !/<section id="contact"/.test(publicPage.html) && !/whatsapp-qr\.svg/.test(publicPage.html));
 check("customer interior uses the night market palette without white panels or white reading", /Customer interior — night market palette without white panels or white reading/.test(publicPage.html) && /--tt-cream:#120e16/.test(publicPage.html) && /#installAppButton\{background:#2b1b2c/.test(publicPage.html) && /dialog\{background:#211722/.test(publicPage.html));
@@ -179,7 +179,7 @@ check("marketplace API only grants owner access to published restaurants", /rest
 const worker = read("service-worker.js");
 new vm.Script(worker, { filename: "service-worker.js" });
 check("service worker JavaScript compiles", true);
-check("browser checks for the newest app update without reusing a saved worker file", /serviceWorker\.register\("\.\/service-worker\.js\?v=84",\{updateViaCache:"none"\}\)\.then\(registration=>/.test(publicPage.html) && /controllerchange/.test(publicPage.html));
+check("shared install setup checks for an updated service worker directly", /serviceWorker\.register\("\.\/service-worker\.js\?v=85", \{ updateViaCache: "none" \}\)/.test(read("install-app.js")));
 for (const file of ["manifest.webmanifest", "config.js", "logo.svg", "icon.svg", "privacy.html", "terms.html", "account.html", "restaurant-portal.html"]) {
   check(file + " exists", fs.existsSync(path.join(root, file)));
 }
@@ -197,7 +197,12 @@ for (const size of [192, 512]) {
   check("PWA icon matches its declared dimensions", png.readUInt32BE(16) === size && png.readUInt32BE(20) === size);
   check("PWA icon is cached for install", worker.includes('"./' + icon.src + '"'));
 }
-check("phone install opens the browser prompt and explains the Android shortcut fallback", /await prompt\.prompt\(\)/.test(publicPage.html) && /Add to Home screen/.test(publicPage.html) && /Create shortcut/.test(publicPage.html));
+const installScript = read("install-app.js");
+new vm.Script(installScript, { filename: "install-app.js" });
+const restaurantManifest = JSON.parse(read("restaurant.webmanifest"));
+check("the restaurant install opens the scoped portal under a distinct app identity", restaurantManifest.id !== manifest.id && restaurantManifest.start_url === "./restaurant-portal.html" && restaurantManifest.scope === restaurantManifest.start_url && restaurantManifest.display === "standalone");
+check("both install buttons share browser prompts and phone and laptop instructions", [publicPage.html, restaurantPortal.html].every(html => /src="install-app\.js\?v=85"/.test(html) && /id="installAppButton"/.test(html)) && /await prompt\.prompt\(\)/.test(installScript) && /Add to Home screen/.test(installScript) && /Create shortcut/.test(installScript) && /Add to Dock/.test(installScript) && /Install this site as an app/.test(installScript));
+check("restaurant install assets are cached and included in the Android web bundle", ["restaurant.webmanifest", "install-app.js"].every(file => worker.includes('"./' + file + '?v=85"') && read("scripts/prepare-web.js").includes('"' + file + '"')));
 check("service worker cache includes the secure sign-in callback", /reset-password\.html/.test(worker));
 check("service worker cache includes customer and restaurant portals", /account\.html/.test(worker) && /restaurant-portal\.html/.test(worker));
 check("service worker cache includes native auth handler", /native-auth\.js/.test(worker));

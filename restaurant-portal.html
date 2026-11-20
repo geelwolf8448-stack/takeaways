@@ -3,8 +3,11 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#080808">
+<link rel="manifest" href="restaurant.webmanifest?v=85">
+<link rel="apple-touch-icon" href="icon-192.png">
 <meta name="robots" content="noindex,nofollow"><title>Restaurant Portal · Takeaways Tonight?</title>
 <style>
+#installAppButton[hidden]{display:none!important}
 :root{color-scheme:dark;--gold:#ffd21a;--panel:#17100a;--muted:#d4c8bb}
 *{box-sizing:border-box}body{margin:0;background:#050505;color:#fff;font:15px/1.5 Arial,sans-serif}
 header{padding:22px 18px;border-bottom:3px solid var(--gold);background:linear-gradient(110deg,#050505,#381609,#090909)}
@@ -27,6 +30,9 @@ main.wrap{max-width:1120px;padding:0 clamp(14px,3vw,32px) 48px;margin:-24px auto
 <body>
 <header class="owner-poster"><div class="owner-nav"><span class="owner-nav-title">🍽️ RESTAURANT OWNER DASHBOARD</span><div class="owner-nav-links"><a href="#restaurants">Manage adverts & specials</a><a href="index.html">← Customer app</a></div></div><div class="owner-brand"><img class="owner-logo" src="logo.svg" alt="Takeaways Tonight? — chef hat and delivery rider logo"><div class="owner-tagline">Build your menu. Reach hungry locals.</div><p class="owner-intro">Your laptop workspace for your restaurant profile, food photos, prices, payment choices, specials and customer orders.</p><a class="owner-primary" href="#loginPanel">SIGN IN TO YOUR DASHBOARD</a></div></header>
 <main class="wrap">
+<button class="secondary" id="installAppButton" type="button" aria-describedby="installStatus" data-app-name="Takeaways Tonight? Restaurant Portal">Install Restaurant Portal</button>
+<p id="installStatus" class="small" role="status" hidden></p>
+<script src="install-app.js?v=85"></script>
 <section class="panel" id="loginPanel">
 <h2>Restaurant owner sign in</h2><div class="status"><b>14-DAY FREE PILOT</b><br>Every restaurant, takeaway shop, home-based takeaway, inyama shop and coffee shop gets a free 14-day pilot after its private application is verified and approved. No commission is charged on food orders — you keep 100% of your food sales. Your signed-in dashboard shows your pilot dates. Platform continuation billing is being rebuilt, and no platform payment is taken from this dashboard.</div><p class="small">After submitting an application, confirm your owner email address and wait for approval. Then sign in with the email address and password you created. You can also request a one-time secure sign-in link.</p>
 <label for="name">Your name (for a sign-in link)</label><input id="name" autocomplete="name" placeholder="Full name">
